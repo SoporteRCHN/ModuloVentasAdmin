@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace Datos
+namespace DatosVentasAdmin
 {
     public class EnviarConsultas
     {
@@ -1107,5 +1107,210 @@ namespace Datos
 
             return tabla;
         }
+        public DataTable SP_CiudadesENAC(dynamic a)
+        {
+            SqlDataReader leer = null;
+            SqlCommand comando = new SqlCommand();
+            DataTable tabla = new DataTable();
+
+            if (tabla.Rows.Count > 0)
+            {
+                tabla.Rows.Clear();
+                tabla.Clear();
+            }
+
+            // Abrir conexión (ajusta el parámetro según tu configuración)
+            comando.Connection = Conexion.AbrirConexion(4);
+
+            // Parámetros del procedimiento
+            comando.Parameters.AddWithValue("@Opcion", a.Opcion ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Ciudad", a.Ciudad ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Nombre", a.Nombre ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Ruta", a.Ruta ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Sucursal", a.Sucursal ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@CiudadSucursalPrincipal", a.CiudadSucursalPrincipal ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Lunes", a.Lunes ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Martes", a.Martes ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Miercoles", a.Miercoles ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Jueves", a.Jueves ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Viernes", a.Viernes ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Sabados", a.Sabados ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Domingos", a.Domingos ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Pais", a.Pais ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Empresa", a.Empresa ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@UPosteo", a.UPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@FPosteo", a.FPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@PC", a.PC ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Observacion", a.Observacion ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Zona", a.Zona ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@CiudadPrincipal", a.CiudadPrincipal ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Cabecera", a.Cabecera ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@SucursalPago", a.SucursalPago ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@act", a.act ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Tabla", a.Tabla ?? (object)DBNull.Value);
+
+            // Nombre del procedimiento
+            comando.CommandText = "ENAC.dbo.SP_Ciudades";
+            comando.CommandType = CommandType.StoredProcedure;
+
+            // Ejecutar y cargar resultados
+            leer = comando.ExecuteReader();
+            tabla.Load(leer);
+
+            Conexion.CerrarConexion();
+
+            return tabla;
+        }
+        public DataTable SP_ProductosENAC(dynamic a)
+        {
+            SqlDataReader leer = null;
+            SqlCommand comando = new SqlCommand();
+            DataTable tabla = new DataTable();
+
+            if (tabla.Rows.Count > 0)
+            {
+                tabla.Rows.Clear();
+                tabla.Clear();
+            }
+
+            // Abrir conexión (ajusta el parámetro según tu configuración)
+            comando.Connection = Conexion.AbrirConexion(4);
+
+            // Parámetros del procedimiento
+            comando.Parameters.AddWithValue("@Opcion", a.Opcion ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Producto", a.Producto ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Nombre", a.Nombre ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@CostoSencillo", a.CostoSencillo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Activo", a.Activo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Empresa", a.Empresa ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@UPosteo", a.UPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@FPosteo", a.FPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@PC", a.PC ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Cliente", a.Cliente ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Listo", a.Listo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@act", a.Act ?? (object)DBNull.Value);
+
+            // Nombre del procedimiento
+            comando.CommandText = "ENAC.dbo.SP_Productos";
+            comando.CommandType = CommandType.StoredProcedure;
+
+            // Ejecutar y cargar resultados
+            leer = comando.ExecuteReader();
+            tabla.Load(leer);
+
+            Conexion.CerrarConexion();
+
+            return tabla;
+        }
+        public DataTable SP_ProductoCostosENAC(dynamic a)
+        {
+            SqlDataReader leer = null;
+            SqlCommand comando = new SqlCommand();
+            DataTable tabla = new DataTable();
+
+            if (tabla.Rows.Count > 0)
+            {
+                tabla.Rows.Clear();
+                tabla.Clear();
+            }
+
+            // Abrir conexión (ajusta el parámetro según tu configuración)
+            comando.Connection = Conexion.AbrirConexion(3);
+
+            // Parámetros del procedimiento
+            comando.Parameters.AddWithValue("@Opcion", a.Opcion ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Producto", a.Producto ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@CiudadRemitente", a.CiudadRemitente ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@CiudadDestino", a.CiudadDestino ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Costo", a.Costo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Empresa", a.Empresa ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@UPosteo", a.UPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@FPosteo", a.FPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@PC", a.PC ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@CostoRecolector", a.CostoRecolector ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@act", a.Act ?? (object)DBNull.Value);
+
+            // Nombre del procedimiento
+            comando.CommandText = "ENAC.dbo.SP_ProductoCostos";
+            comando.CommandType = CommandType.StoredProcedure;
+
+            // Ejecutar y cargar resultados
+            leer = comando.ExecuteReader();
+            tabla.Load(leer);
+
+            Conexion.CerrarConexion();
+
+            return tabla;
+        }
+        public DataTable SP_CotizacionEncabezado(dynamic a)
+        {
+            SqlDataReader leer = null;
+            SqlCommand comando = new SqlCommand();
+            DataTable tabla = new DataTable();
+
+            if (tabla.Rows.Count > 0)
+            {
+                tabla.Rows.Clear();
+                tabla.Clear();
+            }
+
+            comando.Connection = Conexion.AbrirConexion(3);
+
+            comando.Parameters.AddWithValue("@Opcion", a.Opcion ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@EncabezadoID", a.EncabezadoID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@TipoCotizacionID", a.TipoCotizacionID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@ImpuestoID", a.ImpuestoID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@UPosteo", a.UPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@FPosteo", a.FPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@PC", a.PC ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Estado", a.Estado ?? (object)DBNull.Value);
+
+            comando.CommandText = "RCCONFIG.Empresa.SP_CotizacionEncabezado";
+            comando.CommandType = CommandType.StoredProcedure;
+
+            leer = comando.ExecuteReader();
+            tabla.Load(leer);
+
+            Conexion.CerrarConexion();
+
+            return tabla;
+        }
+        public DataTable SP_CotizacionDetalle(dynamic a)
+        {
+            SqlDataReader leer = null;
+            SqlCommand comando = new SqlCommand();
+            DataTable tabla = new DataTable();
+
+            if (tabla.Rows.Count > 0)
+            {
+                tabla.Rows.Clear();
+                tabla.Clear();
+            }
+
+            comando.Connection = Conexion.AbrirConexion(3);
+
+            comando.Parameters.AddWithValue("@Opcion", a.Opcion ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@DetalleID", a.DetalleID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@EncabezadoID", a.EncabezadoID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@CiudadOrigenID", a.CiudadOrigenID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@CiudadDestinoID", a.CiudadDestinoID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@ProductoID", a.ProductoID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Precio", a.Precio ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@UPosteo", a.UPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@FPosteo", a.FPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@PC", a.PC ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Estado", a.Estado ?? (object)DBNull.Value);
+
+            comando.CommandText = "RCCONFIG.Empresa.SP_CotizacionDetalle";
+            comando.CommandType = CommandType.StoredProcedure;
+
+            leer = comando.ExecuteReader();
+            tabla.Load(leer);
+
+            Conexion.CerrarConexion();
+
+            return tabla;
+        }
+
     }
 }

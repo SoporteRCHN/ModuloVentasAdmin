@@ -1,4 +1,4 @@
-﻿namespace ModuloLanzador.LoginMenu
+﻿namespace ModuloVentasAdmin.LoginMenu
 {
     partial class Login
     {
@@ -83,7 +83,7 @@
             // pbxSalir
             // 
             this.pbxSalir.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.pbxSalir.Image = global::ModuloLanzador.Properties.Resources.close_24px;
+            this.pbxSalir.Image = global::ModuloVentasAdmin.Properties.Resources.close_24px;
             this.pbxSalir.Location = new System.Drawing.Point(335, 11);
             this.pbxSalir.Name = "pbxSalir";
             this.pbxSalir.Size = new System.Drawing.Size(27, 24);
@@ -207,7 +207,7 @@
             // pictureBox3
             // 
             this.pictureBox3.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.pictureBox3.Image = global::ModuloLanzador.Properties.Resources.Password_32px;
+            this.pictureBox3.Image = global::ModuloVentasAdmin.Properties.Resources.Password_32px;
             this.pictureBox3.Location = new System.Drawing.Point(7, 3);
             this.pictureBox3.Name = "pictureBox3";
             this.pictureBox3.Size = new System.Drawing.Size(38, 34);
@@ -236,7 +236,7 @@
             // pictureBox2
             // 
             this.pictureBox2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.pictureBox2.Image = global::ModuloLanzador.Properties.Resources.user_shield_32px;
+            this.pictureBox2.Image = global::ModuloVentasAdmin.Properties.Resources.user_shield_32px;
             this.pictureBox2.Location = new System.Drawing.Point(6, 2);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(38, 34);

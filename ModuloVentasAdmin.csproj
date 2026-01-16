@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F93D648C-0456-4888-AC3E-29669FE45E14}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>ModuloLanzador</RootNamespace>
-    <AssemblyName>ModuloLanzador</AssemblyName>
+    <RootNamespace>ModuloVentasAdmin</RootNamespace>
+    <AssemblyName>ModuloVentasAdmin</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -46,6 +46,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmCotizacionDinamica_BCK.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCotizacionDinamica_BCK.Designer.cs">
+      <DependentUpon>frmCotizacionDinamica_BCK.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmCotizacionDinamica.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCotizacionDinamica.Designer.cs">
+      <DependentUpon>frmCotizacionDinamica.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmCotizaciones_BCK.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCotizaciones_BCK.Designer.cs">
+      <DependentUpon>frmCotizaciones_BCK.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmCotizaciones.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCotizaciones.Designer.cs">
+      <DependentUpon>frmCotizaciones.cs</DependentUpon>
+    </Compile>
     <Compile Include="LoginMenu\DynamicMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -61,6 +85,18 @@
     <Compile Include="LoginMenu\RegistroAcciones.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="frmCotizacionDinamica_BCK.resx">
+      <DependentUpon>frmCotizacionDinamica_BCK.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCotizacionDinamica.resx">
+      <DependentUpon>frmCotizacionDinamica.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCotizaciones_BCK.resx">
+      <DependentUpon>frmCotizaciones_BCK.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCotizaciones.resx">
+      <DependentUpon>frmCotizaciones.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LoginMenu\DynamicMain.resx">
       <DependentUpon>DynamicMain.cs</DependentUpon>
     </EmbeddedResource>
@@ -91,16 +127,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Datos\DatosVentasAdmin.csproj">
-      <Project>{fd185ceb-75b1-4307-8332-5640881e65cb}</Project>
-      <Name>DatosVentasAdmin</Name>
-    </ProjectReference>
-    <ProjectReference Include="Logica\LogicaVentasAdmin.csproj">
-      <Project>{a269eebe-d736-482c-9e05-eff20f850f78}</Project>
-      <Name>LogicaVentasAdmin</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\white_menu_64px.png" />
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +149,19 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\logocirculo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\blue_Checkmark_22px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Datos\DatosVentasAdmin.csproj">
+      <Project>{fd185ceb-75b1-4307-8332-5640881e65cb}</Project>
+      <Name>DatosVentasAdmin</Name>
+    </ProjectReference>
+    <ProjectReference Include="Logica\LogicaVentasAdmin.csproj">
+      <Project>{a269eebe-d736-482c-9e05-eff20f850f78}</Project>
+      <Name>LogicaVentasAdmin</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

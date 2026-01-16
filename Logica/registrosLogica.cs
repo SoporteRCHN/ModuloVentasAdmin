@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Datos;
+using DatosVentasAdmin;
 using Microsoft.Win32;
 
-namespace Logica
+namespace LogicaVentasAdmin
 {
     public class registrosLogica
     {

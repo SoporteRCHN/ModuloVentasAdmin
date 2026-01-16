@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ModuloLanzador.Properties {
+namespace ModuloVentasAdmin.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace ModuloLanzador.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ModuloLanzador.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ModuloVentasAdmin.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -66,6 +66,16 @@ namespace ModuloLanzador.Properties {
         internal static System.Drawing.Bitmap bill_26px {
             get {
                 object obj = ResourceManager.GetObject("bill_26px", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap blue_Checkmark_22px {
+            get {
+                object obj = ResourceManager.GetObject("blue_Checkmark_22px", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

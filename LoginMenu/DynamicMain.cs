@@ -1,6 +1,6 @@
-﻿using Logica;
+﻿using LogicaVentasAdmin;
 
-using ModuloLanzador.LoginMenu;
+using ModuloVentasAdmin.LoginMenu;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ModuloLanzador
+namespace ModuloVentasAdmin
 {
     public partial class DynamicMain : Form
     {
@@ -70,22 +70,16 @@ namespace ModuloLanzador
             CargarEncabezado(usuario);
             usuarionombre = usuario;
             usuarionlogin = usuario;
-            ModuloID = 28;
+            ModuloID = 29;
            
             FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
             string versionStr = $"{versionInfo.ProductMajorPart}.{versionInfo.ProductMinorPart}.{versionInfo.ProductBuildPart}.{versionInfo.ProductPrivatePart}";
 
 
             toolStripLabel2.Text = versionStr;
-            if (Datos.BD_Conexion.servidor.ToString() == "192.168.1.180")
-            {
-                rutaEmitirEvento = "http://192.168.1.179:3001";
-            }
-            else
-            {
-                rutaEmitirEvento = "https://app.rapidocargo.online:3000";
-            }
-            toolStripLabel4.Text = Datos.BD_Conexion.servidor.ToString();
+           
+            rutaEmitirEvento = "https://app.rapidocargo.online:3000";
+            toolStripLabel4.Text = DatosVentasAdmin.BD_Conexion.servidor.ToString();
             toolStripLabel6.Text = usuarionlogin;
 
             BuscarMenuFinal();
@@ -255,7 +249,7 @@ namespace ModuloLanzador
         }
         private Dictionary<string, Image> iconDictionary = new Dictionary<string, Image>
         {
-             { "frmFacturasGeneral", global::ModuloLanzador.Properties.Resources.bill_26px },
+             { "frmFacturasGeneral", global::ModuloVentasAdmin.Properties.Resources.bill_26px },
         };
 
         private void CargarMenuDinamico(DataTable dtMenuOpciones)
@@ -305,15 +299,15 @@ namespace ModuloLanzador
             {
                 if (nivel == 0)
                 {
-                    btnMenu.Image = global::ModuloLanzador.Properties.Resources.white_sort_right_16px;
+                    btnMenu.Image = global::ModuloVentasAdmin.Properties.Resources.white_sort_right_16px;
                     btnMenu.Tag = "collapsed";
                 }
                 else
                 {
                     var hijos = dtMenuOpciones.AsEnumerable().Where(r => Convert.ToInt32(r["PadreID"]) == menuID).ToList();
                     btnMenu.Image = hijos.Count > 0
-                        ? global::ModuloLanzador.Properties.Resources.white_sort_down_16px
-                        : global::ModuloLanzador.Properties.Resources.white_sort_right_16px;
+                        ? global::ModuloVentasAdmin.Properties.Resources.white_sort_down_16px
+                        : global::ModuloVentasAdmin.Properties.Resources.white_sort_right_16px;
                 }
 
                 btnMenu.ImageAlign = ContentAlignment.MiddleLeft;
@@ -362,8 +356,8 @@ namespace ModuloLanzador
                 // Padre sin hijos → abrir formulario
                 switch (clickedButton.Text.Trim())
                 {
-                    case "Configuracion":
-                        //LanzarForm(new frmPerfilesUsuarios(), "HOME / ADMINISTRAR PERFILES");
+                    case "COTIZACIONES":
+                        LanzarForm(new frmCotizaciones(), "HOME / ADMINISTRAR COTIZACIONES");
                         break;
                 }
                 return;
@@ -392,8 +386,8 @@ namespace ModuloLanzador
 
                 // Cambiar ícono del botón padre según estado
                 clickedButton.Image = shouldExpand
-                    ? global::ModuloLanzador.Properties.Resources.white_sort_down_16px
-                    : global::ModuloLanzador.Properties.Resources.white_sort_right_16px;
+                    ? global::ModuloVentasAdmin.Properties.Resources.white_sort_down_16px
+                    : global::ModuloVentasAdmin.Properties.Resources.white_sort_right_16px;
                 return;
             }
 

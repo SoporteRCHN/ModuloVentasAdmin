@@ -1,4 +1,4 @@
-﻿using Logica;
+﻿using LogicaVentasAdmin;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ModuloLanzador.LoginMenu
+namespace ModuloVentasAdmin.LoginMenu
 {
     public partial class Login : Form
     {

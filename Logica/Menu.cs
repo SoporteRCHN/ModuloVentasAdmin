@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Logica
+namespace LogicaVentasAdmin
 {
     public class Menu
     {
@@ -416,4 +416,88 @@ namespace Logica
         public bool? ExcepcionCaja { get; set; }
         public string Comentario { get; set; }
     }
+    public class CiudadesENAC
+    {
+        public string Opcion { get; set; }
+        public string Ciudad { get; set; }
+        public string Nombre { get; set; }
+        public string Ruta { get; set; }
+        public string Sucursal { get; set; }
+        public bool? CiudadSucursalPrincipal { get; set; }
+        public bool? Lunes { get; set; }
+        public bool? Martes { get; set; }
+        public bool? Miercoles { get; set; }
+        public bool? Jueves { get; set; }
+        public bool? Viernes { get; set; }
+        public bool? Sabados { get; set; }
+        public bool? Domingos { get; set; }
+        public string Pais { get; set; }
+        public string Empresa { get; set; }
+        public string UPosteo { get; set; }
+        public DateTime? FPosteo { get; set; }
+        public string PC { get; set; }
+        public string Observacion { get; set; }
+        public string Zona { get; set; }
+        public string CiudadPrincipal { get; set; }
+        public bool? Cabecera { get; set; }
+        public string SucursalPago { get; set; }
+        public string act { get; set; }
+        public string Tabla { get; set; }
+    }
+    public class ProductosENAC
+    {
+        public string Opcion { get; set; }
+        public string Producto { get; set; }
+        public string Nombre { get; set; }
+        public decimal? CostoSencillo { get; set; }
+        public bool? Activo { get; set; }
+        public string Empresa { get; set; }
+        public string UPosteo { get; set; }
+        public DateTime? FPosteo { get; set; }
+        public string PC { get; set; }
+        public string Cliente { get; set; }
+        public string Listo { get; set; }
+        public string Act { get; set; }
+    }
+    public class ProductoCostosENAC
+    {
+        public string Opcion { get; set; }
+        public string Producto { get; set; }
+        public string CiudadRemitente { get; set; }
+        public string CiudadDestino { get; set; }
+        public decimal? Costo { get; set; }
+        public string Empresa { get; set; }
+        public string UPosteo { get; set; }
+        public DateTime? FPosteo { get; set; }
+        public string PC { get; set; }
+        public decimal? CostoRecolector { get; set; }
+        public string Act { get; set; }
+    }
+    public class CotizacionEncabezadoDTO
+    {
+        public string Opcion { get; set; }
+        public long? EncabezadoID { get; set; }
+        public int? TipoCotizacionID { get; set; }
+        public int? ImpuestoID { get; set; }
+        public string UPosteo { get; set; }
+        public DateTime? FPosteo { get; set; }
+        public string PC { get; set; }
+        public bool? Estado { get; set; }
+    }
+    public class CotizacionDetalleDTO
+    {
+        public string Opcion { get; set; }
+        public long? DetalleID { get; set; }
+        public long? EncabezadoID { get; set; }
+        public int? CiudadOrigenID { get; set; }
+        public int? CiudadDestinoID { get; set; }
+        public int? ProductoID { get; set; }
+        public decimal? Precio { get; set; }
+        public string UPosteo { get; set; }
+        public DateTime? FPosteo { get; set; }
+        public string PC { get; set; }
+        public bool? Estado { get; set; }
+    }
+
+
 }

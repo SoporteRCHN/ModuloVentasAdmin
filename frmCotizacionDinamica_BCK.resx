@@ -117,32 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="logocirculo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\logocirculo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="close_24px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\close_24px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="white_sort_down_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\white_sort_down_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="white_sort_right_16px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\white_sort_right_16px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="bill_26px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\bill_26px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Password_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Password_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="user_shield_32px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\user_shield_32px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="white_menu_64px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\white_menu_64px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="blue_Checkmark_22px" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\blue_Checkmark_22px.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
 </root>

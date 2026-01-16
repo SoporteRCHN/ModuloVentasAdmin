@@ -1,4 +1,4 @@
-﻿using Datos;
+﻿using DatosVentasAdmin;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Logica
+namespace LogicaVentasAdmin
 {
     public class clsLogica
     {
@@ -179,5 +179,36 @@ namespace Logica
             tabla = enviar.SP_MenuDinamico(a);
             return tabla;
         }
+        public DataTable SP_CiudadesENAC(CiudadesENAC a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_CiudadesENAC(a);
+            return tabla;
+        }
+        public DataTable SP_ProductosENAC(ProductosENAC a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_ProductosENAC(a);
+            return tabla;
+        }
+        public DataTable SP_ProductoCostosENAC(ProductoCostosENAC a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_ProductoCostosENAC(a);
+            return tabla;
+        }
+        public DataTable SP_CotizacionEncabezado(CotizacionEncabezadoDTO a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_CotizacionEncabezado(a);
+            return tabla;
+        }
+        public DataTable SP_CotizacionDetalle(CotizacionDetalleDTO a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_CotizacionDetalle(a);
+            return tabla;
+        }
+
     }
 }

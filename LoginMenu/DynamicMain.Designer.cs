@@ -1,4 +1,4 @@
-﻿namespace ModuloLanzador
+﻿namespace ModuloVentasAdmin
 {
     partial class DynamicMain
     {
@@ -292,7 +292,7 @@
             // 
             // pbxMenu
             // 
-            this.pbxMenu.Image = global::ModuloLanzador.Properties.Resources.white_menu_64px;
+            this.pbxMenu.Image = global::ModuloVentasAdmin.Properties.Resources.white_menu_64px;
             this.pbxMenu.Location = new System.Drawing.Point(17, 16);
             this.pbxMenu.Name = "pbxMenu";
             this.pbxMenu.Size = new System.Drawing.Size(26, 26);
@@ -334,7 +334,7 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Image = global::ModuloLanzador.Properties.Resources.logocirculo;
+            this.pictureBox1.Image = global::ModuloVentasAdmin.Properties.Resources.logocirculo;
             this.pictureBox1.Location = new System.Drawing.Point(5, 1);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(44, 43);

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Datos
+namespace DatosVentasAdmin
 {
 
     public class BD_Conexion
@@ -29,7 +29,7 @@ namespace Datos
             }
             else if (valor == 2)
             {
-                Conexion = new SqlConnection("Data Source = " + servidor + "; Initial Catalog=RCCONFIG;User ID=saconf; Password=Qwerty!2024");
+                Conexion = new SqlConnection("Data Source = " + servidor + "; Initial Catalog=RCCONFIG;User ID=sa; Password=Adm1n1s7r4d0r");
             }
             else if (valor == 3)
             {

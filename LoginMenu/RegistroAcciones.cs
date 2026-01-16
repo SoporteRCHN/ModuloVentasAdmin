@@ -1,11 +1,11 @@
-﻿using Logica;
+﻿using LogicaVentasAdmin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModuloLanzador.LoginMenu
+namespace ModuloVentasAdmin.LoginMenu
 {
     public class RegistroAcciones
     {
