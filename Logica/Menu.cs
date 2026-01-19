@@ -478,6 +478,8 @@ namespace LogicaVentasAdmin
         public string Opcion { get; set; }
         public long? EncabezadoID { get; set; }
         public int? TipoCotizacionID { get; set; }
+        public int? ClienteID { get; set; }
+        public string Atencion { get; set; }
         public int? ImpuestoID { get; set; }
         public string UPosteo { get; set; }
         public DateTime? FPosteo { get; set; }
@@ -488,16 +490,44 @@ namespace LogicaVentasAdmin
     {
         public string Opcion { get; set; }
         public long? DetalleID { get; set; }
-        public long? EncabezadoID { get; set; }
-        public int? CiudadOrigenID { get; set; }
-        public int? CiudadDestinoID { get; set; }
-        public int? ProductoID { get; set; }
+        public int? EncabezadoID { get; set; }
+        public string CiudadOrigenID { get; set; }
+        public string CiudadDestinoID { get; set; }
+        public string ProductoID { get; set; }
         public decimal? Precio { get; set; }
         public string UPosteo { get; set; }
         public DateTime? FPosteo { get; set; }
         public string PC { get; set; }
         public bool? Estado { get; set; }
     }
-
-
+    public class CotizacionTerminoDTO
+    {
+        public string Opcion { get; set; } // Agregar, Actualizar, Eliminar, Listar
+        public long? TerminoID { get; set; }
+        public string Descripcion { get; set; }
+        public string UPosteo { get; set; }
+        public DateTime? FPosteo { get; set; }
+        public string PC { get; set; }
+        public bool? Estado { get; set; }
+    }
+    public class CotizacionTipoDTO
+    {
+        public string Opcion { get; set; }
+        public long? TipoID { get; set; }
+        public string Descripcion { get; set; }
+        public string UPosteo { get; set; }
+        public DateTime? FPosteo { get; set; }
+        public string PC { get; set; }
+        public bool? Estado { get; set; }
+    }
+    public class CotizacionImpuestoDTO
+    {
+        public string Opcion { get; set; }
+        public long? ImpuestoID { get; set; }
+        public string Descripcion { get; set; }
+        public string UPosteo { get; set; }
+        public DateTime? FPosteo { get; set; }
+        public string PC { get; set; }
+        public bool? Estado { get; set; }
+    }
 }

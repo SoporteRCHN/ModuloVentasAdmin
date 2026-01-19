@@ -163,5 +163,10 @@
       <Name>LogicaVentasAdmin</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="iTextSharp">
+      <Version>5.5.13.4</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

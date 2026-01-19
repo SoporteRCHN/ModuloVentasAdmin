@@ -116,7 +116,6 @@ namespace ModuloVentasAdmin
                 MessageBox.Show("Ocurrio un problema al actualizar la tasa de cambio en la base de datos", "Aviso Urgente", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return 0;
             }
-            return 0;
         }
         public void SeguimientoUsuario(string _Operacion, int _AccionID)
         {

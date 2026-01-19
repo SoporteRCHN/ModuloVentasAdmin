@@ -209,6 +209,23 @@ namespace LogicaVentasAdmin
             tabla = enviar.SP_CotizacionDetalle(a);
             return tabla;
         }
-
+        public DataTable SP_CotizacionTerminos(CotizacionTerminoDTO a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_CotizacionTerminos(a);
+            return tabla;
+        }
+        public DataTable SP_CotizacionTipo(CotizacionTipoDTO a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_CotizacionTipo(a);
+            return tabla;
+        }
+        public DataTable SP_CotizacionImpuesto(CotizacionImpuestoDTO a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_CotizacionImpuesto(a);
+            return tabla;
+        }
     }
 }

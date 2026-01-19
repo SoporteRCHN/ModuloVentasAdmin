@@ -1259,6 +1259,8 @@ namespace DatosVentasAdmin
             comando.Parameters.AddWithValue("@Opcion", a.Opcion ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@EncabezadoID", a.EncabezadoID ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@TipoCotizacionID", a.TipoCotizacionID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@ClienteID", a.ClienteID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Atencion", a.Atencion ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@ImpuestoID", a.ImpuestoID ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@UPosteo", a.UPosteo ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@FPosteo", a.FPosteo ?? (object)DBNull.Value);
@@ -1302,6 +1304,107 @@ namespace DatosVentasAdmin
             comando.Parameters.AddWithValue("@Estado", a.Estado ?? (object)DBNull.Value);
 
             comando.CommandText = "RCCONFIG.Empresa.SP_CotizacionDetalle";
+            comando.CommandType = CommandType.StoredProcedure;
+
+            leer = comando.ExecuteReader();
+            tabla.Load(leer);
+
+            Conexion.CerrarConexion();
+
+            return tabla;
+        }
+        public DataTable SP_CotizacionTerminos(dynamic a)
+        {
+            SqlDataReader leer = null;
+            SqlCommand comando = new SqlCommand();
+            DataTable tabla = new DataTable();
+
+            if (tabla.Rows.Count > 0)
+            {
+                tabla.Rows.Clear();
+                tabla.Clear();
+            }
+
+            // 🔹 Abre la conexión (usa tu helper de conexión)
+            comando.Connection = Conexion.AbrirConexion(3);
+
+            // 🔹 Parámetros del SP
+            comando.Parameters.AddWithValue("@Opcion", a.Opcion ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@TerminoID", a.TerminoID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Descripcion", a.Descripcion ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@UPosteo", a.UPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@FPosteo", a.FPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@PC", a.PC ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Estado", a.Estado ?? (object)DBNull.Value);
+
+            // 🔹 Nombre del procedimiento
+            comando.CommandText = "RCCONFIG.Empresa.SP_CotizacionTerminos";
+            comando.CommandType = CommandType.StoredProcedure;
+
+            // 🔹 Ejecuta y carga resultados
+            leer = comando.ExecuteReader();
+            tabla.Load(leer);
+
+            Conexion.CerrarConexion();
+
+            return tabla;
+        }
+
+        public DataTable SP_CotizacionTipo(dynamic a)
+        {
+            SqlDataReader leer = null;
+            SqlCommand comando = new SqlCommand();
+            DataTable tabla = new DataTable();
+
+            if (tabla.Rows.Count > 0)
+            {
+                tabla.Rows.Clear();
+                tabla.Clear();
+            }
+
+            comando.Connection = Conexion.AbrirConexion(3);
+
+            comando.Parameters.AddWithValue("@Opcion", a.Opcion ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@TipoID", a.TipoID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Descripcion", a.Descripcion ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@UPosteo", a.UPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@FPosteo", a.FPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@PC", a.PC ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Estado", a.Estado ?? (object)DBNull.Value);
+
+            comando.CommandText = "RCCONFIG.Empresa.SP_CotizacionTipo";
+            comando.CommandType = CommandType.StoredProcedure;
+
+            leer = comando.ExecuteReader();
+            tabla.Load(leer);
+
+            Conexion.CerrarConexion();
+
+            return tabla;
+        }
+        public DataTable SP_CotizacionImpuesto(dynamic a)
+        {
+            SqlDataReader leer = null;
+            SqlCommand comando = new SqlCommand();
+            DataTable tabla = new DataTable();
+
+            if (tabla.Rows.Count > 0)
+            {
+                tabla.Rows.Clear();
+                tabla.Clear();
+            }
+
+            comando.Connection = Conexion.AbrirConexion(3);
+
+            comando.Parameters.AddWithValue("@Opcion", a.Opcion ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@ImpuestoID", a.ImpuestoID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Descripcion", a.Descripcion ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@UPosteo", a.UPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@FPosteo", a.FPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@PC", a.PC ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Estado", a.Estado ?? (object)DBNull.Value);
+
+            comando.CommandText = "RCCONFIG.Empresa.SP_CotizacionImpuesto";
             comando.CommandType = CommandType.StoredProcedure;
 
             leer = comando.ExecuteReader();
