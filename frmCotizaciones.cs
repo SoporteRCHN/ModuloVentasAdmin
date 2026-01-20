@@ -17,6 +17,7 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Rectangle = iTextSharp.text.Rectangle;
 using iTextSharp.text.pdf.parser;
+using ModuloVentasAdmin;
 
 namespace ModuloVentasAdmin
 {
@@ -25,6 +26,8 @@ namespace ModuloVentasAdmin
         public int OrigenID, DestinoID, ProductoID, _EncabezadoID, _DetalleID = 0;
         public string NombreOrigen, NombreDestino, NombreProducto = "";
         public bool _TerminosExisten, _estaActualizando = false;
+
+        AutoCompleteStringCollection listaNombres = new AutoCompleteStringCollection();
 
         public DataTable dtOrigen = new DataTable();
         public DataTable dtDestino = new DataTable();
@@ -56,6 +59,31 @@ namespace ModuloVentasAdmin
             cmbImpuesto.SelectedIndex = 0;
             cargarCotizaciones();
         }
+        private void cargarClientes()
+        {
+            string _Opcion = "BuscarPorCodigoLigero";
+
+            ClienteENAC getClientes = new ClienteENAC
+            {
+                Opcion = _Opcion,
+                Cliente = txtClienteNombre.Text,
+                Nombre = txtClienteNombre.Text,
+            };
+            DataTable dtGetCliente = logica.SP_ClientesENAC(getClientes);
+            if (dtGetCliente.Rows.Count > 0) 
+            {
+                txtClienteID.Text = dtGetCliente.Rows[0]["ClienteID"].ToString();
+                txtClienteNombre.Text = dtGetCliente.Rows[0]["NombreCompleto"].ToString();
+            }
+            else
+            {
+                Toast.Mostrar("No se encontro ese codigo de cliente.", TipoAlerta.Warning);
+                txtClienteNombre.Text = String.Empty;
+                txtClienteID.Text = String.Empty;
+                txtClienteNombre.Focus();
+            }
+        }
+
         private void cargarCotizaciones()
         {
             CotizacionEncabezadoDTO getCotizaciones = new CotizacionEncabezadoDTO
@@ -1129,6 +1157,64 @@ namespace ModuloVentasAdmin
         private void btnPDF_Click_1(object sender, EventArgs e)
         {
             GenerarPDFCotizacion(registrosGenerados, productosGenerados, origenesGenerados, destinosGenerados, dtTerminos);
+        }
+
+        private void rbdNombre_CheckedChanged(object sender, EventArgs e)
+        {
+
+            Form MensajeAdvertencia = new Form();
+            using (frmBuscarClientes Mensaje = new frmBuscarClientes())
+            {
+                MensajeAdvertencia.StartPosition = FormStartPosition.CenterScreen;
+                MensajeAdvertencia.FormBorderStyle = FormBorderStyle.None;
+                MensajeAdvertencia.Opacity = .70d;
+                MensajeAdvertencia.BackColor = Color.Black;
+                MensajeAdvertencia.WindowState = FormWindowState.Maximized;
+                MensajeAdvertencia.Location = this.Location;
+                MensajeAdvertencia.ShowInTaskbar = false;
+                Mensaje.Owner = MensajeAdvertencia;
+                MensajeAdvertencia.Show();
+
+                if (Mensaje.ShowDialog() == DialogResult.OK)
+                {
+                    if (Mensaje.ClienteId != 0)
+                    {
+                        txtClienteNombre.Text = Mensaje.ClienteNombre;
+                        txtClienteID.Text = Mensaje.ClienteId.ToString();
+                    }
+                }
+
+                MensajeAdvertencia.Dispose();
+            }
+        }
+        private void txtClienteNombre_KeyPress(object sender, KeyPressEventArgs e)
+        {
+           
+        }
+
+        private void rdbCodigo_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void txtClienteID_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (String.IsNullOrWhiteSpace(txtClienteID.Text))
+                    return;
+
+                e.SuppressKeyPress = true;
+                cargarClientes();
+            }
+        }
+
+        private void txtClienteID_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
         }
 
         private void recuperarDetalle(int _DetalleID)
