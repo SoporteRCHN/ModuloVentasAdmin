@@ -65,14 +65,15 @@
             this.dgvProducto = new System.Windows.Forms.DataGridView();
             this.btnAgregar = new System.Windows.Forms.Button();
             this.tableLayoutPanel9 = new System.Windows.Forms.TableLayoutPanel();
-            this.label8 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
             this.txtClienteID = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
             this.btnCliente = new System.Windows.Forms.Button();
             this.txtClienteNombre = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.rdbCodigo = new System.Windows.Forms.RadioButton();
+            this.tableLayoutPanel13 = new System.Windows.Forms.TableLayoutPanel();
             this.rbdNombre = new System.Windows.Forms.RadioButton();
-            this.label12 = new System.Windows.Forms.Label();
+            this.rdbCodigo = new System.Windows.Forms.RadioButton();
+            this.label7 = new System.Windows.Forms.Label();
             this.tableLayoutPanel10 = new System.Windows.Forms.TableLayoutPanel();
             this.label9 = new System.Windows.Forms.Label();
             this.txtAtencion = new System.Windows.Forms.TextBox();
@@ -84,7 +85,6 @@
             this.tlpRegistroFinal = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.tableLayoutPanel13 = new System.Windows.Forms.TableLayoutPanel();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -105,10 +105,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvDestino)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvProducto)).BeginInit();
             this.tableLayoutPanel9.SuspendLayout();
+            this.tableLayoutPanel13.SuspendLayout();
             this.tableLayoutPanel10.SuspendLayout();
             this.tableLayoutPanel11.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.tableLayoutPanel13.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -655,29 +655,38 @@
             this.tableLayoutPanel9.Size = new System.Drawing.Size(993, 58);
             this.tableLayoutPanel9.TabIndex = 13;
             // 
-            // label8
+            // label12
             // 
-            this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(3, 37);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(106, 13);
-            this.label8.TabIndex = 1;
-            this.label8.Text = "CODIGO:";
+            this.label12.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(3, 8);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(105, 13);
+            this.label12.TabIndex = 0;
+            this.label12.Text = "FILTRO POR:";
             // 
             // txtClienteID
             // 
             this.txtClienteID.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtClienteID.BackColor = System.Drawing.Color.White;
             this.txtClienteID.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.txtClienteID.Enabled = false;
             this.txtClienteID.ForeColor = System.Drawing.Color.Black;
-            this.txtClienteID.Location = new System.Drawing.Point(115, 33);
+            this.txtClienteID.Location = new System.Drawing.Point(114, 33);
             this.txtClienteID.Name = "txtClienteID";
             this.txtClienteID.Size = new System.Drawing.Size(281, 20);
             this.txtClienteID.TabIndex = 4;
             this.txtClienteID.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtClienteID_KeyDown);
             this.txtClienteID.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtClienteID_KeyPress);
+            // 
+            // label8
+            // 
+            this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(3, 37);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(105, 13);
+            this.label8.TabIndex = 1;
+            this.label8.Text = "CODIGO:";
             // 
             // btnCliente
             // 
@@ -686,7 +695,7 @@
             this.btnCliente.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnCliente.ForeColor = System.Drawing.Color.White;
             this.btnCliente.Image = global::ModuloVentasAdmin.Properties.Resources.search_16px;
-            this.btnCliente.Location = new System.Drawing.Point(399, 29);
+            this.btnCliente.Location = new System.Drawing.Point(398, 29);
             this.btnCliente.Margin = new System.Windows.Forms.Padding(0);
             this.btnCliente.Name = "btnCliente";
             this.btnCliente.Size = new System.Drawing.Size(62, 29);
@@ -702,20 +711,39 @@
             this.txtClienteNombre.BackColor = System.Drawing.Color.White;
             this.txtClienteNombre.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.txtClienteNombre.ForeColor = System.Drawing.Color.Black;
-            this.txtClienteNombre.Location = new System.Drawing.Point(559, 33);
+            this.txtClienteNombre.Location = new System.Drawing.Point(558, 33);
             this.txtClienteNombre.Name = "txtClienteNombre";
-            this.txtClienteNombre.Size = new System.Drawing.Size(431, 20);
+            this.txtClienteNombre.ReadOnly = true;
+            this.txtClienteNombre.Size = new System.Drawing.Size(432, 20);
             this.txtClienteNombre.TabIndex = 3;
             // 
-            // label7
+            // tableLayoutPanel13
             // 
-            this.label7.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(498, 37);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(55, 13);
-            this.label7.TabIndex = 0;
-            this.label7.Text = "CLIENTE:";
+            this.tableLayoutPanel13.ColumnCount = 2;
+            this.tableLayoutPanel9.SetColumnSpan(this.tableLayoutPanel13, 2);
+            this.tableLayoutPanel13.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel13.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel13.Controls.Add(this.rbdNombre, 1, 0);
+            this.tableLayoutPanel13.Controls.Add(this.rdbCodigo, 0, 0);
+            this.tableLayoutPanel13.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel13.Location = new System.Drawing.Point(114, 3);
+            this.tableLayoutPanel13.Name = "tableLayoutPanel13";
+            this.tableLayoutPanel13.RowCount = 1;
+            this.tableLayoutPanel13.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel13.Size = new System.Drawing.Size(343, 23);
+            this.tableLayoutPanel13.TabIndex = 5;
+            // 
+            // rbdNombre
+            // 
+            this.rbdNombre.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.rbdNombre.AutoSize = true;
+            this.rbdNombre.Location = new System.Drawing.Point(174, 3);
+            this.rbdNombre.Name = "rbdNombre";
+            this.rbdNombre.Size = new System.Drawing.Size(166, 17);
+            this.rbdNombre.TabIndex = 1;
+            this.rbdNombre.Text = "NOMBRE DE CLIENTE";
+            this.rbdNombre.UseVisualStyleBackColor = true;
+            this.rbdNombre.CheckedChanged += new System.EventHandler(this.rbdNombre_CheckedChanged);
             // 
             // rdbCodigo
             // 
@@ -731,27 +759,15 @@
             this.rdbCodigo.UseVisualStyleBackColor = true;
             this.rdbCodigo.CheckedChanged += new System.EventHandler(this.rdbCodigo_CheckedChanged);
             // 
-            // rbdNombre
+            // label7
             // 
-            this.rbdNombre.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.rbdNombre.AutoSize = true;
-            this.rbdNombre.Location = new System.Drawing.Point(174, 3);
-            this.rbdNombre.Name = "rbdNombre";
-            this.rbdNombre.Size = new System.Drawing.Size(166, 17);
-            this.rbdNombre.TabIndex = 1;
-            this.rbdNombre.Text = "NOMBRE DE CLIENTE";
-            this.rbdNombre.UseVisualStyleBackColor = true;
-            this.rbdNombre.CheckedChanged += new System.EventHandler(this.rbdNombre_CheckedChanged);
-            // 
-            // label12
-            // 
-            this.label12.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(3, 8);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(106, 13);
-            this.label12.TabIndex = 0;
-            this.label12.Text = "FILTRO POR:";
+            this.label7.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(497, 37);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(55, 13);
+            this.label7.TabIndex = 0;
+            this.label7.Text = "CLIENTE:";
             // 
             // tableLayoutPanel10
             // 
@@ -892,34 +908,18 @@
             this.pictureBox1.TabIndex = 131;
             this.pictureBox1.TabStop = false;
             // 
-            // tableLayoutPanel13
-            // 
-            this.tableLayoutPanel13.ColumnCount = 2;
-            this.tableLayoutPanel9.SetColumnSpan(this.tableLayoutPanel13, 2);
-            this.tableLayoutPanel13.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel13.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel13.Controls.Add(this.rbdNombre, 1, 0);
-            this.tableLayoutPanel13.Controls.Add(this.rdbCodigo, 0, 0);
-            this.tableLayoutPanel13.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel13.Location = new System.Drawing.Point(115, 3);
-            this.tableLayoutPanel13.Name = "tableLayoutPanel13";
-            this.tableLayoutPanel13.RowCount = 1;
-            this.tableLayoutPanel13.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel13.Size = new System.Drawing.Size(343, 23);
-            this.tableLayoutPanel13.TabIndex = 5;
-            // 
             // frmCotizaciones
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(1421, 720);
+            this.ClientSize = new System.Drawing.Size(1032, 720);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.label1);
             this.Name = "frmCotizaciones";
             this.Text = "frmCotizaciones";
-            this.Load += new System.EventHandler(this.frmCotizacionesV2_Load);
+            this.Load += new System.EventHandler(this.frmCotizaciones_Load);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
@@ -948,13 +948,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvProducto)).EndInit();
             this.tableLayoutPanel9.ResumeLayout(false);
             this.tableLayoutPanel9.PerformLayout();
+            this.tableLayoutPanel13.ResumeLayout(false);
+            this.tableLayoutPanel13.PerformLayout();
             this.tableLayoutPanel10.ResumeLayout(false);
             this.tableLayoutPanel10.PerformLayout();
             this.tableLayoutPanel11.ResumeLayout(false);
             this.tableLayoutPanel11.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.tableLayoutPanel13.ResumeLayout(false);
-            this.tableLayoutPanel13.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

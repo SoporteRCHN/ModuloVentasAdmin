@@ -531,4 +531,16 @@ namespace LogicaVentasAdmin
         public string PC { get; set; }
         public bool? Estado { get; set; }
     }
+    public class ProductosGruposENAC
+    {
+        public string Opcion { get; set; }
+        public int? ProductoGrupoID { get; set; }
+        public int? GrupoID { get; set; }
+        public string ProductoID { get; set; }
+        public string UPosteo { get; set; }
+        public DateTime? FPosteo { get; set; }
+        public string PC { get; set; }
+        public bool? Estado { get; set; }
+    }
+
 }

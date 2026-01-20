@@ -32,14 +32,14 @@
             this.panel4 = new System.Windows.Forms.Panel();
             this.DgvClientes = new System.Windows.Forms.DataGridView();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.btnCancelar = new System.Windows.Forms.Button();
+            this.btnAceptar = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel5 = new System.Windows.Forms.Panel();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.TxtCliente = new System.Windows.Forms.TextBox();
-            this.btnCancelar = new System.Windows.Forms.Button();
-            this.btnAceptar = new System.Windows.Forms.Button();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.panel2.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -91,8 +91,10 @@
             this.DgvClientes.Size = new System.Drawing.Size(515, 258);
             this.DgvClientes.TabIndex = 0;
             this.DgvClientes.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.DgvClientes_CellContentClick);
+            this.DgvClientes.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.DgvClientes_CellDoubleClick);
             this.DgvClientes.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.DgvClientes_CellValueChanged);
             this.DgvClientes.CurrentCellDirtyStateChanged += new System.EventHandler(this.DgvClientes_CurrentCellDirtyStateChanged);
+            this.DgvClientes.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DgvClientes_KeyDown);
             // 
             // panel3
             // 
@@ -104,63 +106,6 @@
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(515, 60);
             this.panel3.TabIndex = 1;
-            // 
-            // panel1
-            // 
-            this.panel1.BackColor = System.Drawing.Color.White;
-            this.panel1.Controls.Add(this.panel5);
-            this.panel1.Controls.Add(this.label6);
-            this.panel1.Controls.Add(this.label9);
-            this.panel1.Controls.Add(this.TxtCliente);
-            this.panel1.Controls.Add(this.pictureBox1);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel1.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.panel1.Location = new System.Drawing.Point(0, 0);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(515, 105);
-            this.panel1.TabIndex = 2;
-            // 
-            // panel5
-            // 
-            this.panel5.Controls.Add(this.pictureBox2);
-            this.panel5.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panel5.Location = new System.Drawing.Point(0, 0);
-            this.panel5.Name = "panel5";
-            this.panel5.Size = new System.Drawing.Size(515, 32);
-            this.panel5.TabIndex = 104;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(41, 69);
-            this.label6.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(55, 16);
-            this.label6.TabIndex = 24;
-            this.label6.Text = "Buscar:";
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.Location = new System.Drawing.Point(14, 41);
-            this.label9.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(166, 18);
-            this.label9.TabIndex = 103;
-            this.label9.Text = "Búsqueda de clientes";
-            // 
-            // TxtCliente
-            // 
-            this.TxtCliente.Font = new System.Drawing.Font("Century Gothic", 9.75F);
-            this.TxtCliente.Location = new System.Drawing.Point(98, 66);
-            this.TxtCliente.Margin = new System.Windows.Forms.Padding(4);
-            this.TxtCliente.Name = "TxtCliente";
-            this.TxtCliente.Size = new System.Drawing.Size(379, 23);
-            this.TxtCliente.TabIndex = 22;
-            this.TxtCliente.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TxtCliente_KeyPress);
             // 
             // btnCancelar
             // 
@@ -194,6 +139,31 @@
             this.btnAceptar.UseVisualStyleBackColor = false;
             this.btnAceptar.Click += new System.EventHandler(this.btnAceptar_Click);
             // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.Color.White;
+            this.panel1.Controls.Add(this.panel5);
+            this.panel1.Controls.Add(this.label6);
+            this.panel1.Controls.Add(this.label9);
+            this.panel1.Controls.Add(this.TxtCliente);
+            this.panel1.Controls.Add(this.pictureBox1);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel1.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(515, 105);
+            this.panel1.TabIndex = 2;
+            // 
+            // panel5
+            // 
+            this.panel5.Controls.Add(this.pictureBox2);
+            this.panel5.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel5.Location = new System.Drawing.Point(0, 0);
+            this.panel5.Name = "panel5";
+            this.panel5.Size = new System.Drawing.Size(515, 32);
+            this.panel5.TabIndex = 104;
+            // 
             // pictureBox2
             // 
             this.pictureBox2.BackColor = System.Drawing.Color.Transparent;
@@ -206,6 +176,39 @@
             this.pictureBox2.TabIndex = 105;
             this.pictureBox2.TabStop = false;
             this.pictureBox2.Click += new System.EventHandler(this.pictureBox2_Click);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(41, 69);
+            this.label6.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(55, 16);
+            this.label6.TabIndex = 24;
+            this.label6.Text = "Buscar:";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label9.Location = new System.Drawing.Point(14, 41);
+            this.label9.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(166, 18);
+            this.label9.TabIndex = 103;
+            this.label9.Text = "Búsqueda de clientes";
+            // 
+            // TxtCliente
+            // 
+            this.TxtCliente.Font = new System.Drawing.Font("Century Gothic", 9.75F);
+            this.TxtCliente.Location = new System.Drawing.Point(98, 66);
+            this.TxtCliente.Margin = new System.Windows.Forms.Padding(4);
+            this.TxtCliente.Name = "TxtCliente";
+            this.TxtCliente.Size = new System.Drawing.Size(379, 23);
+            this.TxtCliente.TabIndex = 22;
+            this.TxtCliente.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtCliente_KeyDown);
+            this.TxtCliente.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TxtCliente_KeyPress);
             // 
             // pictureBox1
             // 

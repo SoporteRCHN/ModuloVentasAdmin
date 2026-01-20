@@ -81,12 +81,13 @@ namespace LogicaVentasAdmin
                 chkCol.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
                 chkCol.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
                 DgvClientes.Columns.Add(chkCol);
-               
+
                 DataGridViewTextBoxColumn colClienteID = new DataGridViewTextBoxColumn();
                 colClienteID.DataPropertyName = "ClienteID";
                 colClienteID.HeaderText = "ClienteID";
                 colClienteID.Width = 100;
                 colClienteID.Name = "ClienteID";
+                colClienteID.ReadOnly = true;
                 DgvClientes.Columns.Add(colClienteID);
 
                 DataGridViewTextBoxColumn colNombre = new DataGridViewTextBoxColumn();
@@ -155,6 +156,10 @@ namespace LogicaVentasAdmin
 
         private void btnAceptar_Click(object sender, EventArgs e)
         {
+            enviarCliente();
+        }
+        private void enviarCliente()
+        {
             var filaSeleccionada = DgvClientes.Rows
                 .Cast<DataGridViewRow>()
                 .FirstOrDefault(r => Convert.ToBoolean(r.Cells["Seleccionar"].Value) == true);
@@ -164,7 +169,7 @@ namespace LogicaVentasAdmin
                 ClienteId = Convert.ToInt32(filaSeleccionada.Cells["ClienteID"].Value);
                 ClienteNombre = filaSeleccionada.Cells["NombreCompleto"].Value.ToString();
 
-                this.DialogResult = DialogResult.OK; 
+                this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             else
@@ -258,13 +263,85 @@ namespace LogicaVentasAdmin
                     };
                     DgvClientes.Columns.Add(colNombre);
 
-                    // Asignamos el DataSource
                     DgvClientes.DataSource = dtClientes.DefaultView;
+
+                    DgvClientes.Focus();
+
+                    if (DgvClientes.Rows.Count > 0)
+                    {
+                        DgvClientes.ClearSelection();
+                        DgvClientes.Rows[0].Selected = true;
+                        DgvClientes.CurrentCell = DgvClientes.Rows[0].Cells[0];
+                    }
+
                 }
                 else
                 {
-                    // 🔹 Si no hay resultados, limpiamos el grid
                     DgvClientes.DataSource = null;
+                }
+            }
+
+        }
+
+
+        private void DgvClientes_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                DgvClientes.Rows[e.RowIndex].Cells["Seleccionar"].Value = true;
+
+                foreach (DataGridViewRow row in DgvClientes.Rows)
+                {
+                    if (row.Index != e.RowIndex)
+                    {
+                        row.Cells["Seleccionar"].Value = false;
+                        dtClientes.Rows[row.Index]["Seleccionar"] = false;
+                    }
+                }
+
+                dtClientes.Rows[e.RowIndex]["Seleccionar"] = true;
+
+                enviarCliente();
+            }
+        }
+        private void DgvClientes_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter && DgvClientes.CurrentRow != null)
+            {
+                e.SuppressKeyPress = true;
+
+                int rowIndex = DgvClientes.CurrentRow.Index;
+
+                DgvClientes.Rows[rowIndex].Cells["Seleccionar"].Value = true;
+
+                foreach (DataGridViewRow row in DgvClientes.Rows)
+                {
+                    if (row.Index != rowIndex)
+                    {
+                        row.Cells["Seleccionar"].Value = false;
+                        dtClientes.Rows[row.Index]["Seleccionar"] = false;
+                    }
+                }
+
+                dtClientes.Rows[rowIndex]["Seleccionar"] = true;
+
+                enviarCliente();
+            }
+        }
+        private void TxtCliente_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Down)
+            {
+                e.SuppressKeyPress = true; // evita que se procese como texto
+
+                DgvClientes.Focus();
+
+                // Seleccionar la primera fila si existe
+                if (DgvClientes.Rows.Count > 0)
+                {
+                    DgvClientes.ClearSelection();
+                    DgvClientes.Rows[0].Selected = true;
+                    DgvClientes.CurrentCell = DgvClientes.Rows[0].Cells[0];
                 }
             }
         }

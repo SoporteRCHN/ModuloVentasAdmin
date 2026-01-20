@@ -1415,6 +1415,39 @@ namespace DatosVentasAdmin
 
             return tabla;
         }
+        public DataTable SP_ProductosGruposENAC(dynamic a)
+        {
+            SqlDataReader leer = null;
+            SqlCommand comando = new SqlCommand();
+            DataTable tabla = new DataTable();
+
+            if (tabla.Rows.Count > 0)
+            {
+                tabla.Rows.Clear();
+                tabla.Clear();
+            }
+
+            comando.Connection = Conexion.AbrirConexion(4);
+
+            comando.Parameters.AddWithValue("@Opcion", a.Opcion ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@ProductoGrupoID", a.ProductoGrupoID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@GrupoID", a.GrupoID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@ProductoID", a.ProductoID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@UPosteo", a.UPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@FPosteo", a.FPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@PC", a.PC ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Estado", a.Estado ?? (object)DBNull.Value);
+
+            comando.CommandText = "ENAC.dbo.SP_ProductosGrupos";
+            comando.CommandType = CommandType.StoredProcedure;
+
+            leer = comando.ExecuteReader();
+            tabla.Load(leer);
+
+            Conexion.CerrarConexion();
+
+            return tabla;
+        }
 
     }
 }

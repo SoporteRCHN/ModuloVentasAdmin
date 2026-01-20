@@ -227,5 +227,11 @@ namespace LogicaVentasAdmin
             tabla = enviar.SP_CotizacionImpuesto(a);
             return tabla;
         }
+        public DataTable SP_ProductosGruposENAC(ProductosGruposENAC a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_ProductosGruposENAC(a);
+            return tabla;
+        }
     }
 }

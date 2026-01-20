@@ -38,6 +38,7 @@ namespace ModuloVentasAdmin
         public DataTable dtGetCotizaciones = new DataTable();
         public DataTable dtEncabezado = new DataTable();
         public DataTable dtDetalle = new DataTable();
+        public DataTable dtGruposProductos = new DataTable();
 
         // Variables de clase para mantener lo que generaste
         public List<CotizacionRegistro> registrosGenerados;
@@ -58,6 +59,7 @@ namespace ModuloVentasAdmin
             cargarImpuestos();
             cmbImpuesto.SelectedIndex = 0;
             cargarCotizaciones();
+            cargarGruposProductos();
         }
         private void cargarClientes()
         {
@@ -66,8 +68,8 @@ namespace ModuloVentasAdmin
             ClienteENAC getClientes = new ClienteENAC
             {
                 Opcion = _Opcion,
-                Cliente = txtClienteNombre.Text,
-                Nombre = txtClienteNombre.Text,
+                Cliente = txtClienteID.Text,
+                Nombre = txtClienteID.Text,
             };
             DataTable dtGetCliente = logica.SP_ClientesENAC(getClientes);
             if (dtGetCliente.Rows.Count > 0) 
@@ -80,7 +82,7 @@ namespace ModuloVentasAdmin
                 Toast.Mostrar("No se encontro ese codigo de cliente.", TipoAlerta.Warning);
                 txtClienteNombre.Text = String.Empty;
                 txtClienteID.Text = String.Empty;
-                txtClienteNombre.Focus();
+                txtClienteID.Focus();
             }
         }
 
@@ -461,7 +463,7 @@ namespace ModuloVentasAdmin
                         var reg = registrosGenerados.FirstOrDefault(r =>
                             r.ProductoID == productosGenerados[p].ProductoID &&
                             r.CiudadDestinoID == destinosGenerados[d].CiudadID &&
-                            r.CiudadOrigenID == origenesGenerados.First().CiudadID // si manejas varios orígenes, ajusta aquí
+                            r.CiudadOrigenID == origenesGenerados.First().CiudadID 
                         );
 
                         if (reg != null)
@@ -506,7 +508,15 @@ namespace ModuloVentasAdmin
                 MessageBox.Show("Primero debe generar la cotización antes de guardarla.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
-
+        private void cargarGruposProductos() 
+        {
+            ProductosGruposENAC getGrupos = new ProductosGruposENAC 
+            {
+                Opcion = "Listado"
+            };
+            dtGruposProductos = logica.SP_ProductosGruposENAC(getGrupos);
+           
+        }
 
         private void guardarEncabezado(List<CotizacionRegistro> registros, List<CiudadOrigen> origenes, List<CiudadDestino> destinos, List<ProductoSeleccionado> productos)
         {
@@ -628,24 +638,8 @@ namespace ModuloVentasAdmin
             }
         }
 
-        private void btnPDF_Click(object sender, EventArgs e)
-        {
-            if (String.IsNullOrWhiteSpace(txtClienteNombre.Text) && String.IsNullOrWhiteSpace(txtClienteID.Text))
-            {
-                MessageBox.Show("Aun no ha seleccionado un cliente.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (tlpRegistroFinal.RowCount <= 0)
-            {
-                MessageBox.Show("Aun no ha agregado los registros de la cotizacion.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            
-                
-           
-        }
-        private void GenerarPDFCotizacion(List<CotizacionRegistro> registros,List<ProductoSeleccionado> productos,List<frmCotizacionDinamica.CiudadOrigen> origenes,List<CiudadDestino> destinos,DataTable dtTerminos)
+        private void GenerarPDFCotizacion(List<CotizacionRegistro> registros,List<ProductoSeleccionado> productos,List<frmCotizacionDinamica.CiudadOrigen> origenes,
+List<CiudadDestino> destinos,DataTable dtTerminos)
         {
             Document doc = new Document(PageSize.LETTER, 40, 40, 40, 40);
             string path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Cotizacion.pdf");
@@ -665,7 +659,7 @@ namespace ModuloVentasAdmin
 
                 // Logo izquierda
                 iTextSharp.text.Image logoIzq = iTextSharp.text.Image.GetInstance(@"\\192.168.1.179\Logos\RCHondurasColor.png");
-                logoIzq.ScaleAbsolute(130, 150);
+                logoIzq.ScaleAbsolute(120, 100);
                 PdfPCell cellLogoIzq = new PdfPCell(logoIzq);
                 cellLogoIzq.Border = Rectangle.NO_BORDER;
                 cellLogoIzq.HorizontalAlignment = Element.ALIGN_LEFT;
@@ -682,7 +676,7 @@ namespace ModuloVentasAdmin
 
                 // Logo derecha
                 iTextSharp.text.Image logoDer = iTextSharp.text.Image.GetInstance(@"\\192.168.1.179\Logos\RCPaqueteria.png");
-                logoDer.ScaleAbsolute(130, 30);
+                logoDer.ScaleAbsolute(120, 15);
                 PdfPCell cellLogoDer = new PdfPCell(logoDer);
                 cellLogoDer.Border = Rectangle.NO_BORDER;
                 cellLogoDer.HorizontalAlignment = Element.ALIGN_RIGHT;
@@ -693,7 +687,6 @@ namespace ModuloVentasAdmin
                 headerTable.DefaultCell.FixedHeight = 50;
 
                 doc.Add(headerTable);
-
 
                 // 🔹 Cliente y Fecha
                 PdfPTable clienteFechaTable = new PdfPTable(2);
@@ -732,186 +725,153 @@ namespace ModuloVentasAdmin
                 // 🔹 Espacio
                 doc.Add(new Paragraph("\n"));
 
-                // 🔹 Cotización (productos/destinos/precios)
+                // 🔹 Agrupar productos por GrupoID
+                var productosAgrupados = (from p in productos
+                                          join g in dtGruposProductos.AsEnumerable()
+                                          on p.ProductoID equals g.Field<string>("ProductoID") into gj
+                                          from subg in gj.DefaultIfEmpty()
+                                          select new
+                                          {
+                                              Producto = p,
+                                              GrupoID = subg != null ? subg.Field<int>("GrupoID") : (int?)null
+                                          })
+                                          .GroupBy(x => x.GrupoID)
+                                          .OrderBy(g => g.Key ?? int.MaxValue)
+                                          .ToList();
+
                 int maxColsPorBloque = 5;
-                for (int start = 0; start < productos.Count; start += maxColsPorBloque)
+
+                foreach (var grupo in productosAgrupados)
                 {
-                    int end = Math.Min(start + maxColsPorBloque, productos.Count);
+                    int? grupoID = grupo.Key;
 
-                    PdfPTable table = new PdfPTable(1 + maxColsPorBloque);
-                    table.WidthPercentage = 100;
+                    // 🔹 Título de grupo
+                    var fontGrupo = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8);
+               
+                    var productosDelGrupo = grupo.Select(x => x.Producto).ToList();
 
-                    float[] widths = new float[1 + maxColsPorBloque];
-                    widths[0] = 200f;
-                    for (int i = 1; i < widths.Length; i++)
-                        widths[i] = 100f;
-                    table.SetWidths(widths);
-
-                    // 🔹 Fila 1: encabezado
-                    string origenesConcat = string.Join(", ", origenes.Select(o => o.Nombre));
-                    PdfPCell cellOrigen = new PdfPCell(new Phrase("SUCURSAL REMITENTE: " + origenesConcat, fontHeader));
-                    cellOrigen.HorizontalAlignment = Element.ALIGN_CENTER;
-                    cellOrigen.VerticalAlignment = Element.ALIGN_MIDDLE;
-                    cellOrigen.PaddingTop = 10f;
-                    cellOrigen.PaddingBottom = 10f;
-                    table.AddCell(cellOrigen);
-
-                    for (int i = 0; i < maxColsPorBloque; i++)
+                    for (int start = 0; start < productosDelGrupo.Count; start += maxColsPorBloque)
                     {
-                        if (start + i < productos.Count)
+                        PdfPTable table = new PdfPTable(1 + maxColsPorBloque);
+                        table.WidthPercentage = 100;
+
+                        float[] widths = new float[1 + maxColsPorBloque];
+                        widths[0] = 200f;
+                        for (int i = 1; i < widths.Length; i++) widths[i] = 100f;
+                        table.SetWidths(widths);
+
+                        // 🔹 Fila 1: encabezado
+                        string origenesConcat = string.Join(", ", origenes.Select(o => o.Nombre));
+                        PdfPCell cellOrigen = new PdfPCell(new Phrase("SUCURSAL REMITENTE: " + origenesConcat, fontHeader));
+                        cellOrigen.HorizontalAlignment = Element.ALIGN_CENTER;
+                        cellOrigen.VerticalAlignment = Element.ALIGN_MIDDLE;
+                        cellOrigen.PaddingTop = 10f;
+                        cellOrigen.PaddingBottom = 10f;
+                        table.AddCell(cellOrigen);
+
+                        for (int i = 0; i < maxColsPorBloque; i++)
                         {
-                            PdfPCell cellProd = new PdfPCell(new Phrase(productos[start + i].Nombre, fontHeader));
-                            cellProd.HorizontalAlignment = Element.ALIGN_CENTER;
-                            cellProd.VerticalAlignment = Element.ALIGN_MIDDLE;
-                            cellProd.PaddingTop = 10f;
-                            cellProd.PaddingBottom = 10f;
-                            table.AddCell(cellProd);
+                            if (start + i < productosDelGrupo.Count)
+                            {
+                                PdfPCell cellProd = new PdfPCell(new Phrase(productosDelGrupo[start + i].Nombre, fontHeader));
+                                cellProd.HorizontalAlignment = Element.ALIGN_CENTER;
+                                cellProd.VerticalAlignment = Element.ALIGN_MIDDLE;
+                                cellProd.PaddingTop = 10f;
+                                cellProd.PaddingBottom = 10f;
+                                table.AddCell(cellProd);
+                            }
+                            else
+                            {
+                                PdfPCell empty = new PdfPCell(new Phrase("", fontHeader));
+                                empty.Border = Rectangle.NO_BORDER;
+                                empty.PaddingTop = 10f;
+                                empty.PaddingBottom = 10f;
+                                table.AddCell(empty);
+                            }
                         }
-                        else
+
+                        // 🔹 Fila 2: destinos + precios
+                        string destinosConcat = string.Join("\n", destinos.Select(d => d.Nombre));
+                        PdfPCell cellDestinos = new PdfPCell(new Phrase(destinosConcat, fontCell));
+                        cellDestinos.HorizontalAlignment = Element.ALIGN_CENTER;
+                        cellDestinos.VerticalAlignment = Element.ALIGN_MIDDLE;
+                        cellDestinos.PaddingTop = 10f;
+                        cellDestinos.PaddingBottom = 10f;
+                        table.AddCell(cellDestinos);
+
+                        for (int i = 0; i < maxColsPorBloque; i++)
                         {
-                            PdfPCell empty = new PdfPCell(new Phrase("", fontHeader));
-                            empty.Border = Rectangle.NO_BORDER;
-                            empty.PaddingTop = 10f;
-                            empty.PaddingBottom = 10f;
-                            table.AddCell(empty);
+                            if (start + i < productosDelGrupo.Count)
+                            {
+                                var reg = registros.FirstOrDefault(r => r.ProductoID == productosDelGrupo[start + i].ProductoID);
+                                string precio = reg != null ? reg.PrecioNormal.ToString("N2") : "0.00";
+
+                                PdfPCell cellPrecio = new PdfPCell(new Phrase(precio, fontCell));
+                                cellPrecio.HorizontalAlignment = Element.ALIGN_CENTER;
+                                cellPrecio.VerticalAlignment = Element.ALIGN_MIDDLE;
+                                cellPrecio.PaddingTop = 10f;
+                                cellPrecio.PaddingBottom = 10f;
+                                table.AddCell(cellPrecio);
+                            }
+                            else
+                            {
+                                PdfPCell empty = new PdfPCell(new Phrase("", fontCell));
+                                empty.Border = Rectangle.NO_BORDER;
+                                empty.PaddingTop = 10f;
+                                empty.PaddingBottom = 10f;
+                                table.AddCell(empty);
+                            }
                         }
+
+                        doc.Add(table);
+                        doc.Add(new Paragraph(" ", fontCell));
                     }
-
-                    // 🔹 Fila 2: destinos + precios
-                    string destinosConcat = string.Join("\n", destinos.Select(d => d.Nombre));
-                    PdfPCell cellDestinos = new PdfPCell(new Phrase(destinosConcat, fontCell));
-                    cellDestinos.HorizontalAlignment = Element.ALIGN_CENTER;
-                    cellDestinos.VerticalAlignment = Element.ALIGN_MIDDLE;
-                    cellDestinos.PaddingTop = 5f;
-                    cellDestinos.PaddingBottom = 5f;
-                    table.AddCell(cellDestinos);
-
-                    for (int i = 0; i < maxColsPorBloque; i++)
-                    {
-                        if (start + i < productos.Count)
-                        {
-                            var reg = registros.FirstOrDefault(r => r.ProductoID == productos[start + i].ProductoID);
-                            string precio = reg != null ? reg.PrecioNormal.ToString("N2") : "0.00";
-
-                            PdfPCell cellPrecio = new PdfPCell(new Phrase(precio, fontCell));
-                            cellPrecio.HorizontalAlignment = Element.ALIGN_CENTER;
-                            cellPrecio.VerticalAlignment = Element.ALIGN_MIDDLE;
-                            cellPrecio.PaddingTop = 20f;
-                            cellPrecio.PaddingBottom = 20f;
-                            table.AddCell(cellPrecio);
-                        }
-                        else
-                        {
-                            PdfPCell empty = new PdfPCell(new Phrase("", fontCell));
-                            empty.Border = iTextSharp.text.Rectangle.NO_BORDER;
-                            empty.PaddingTop = 20f;
-                            empty.PaddingBottom = 20f;
-                            table.AddCell(empty);
-                        }
-                    }
-
-                    doc.Add(table);
-                    doc.Add(new Paragraph(" ", fontCell));
                 }
 
-                // 🔹 Después de la tabla, agregamos los términos
+                // 🔹 Términos
                 if (dtTerminos != null && dtTerminos.Rows.Count > 0)
                 {
                     doc.Add(new Paragraph("\n"));
-
                     var fontTituloTerminos = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 11);
-                    Paragraph titulo = new Paragraph("TERMINOS Y NEGOCIACIONES ESPECIALES", fontTituloTerminos);
-                    titulo.Alignment = Element.ALIGN_LEFT;
-                    doc.Add(titulo);
+                    doc.Add(new Paragraph("TERMINOS Y NEGOCIACIONES ESPECIALES", fontTituloTerminos));
 
-                    // 🔹 Texto del impuesto seleccionado
                     if (cmbImpuesto.SelectedItem != null)
-                    {
-                        var fontImpuesto = FontFactory.GetFont(FontFactory.HELVETICA, 9);
-                        Paragraph impuestoSel = new Paragraph(cmbImpuesto.Text, fontImpuesto);
-                        impuestoSel.Alignment = Element.ALIGN_LEFT;
-                        doc.Add(impuestoSel);
-                    }
+                        doc.Add(new Paragraph(cmbImpuesto.Text, FontFactory.GetFont(FontFactory.HELVETICA, 9)));
 
-                    var fontTermino = FontFactory.GetFont(FontFactory.HELVETICA, 9);
                     foreach (DataRow row in dtTerminos.Rows)
-                    {
-                        string descripcion = row["Descripcion"].ToString();
-                        Paragraph p = new Paragraph("- " + descripcion, fontTermino);
-                        p.Alignment = Element.ALIGN_LEFT;
-                        doc.Add(p);
-                    }
+                        doc.Add(new Paragraph("- " + row["Descripcion"].ToString(), FontFactory.GetFont(FontFactory.HELVETICA, 9)));
                 }
 
-                // 🔹 Espacio de 2 líneas
-                doc.Add(new Paragraph("\n\n\n\n"));
-
-                // 🔹 Tabla de firmas (Autorizado / Aprobado Por)
+                // 🔹 Firmas
+                doc.Add(new Paragraph("\n\n\n"));
                 PdfPTable firmasTable = new PdfPTable(2);
                 firmasTable.WidthPercentage = 100;
                 firmasTable.SetWidths(new float[] { 250f, 250f });
 
-                // Celda izquierda: línea + texto "Autorizado"
-                PdfPCell cellLineaIzq = new PdfPCell();
-                cellLineaIzq.Border = Rectangle.NO_BORDER;
-                cellLineaIzq.HorizontalAlignment = Element.ALIGN_CENTER;
-
-                // Línea
-                Paragraph lineaIzq = new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(1f, 60f, BaseColor.BLACK, Element.ALIGN_CENTER, -2)));
-                cellLineaIzq.AddElement(lineaIzq);
-
-                // Texto debajo
-                Paragraph autorizado = new Paragraph("Autorizado", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10));
-                autorizado.Alignment = Element.ALIGN_CENTER;
-                cellLineaIzq.AddElement(autorizado);
-
-                // 🔹 Nombre y cargo
-                Paragraph nombreAutorizado = new Paragraph("Nancy D. Valle", FontFactory.GetFont(FontFactory.HELVETICA, 9));
-                nombreAutorizado.Alignment = Element.ALIGN_CENTER;
-                cellLineaIzq.AddElement(nombreAutorizado);
-
-                Paragraph cargoAutorizado = new Paragraph("Gerente Administrativo", FontFactory.GetFont(FontFactory.HELVETICA, 9));
-                cargoAutorizado.Alignment = Element.ALIGN_CENTER;
-                cellLineaIzq.AddElement(cargoAutorizado);
-
+                PdfPCell cellLineaIzq = new PdfPCell { Border = Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_CENTER };
+                cellLineaIzq.AddElement(new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(1f, 60f, BaseColor.BLACK, Element.ALIGN_CENTER, -2))));
+                cellLineaIzq.AddElement(new Paragraph("Autorizado", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)) { Alignment = Element.ALIGN_CENTER });
+                cellLineaIzq.AddElement(new Paragraph("Nancy D. Valle", FontFactory.GetFont(FontFactory.HELVETICA, 9)) { Alignment = Element.ALIGN_CENTER });
+                cellLineaIzq.AddElement(new Paragraph("GERENTE ADMINISTRATIVO", FontFactory.GetFont(FontFactory.HELVETICA, 9)) { Alignment = Element.ALIGN_CENTER });
                 firmasTable.AddCell(cellLineaIzq);
 
-                // Celda derecha: línea + texto "Aprobado Por"
-                PdfPCell cellLineaDer = new PdfPCell();
-                cellLineaDer.Border = Rectangle.NO_BORDER;
-                cellLineaDer.HorizontalAlignment = Element.ALIGN_CENTER;
-
-                // Línea
-                Paragraph lineaDer = new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(1f, 60f, BaseColor.BLACK, Element.ALIGN_CENTER, -2)));
-                cellLineaDer.AddElement(lineaDer);
-
-                // Texto debajo
-                Paragraph aprobado = new Paragraph("Aprobado Por Cliente", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10));
-                aprobado.Alignment = Element.ALIGN_CENTER;
-                cellLineaDer.AddElement(aprobado);
-
-                // 🔹 Firma y sello
-                Paragraph firmaSello = new Paragraph("Firma y Sello", FontFactory.GetFont(FontFactory.HELVETICA, 9));
-                firmaSello.Alignment = Element.ALIGN_CENTER;
-                cellLineaDer.AddElement(firmaSello);
-
-                // 🔹 Nombre del cliente
-                Paragraph nombreCliente = new Paragraph(txtAtencion.Text, FontFactory.GetFont(FontFactory.HELVETICA, 9));
-                nombreCliente.Alignment = Element.ALIGN_CENTER;
-                cellLineaDer.AddElement(nombreCliente);
-
+                // 🔹 Celda derecha: línea + texto "Aprobado Por"
+                PdfPCell cellLineaDer = new PdfPCell { Border = Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_CENTER };
+                cellLineaDer.AddElement(new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(1f, 60f, BaseColor.BLACK, Element.ALIGN_CENTER, -2))));
+                cellLineaDer.AddElement(new Paragraph("Aprobado Por Cliente", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)) { Alignment = Element.ALIGN_CENTER });
+                cellLineaDer.AddElement(new Paragraph("Firma y Sello", FontFactory.GetFont(FontFactory.HELVETICA, 9)) { Alignment = Element.ALIGN_CENTER });
+                cellLineaDer.AddElement(new Paragraph(txtAtencion.Text, FontFactory.GetFont(FontFactory.HELVETICA, 9)) { Alignment = Element.ALIGN_CENTER });
                 firmasTable.AddCell(cellLineaDer);
 
                 doc.Add(firmasTable);
 
-
+                // 🔹 Cerrar documento
                 doc.Close();
             }
 
             System.Diagnostics.Process.Start(path);
-            MessageBox.Show("PDF generado en el escritorio.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            Toast.Mostrar("PDF guardado en el escritorio.", TipoAlerta.Success);
         }
-
 
         private void btnCliente_Click(object sender, EventArgs e)
         {
@@ -1161,30 +1121,32 @@ namespace ModuloVentasAdmin
 
         private void rbdNombre_CheckedChanged(object sender, EventArgs e)
         {
-
-            Form MensajeAdvertencia = new Form();
-            using (frmBuscarClientes Mensaje = new frmBuscarClientes())
+            if (rbdNombre.Checked) 
             {
-                MensajeAdvertencia.StartPosition = FormStartPosition.CenterScreen;
-                MensajeAdvertencia.FormBorderStyle = FormBorderStyle.None;
-                MensajeAdvertencia.Opacity = .70d;
-                MensajeAdvertencia.BackColor = Color.Black;
-                MensajeAdvertencia.WindowState = FormWindowState.Maximized;
-                MensajeAdvertencia.Location = this.Location;
-                MensajeAdvertencia.ShowInTaskbar = false;
-                Mensaje.Owner = MensajeAdvertencia;
-                MensajeAdvertencia.Show();
-
-                if (Mensaje.ShowDialog() == DialogResult.OK)
+                txtClienteID.ReadOnly = true;
+                Form MensajeAdvertencia = new Form();
+                using (frmBuscarClientes Mensaje = new frmBuscarClientes())
                 {
-                    if (Mensaje.ClienteId != 0)
-                    {
-                        txtClienteNombre.Text = Mensaje.ClienteNombre;
-                        txtClienteID.Text = Mensaje.ClienteId.ToString();
-                    }
-                }
+                    MensajeAdvertencia.StartPosition = FormStartPosition.CenterScreen;
+                    MensajeAdvertencia.FormBorderStyle = FormBorderStyle.None;
+                    MensajeAdvertencia.Opacity = .70d;
+                    MensajeAdvertencia.BackColor = Color.Black;
+                    MensajeAdvertencia.WindowState = FormWindowState.Maximized;
+                    MensajeAdvertencia.Location = this.Location;
+                    MensajeAdvertencia.ShowInTaskbar = false;
+                    Mensaje.Owner = MensajeAdvertencia;
+                    MensajeAdvertencia.Show();
 
-                MensajeAdvertencia.Dispose();
+                    if (Mensaje.ShowDialog() == DialogResult.OK)
+                    {
+                        if (Mensaje.ClienteId != 0)
+                        {
+                            txtClienteNombre.Text = Mensaje.ClienteNombre;
+                            txtClienteID.Text = Mensaje.ClienteId.ToString();
+                        }
+                    }
+                    MensajeAdvertencia.Dispose();
+                }
             }
         }
         private void txtClienteNombre_KeyPress(object sender, KeyPressEventArgs e)
@@ -1194,7 +1156,10 @@ namespace ModuloVentasAdmin
 
         private void rdbCodigo_CheckedChanged(object sender, EventArgs e)
         {
-
+            if (rdbCodigo.Checked) 
+            {
+                txtClienteID.ReadOnly = false;
+            }
         }
 
         private void txtClienteID_KeyDown(object sender, KeyEventArgs e)
@@ -1207,6 +1172,11 @@ namespace ModuloVentasAdmin
                 e.SuppressKeyPress = true;
                 cargarClientes();
             }
+        }
+
+        private void frmCotizaciones_Load(object sender, EventArgs e)
+        {
+
         }
 
         private void txtClienteID_KeyPress(object sender, KeyPressEventArgs e)
@@ -1472,11 +1442,6 @@ namespace ModuloVentasAdmin
             }
         }
 
-
-        private void frmCotizacionesV2_Load(object sender, EventArgs e)
-        {
-
-        }
         private void cargarOrigen()
         {
             CiudadesENAC getOrigen = new CiudadesENAC
