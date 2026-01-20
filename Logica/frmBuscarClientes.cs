@@ -97,9 +97,12 @@ namespace LogicaVentasAdmin
                 DgvClientes.Columns.Add(colNombre);
 
                 // Asignamos el DataSource
-                DgvClientes.DataSource = dtClientes;
+                DgvClientes.DataSource = dtClientes.DefaultView;
             }
         }
+
+
+
         private void DgvClientes_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex == DgvClientes.Columns["Seleccionar"].Index && e.RowIndex >= 0)
@@ -169,7 +172,101 @@ namespace LogicaVentasAdmin
                     "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
+        private void TxtCliente_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Solo ejecutamos si presiona Enter
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                e.Handled = true; // evita que se agregue un salto de línea en el TextBox
 
+                string filtro = TxtCliente.Text.Trim();
+
+                if (string.IsNullOrEmpty(filtro))
+                {
+                    // 🔹 Si está vacío → traer todos los clientes
+                    ClienteENAC getClientes = new ClienteENAC
+                    {
+                        Opcion = "BUSCAR"
+                    };
+                    dtClientes = logica.SP_ClientesENAC(getClientes);
+                }
+                else if (int.TryParse(filtro, out int codigo))
+                {
+                    // 🔹 Si es numérico → buscar por código
+                    ClienteENAC getClientes = new ClienteENAC
+                    {
+                        Opcion = "BuscarPorCodigo",
+                        Cliente = filtro
+                    };
+                    dtClientes = logica.SP_ClientesENAC(getClientes);
+                }
+                else
+                {
+                    // 🔹 Si es texto → buscar por nombre
+                    ClienteENAC getClientes = new ClienteENAC
+                    {
+                        Opcion = "BuscarPorNombre",
+                        Nombre = filtro
+                    };
+                    dtClientes = logica.SP_ClientesENAC(getClientes);
+                }
+
+                // 🔹 Configuramos el DataGridView con los resultados
+                if (dtClientes != null && dtClientes.Rows.Count > 0)
+                {
+                    if (!dtClientes.Columns.Contains("Seleccionar"))
+                    {
+                        dtClientes.Columns.Add("Seleccionar", typeof(bool));
+                        foreach (DataRow row in dtClientes.Rows)
+                            row["Seleccionar"] = false;
+                    }
+
+                    DgvClientes.AutoGenerateColumns = false;
+                    DgvClientes.Columns.Clear();
+
+                    // CheckBox
+                    DataGridViewCheckBoxColumn chkCol = new DataGridViewCheckBoxColumn
+                    {
+                        Name = "Seleccionar",
+                        HeaderText = "✔",
+                        Width = 50,
+                        DataPropertyName = "Seleccionar"
+                    };
+                    chkCol.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    chkCol.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    DgvClientes.Columns.Add(chkCol);
+
+                    // ClienteID
+                    DataGridViewTextBoxColumn colClienteID = new DataGridViewTextBoxColumn
+                    {
+                        DataPropertyName = "ClienteID",
+                        HeaderText = "ClienteID",
+                        Width = 100,
+                        Name = "ClienteID"
+                    };
+                    DgvClientes.Columns.Add(colClienteID);
+
+                    // NombreCompleto
+                    DataGridViewTextBoxColumn colNombre = new DataGridViewTextBoxColumn
+                    {
+                        DataPropertyName = "NombreCompleto",
+                        HeaderText = "NombreCompleto",
+                        Name = "NombreCompleto",
+                        Width = 300,
+                        ReadOnly = true
+                    };
+                    DgvClientes.Columns.Add(colNombre);
+
+                    // Asignamos el DataSource
+                    DgvClientes.DataSource = dtClientes.DefaultView;
+                }
+                else
+                {
+                    // 🔹 Si no hay resultados, limpiamos el grid
+                    DgvClientes.DataSource = null;
+                }
+            }
+        }
 
     }
 }

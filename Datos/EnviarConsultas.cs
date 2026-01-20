@@ -1262,6 +1262,7 @@ namespace DatosVentasAdmin
             comando.Parameters.AddWithValue("@ClienteID", a.ClienteID ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@Atencion", a.Atencion ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@ImpuestoID", a.ImpuestoID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@EstadoSeguimiento", a.EstadoSeguimiento ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@UPosteo", a.UPosteo ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@FPosteo", a.FPosteo ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@PC", a.PC ?? (object)DBNull.Value);

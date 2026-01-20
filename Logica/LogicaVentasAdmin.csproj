@@ -81,5 +81,11 @@
   <ItemGroup>
     <None Include="Resources\close_24px.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\TikTok Verified Account_28px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\white_cancel_28px.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

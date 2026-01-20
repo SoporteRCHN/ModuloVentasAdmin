@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing.Drawing2D;
 
 namespace ModuloVentasAdmin.LoginMenu
 {
@@ -22,6 +23,7 @@ namespace ModuloVentasAdmin.LoginMenu
             InitializeComponent();
             InitializeTextBoxes();
             LoadRememberedCredentials();
+            SetGradientBackground(panel1, Color.FromArgb(0, 91, 166), Color.FromArgb(226, 236, 245), LinearGradientMode.Horizontal);
         }
         private void InitializeTextBoxes()
         {
@@ -43,6 +45,16 @@ namespace ModuloVentasAdmin.LoginMenu
             // Attach event handler for textbox Enter key press
             txtUser.KeyDown += TextBox_KeyDown;
             txtContra.KeyDown += TextBox_KeyDown;
+        }
+
+        private void SetGradientBackground(Panel panel, Color color1, Color color2, LinearGradientMode mode)
+        {
+            panel.Paint += (sender, e) =>
+            {
+                Rectangle rect = new Rectangle(0, 0, panel.Width, panel.Height);
+                LinearGradientBrush brush = new LinearGradientBrush(rect, color1, color2, mode);
+                e.Graphics.FillRectangle(brush, rect);
+            };
         }
         private void TextBox_KeyDown(object sender, KeyEventArgs e)
         {

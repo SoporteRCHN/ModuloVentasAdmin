@@ -481,6 +481,7 @@ namespace LogicaVentasAdmin
         public int? ClienteID { get; set; }
         public string Atencion { get; set; }
         public int? ImpuestoID { get; set; }
+        public int? EstadoSeguimiento { get; set; }
         public string UPosteo { get; set; }
         public DateTime? FPosteo { get; set; }
         public string PC { get; set; }

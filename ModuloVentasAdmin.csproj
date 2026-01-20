@@ -168,5 +168,26 @@
       <Version>5.5.13.4</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\TikTok Verified Account_28px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\white_cancel_28px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sync_28px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pdf_28px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Plus_28px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\checked_user_male_64px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\password_641px.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
