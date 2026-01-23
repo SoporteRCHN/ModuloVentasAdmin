@@ -18,6 +18,7 @@ using iTextSharp.text.pdf;
 using Rectangle = iTextSharp.text.Rectangle;
 using iTextSharp.text.pdf.parser;
 using ModuloVentasAdmin;
+using System.Runtime.CompilerServices;
 
 namespace ModuloVentasAdmin
 {
@@ -39,6 +40,7 @@ namespace ModuloVentasAdmin
         public DataTable dtEncabezado = new DataTable();
         public DataTable dtDetalle = new DataTable();
         public DataTable dtGruposProductos = new DataTable();
+        public DataTable dtDescuentos = new DataTable();
 
         // Variables de clase para mantener lo que generaste
         public List<CotizacionRegistro> registrosGenerados;
@@ -60,6 +62,7 @@ namespace ModuloVentasAdmin
             cmbImpuesto.SelectedIndex = 0;
             cargarCotizaciones();
             cargarGruposProductos();
+            cargarDescuentos();
         }
         private void cargarClientes()
         {
@@ -188,48 +191,42 @@ namespace ModuloVentasAdmin
             txtDestino.Text = string.Empty;
             txtProducto.Text = string.Empty;
 
+            // 🔹 Filtros (igual que antes)
             string filtroOrigen = txtOrigen.Text.Trim();
-
             if (dtOrigen != null && dtOrigen.Rows.Count > 0)
             {
                 DataView dv = new DataView(dtOrigen);
                 dv.RowFilter = string.Format("Convert(Ciudad, 'System.String') LIKE '%{0}%' OR Nombre LIKE '%{0}%'", filtroOrigen.Replace("'", "''"));
-
                 dgvOrigen.DataSource = dv;
             }
 
             string filtroDestino = txtDestino.Text.Trim();
-
             if (dtDestino != null && dtDestino.Rows.Count > 0)
             {
                 DataView dv = new DataView(dtDestino);
-
-                // Aplicamos el texto ingresdo como filtro de busqueda
                 dv.RowFilter = string.Format("Convert(Ciudad, 'System.String') LIKE '%{0}%' OR Nombre LIKE '%{0}%'", filtroDestino.Replace("'", "''"));
-
                 dgvDestino.DataSource = dv;
             }
-            string filtroProducto = txtProducto.Text.Trim();
 
+            string filtroProducto = txtProducto.Text.Trim();
             if (dtProducto != null && dtProducto.Rows.Count > 0)
             {
                 DataView dv = new DataView(dtProducto);
-
-                // Aplicamos el texto ingresdo como filtro de busqueda
                 dv.RowFilter = string.Format("Convert(Producto, 'System.String') LIKE '%{0}%' OR Nombre LIKE '%{0}%'", filtroProducto.Replace("'", "''"));
-
                 dgvProducto.DataSource = dv;
             }
+
+            // 🔹 Obtener selecciones
             var origenesSeleccionados = ObtenerOrigenesSeleccionados();
             var destinosSeleccionados = ObtenerDestinosSeleccionados();
             var productosSeleccionados = ObtenerProductosSeleccionados();
 
-            // Validación: al menos un origen marcado
+            // 🔹 Validaciones
             if (origenesSeleccionados == null || origenesSeleccionados.Count == 0)
             {
                 MessageBox.Show("Debe seleccionar al menos un origen antes de continuar.",
                     "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return; // no sigue
+                return;
             }
 
             if (destinosSeleccionados == null || destinosSeleccionados.Count == 0)
@@ -246,20 +243,129 @@ namespace ModuloVentasAdmin
                 return;
             }
 
-            using (var frm = new frmCotizacionDinamica(origenesSeleccionados, destinosSeleccionados, productosSeleccionados))
+            var registros = new List<CotizacionRegistro>();
+            foreach (var prod in productosSeleccionados)
             {
-                if (frm.ShowDialog() == DialogResult.OK)
+                registros.Add(new CotizacionRegistro
                 {
-                    var registros = frm.ObtenerCotizaciones();
+                    ProductoID = prod.ProductoID,
+                    PrecioNormal = 0 // valor inicial, luego el usuario lo ajusta en los NumericUpDown
+                });
+            }
 
-                    // Pintar la tabla
-                    GenerarTablaRegistroFinal(registros, productosSeleccionados, origenesSeleccionados, destinosSeleccionados);
+            GenerarTablaRegistroFinal(registros, productosSeleccionados, origenesSeleccionados, destinosSeleccionados);
 
-                    // Guardar en variables de clase para usarlas luego
-                    registrosGenerados = registros;
-                    productosGenerados = productosSeleccionados;
-                    origenesGenerados = origenesSeleccionados;
-                    destinosGenerados = destinosSeleccionados;
+            productosGenerados = productosSeleccionados;
+            origenesGenerados = origenesSeleccionados;
+            destinosGenerados = destinosSeleccionados;
+
+            registrosGenerados = new List<CotizacionRegistro>();
+
+            foreach (var origen in origenesGenerados)
+            {
+                foreach (var destino in destinosGenerados)
+                {
+                    foreach (var producto in productosGenerados)
+                    {
+                        registrosGenerados.Add(new CotizacionRegistro
+                        {
+                            CiudadOrigenID = origen.CiudadID,
+                            CiudadDestinoID = destino.CiudadID,
+                            ProductoID = producto.ProductoID,
+                            PrecioNormal = 0 // inicial
+                        });
+                    }
+                }
+            }
+
+            //Coloco los valores de los productos seleccionados
+            bool hayDescuentos = dtDescuentos.AsEnumerable()
+                .Any(row => productosGenerados.Any(p => p.ProductoID == row["ProductoID"].ToString()));
+
+            if (hayDescuentos)
+            {
+                using (var frm = new frmTablaDescuentos(txtClienteNombre.Text, txtClienteID.Text))
+                {
+                    if (frm.ShowDialog() == DialogResult.OK)
+                    {
+                        var precios = frm.PreciosSeleccionados;
+                        if (precios != null && precios.Count > 0)
+                        {
+                            AplicarPreciosEnRegistroFinal(precios);
+                        }
+                    }
+                }
+            }
+
+            ValidarCamposRegistroFinal();
+        }
+        private void ValidarCamposRegistroFinal()
+        {
+            Color colorError = Color.FromArgb(242, 175, 138);
+
+            for (int r = 0; r < tlpRegistroFinal.RowCount; r++)
+            {
+                for (int c = 0; c < tlpRegistroFinal.ColumnCount; c++)
+                {
+                    var control = tlpRegistroFinal.GetControlFromPosition(c, r);
+
+                    if (control is NumericUpDown nud)
+                    {
+                        if (nud.Value == 0)
+                        {
+                            nud.BackColor = colorError;
+                        }
+                        else
+                        {
+                            nud.BackColor = Color.White; // restaurar color normal
+                        }
+                    }
+                }
+            }
+        }
+
+        private bool productosSinPrecio()
+        {
+            Color colorError = Color.FromArgb(242, 175, 138);
+
+            for (int r = 0; r < tlpRegistroFinal.RowCount; r++)
+            {
+                for (int c = 0; c < tlpRegistroFinal.ColumnCount; c++)
+                {
+                    var control = tlpRegistroFinal.GetControlFromPosition(c, r);
+
+                    if (control is NumericUpDown nud)
+                    {
+                        // Evaluar si está vacío (texto) o en cero
+                        if (string.IsNullOrWhiteSpace(nud.Text) || nud.Value == 0)
+                        {
+                            nud.BackColor = colorError;
+                                                        
+                            return true; // salir inmediatamente
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+
+        private void AplicarPreciosEnRegistroFinal(Dictionary<string, decimal> precios)
+        {
+            for (int c = 1; c < tlpRegistroFinal.ColumnCount - 1; c++) 
+            {
+                var header = tlpRegistroFinal.GetControlFromPosition(c, 0) as Label;
+                if (header == null) continue;
+
+                string productoNombre = header.Text;
+
+                if (precios.ContainsKey(productoNombre))
+                {
+                    var nud = tlpRegistroFinal.GetControlFromPosition(c, 1) as NumericUpDown;
+                    if (nud != null)
+                    {
+                        nud.Value = precios[productoNombre];
+                    }
                 }
             }
         }
@@ -365,7 +471,6 @@ namespace ModuloVentasAdmin
 
             tlpRegistroFinal.Controls.Add(panelDestinos, 0, 1);
 
-            // Fila 1 → precios por producto (igual que tlpCotizacion pero deshabilitado)
             for (int i = 0; i < productos.Count; i++)
             {
                 var reg = registros.FirstOrDefault(r => r.ProductoID == productos[i].ProductoID);
@@ -382,8 +487,34 @@ namespace ModuloVentasAdmin
                     Enabled = true
                 };
 
+                // 🔹 Inicial: si arranca en 0 → color alerta
+                nudPrecio.BackColor = nudPrecio.Value == 0
+                    ? Color.FromArgb(242, 175, 138)
+                    : Color.White;
+
+                // 🔹 Evento en tiempo real
+                nudPrecio.ValueChanged += (s, e) =>
+                {
+                    var nud = (NumericUpDown)s;
+                    nud.BackColor = nud.Value == 0
+                        ? Color.FromArgb(242, 175, 138) // alerta
+                        : Color.White; // valor válido
+                };
+
+                // 🔹 Evento al salir del control (detecta vacío o 0)
+                nudPrecio.Leave += (s, e) =>
+                {
+                    var nud = (NumericUpDown)s;
+                    if (string.IsNullOrWhiteSpace(nud.Text) || nud.Value == 0)
+                        nud.BackColor = Color.FromArgb(242, 175, 138); // alerta
+                    else
+                        nud.BackColor = Color.White; // valor válido
+                };
+
+                nudPrecio.ResetText();
                 tlpRegistroFinal.Controls.Add(nudPrecio, 1 + i, 1);
             }
+
         }
 
         private List<ProductoSeleccionado> ObtenerProductosSeleccionados()
@@ -422,6 +553,7 @@ namespace ModuloVentasAdmin
                         CiudadPrincipalID = row.Cells["CiudadPrincipal"].Value.ToString()
                     };
                     lista.Add(destino);
+
                 }
             }
 
@@ -448,33 +580,29 @@ namespace ModuloVentasAdmin
         }
         private void ActualizarRegistrosDesdeTabla()
         {
-            // Recorremos todos los destinos y productos
-            for (int d = 0; d < destinosGenerados.Count; d++)
+            for (int p = 0; p < productosGenerados.Count; p++)
             {
-                for (int p = 0; p < productosGenerados.Count; p++)
+                var control = tlpRegistroFinal.GetControlFromPosition(1 + p, 1);
+                if (control is NumericUpDown nud)
                 {
-                    // La celda está en columna (1+p), fila (1+d)
-                    var control = tlpRegistroFinal.GetControlFromPosition(1 + p, 1 + d);
-                    if (control is NumericUpDown nud)
+                    decimal nuevoPrecio = nud.Value;
+
+                    foreach (var destino in destinosGenerados)
                     {
-                        decimal nuevoPrecio = nud.Value;
-
-                        // Buscar el registro correspondiente
-                        var reg = registrosGenerados.FirstOrDefault(r =>
-                            r.ProductoID == productosGenerados[p].ProductoID &&
-                            r.CiudadDestinoID == destinosGenerados[d].CiudadID &&
-                            r.CiudadOrigenID == origenesGenerados.First().CiudadID 
-                        );
-
-                        if (reg != null)
+                        foreach (var origen in origenesGenerados)
                         {
-                            reg.PrecioNormal = nuevoPrecio;
+                            var reg = registrosGenerados.FirstOrDefault(r =>
+                                r.ProductoID == productosGenerados[p].ProductoID &&
+                                r.CiudadDestinoID == destino.CiudadID &&
+                                r.CiudadOrigenID == origen.CiudadID);
+
+                            if (reg != null)
+                                reg.PrecioNormal = nuevoPrecio;
                         }
                     }
                 }
             }
         }
-
 
         private void btnGuardarNacional_Click(object sender, EventArgs e)
         {
@@ -492,10 +620,18 @@ namespace ModuloVentasAdmin
 
             if (registrosGenerados != null && productosGenerados != null && origenesGenerados != null && destinosGenerados != null)
             {
-                // 🔹 Actualizar registros con los valores actuales del NumericUpDown
+                // Actualizar registros con los valores actuales del NumericUpDown
                 ActualizarRegistrosDesdeTabla();
 
-                // 🔹 Guardar y generar PDF con los valores actualizados
+                bool precioVacio = productosSinPrecio();
+
+                if (precioVacio) 
+                {
+                    Toast.Mostrar("Faltan ingresar precios en productos.", TipoAlerta.Warning);
+                    return;
+                }
+
+                // Guardar y generar PDF con los valores actualizados
                 guardarEncabezado(registrosGenerados, origenesGenerados, destinosGenerados, productosGenerados);
                 GenerarPDFCotizacion(registrosGenerados, productosGenerados, origenesGenerados, destinosGenerados, dtTerminos);
 
@@ -515,7 +651,6 @@ namespace ModuloVentasAdmin
                 Opcion = "Listado"
             };
             dtGruposProductos = logica.SP_ProductosGruposENAC(getGrupos);
-           
         }
 
         private void guardarEncabezado(List<CotizacionRegistro> registros, List<CiudadOrigen> origenes, List<CiudadDestino> destinos, List<ProductoSeleccionado> productos)
@@ -583,7 +718,6 @@ namespace ModuloVentasAdmin
                         }
                     }
                 }
-
             }
             else
             {
@@ -1116,6 +1250,8 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
 
         private void btnPDF_Click_1(object sender, EventArgs e)
         {
+            //ActualizarRegistrosDesdeTabla();
+
             GenerarPDFCotizacion(registrosGenerados, productosGenerados, origenesGenerados, destinosGenerados, dtTerminos);
         }
 
@@ -1178,6 +1314,99 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
         {
 
         }
+        private void cargarDescuentos() 
+        {
+            ProductosPreciosENAC getDescuentos = new ProductosPreciosENAC
+            {
+                Opcion = "ListadoDistinct"
+            };
+            dtDescuentos = logica.SP_ProductosPreciosENAC(getDescuentos);
+        }
+
+        private void txtAtencion_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (char.IsControl(e.KeyChar))
+            {
+                return;
+            }
+
+            if (!(char.IsLetterOrDigit(e.KeyChar) || e.KeyChar == ' '))
+            {
+                e.Handled = true; 
+            }
+        }
+
+        private void dgvOrigen_CurrentCellDirtyStateChanged(object sender, EventArgs e)
+        {
+            if (dgvOrigen.IsCurrentCellDirty)
+            {
+                dgvOrigen.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
+        }
+
+        private void dgvOrigen_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex >= 0 && dgvOrigen.Columns[e.ColumnIndex].Name == "SeleccionarOrigen")
+            {
+                ActualizarSeleccionadosOrigen();
+            }
+        }
+
+        private void ActualizarSeleccionadosOrigen()
+        {
+            int cantidadSeleccionados = dtOrigen.AsEnumerable()
+                .Count(r => r.Field<bool>("SeleccionarOrigen"));
+
+            lblSeleccionadoOrigen.Text = $"REGISTROS ORIGEN SELECCIONADOS: {cantidadSeleccionados}";
+        }
+
+        private void ActualizarSeleccionadosDestino()
+        {
+            int cantidadSeleccionados = dtDestino.AsEnumerable()
+                .Count(r => r.Field<bool>("SeleccionarDestino"));
+
+            lblSeleccionadoDestino.Text = $"REGISTROS DESTINOS SELECCIONADOS: {cantidadSeleccionados}";
+        }
+
+        private void dgvDestino_CurrentCellDirtyStateChanged(object sender, EventArgs e)
+        {
+            if (dgvDestino.IsCurrentCellDirty)
+            {
+                dgvDestino.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
+        }
+
+        private void dgvDestino_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex >= 0 && dgvDestino.Columns[e.ColumnIndex].Name == "SeleccionarDestino")
+            {
+                ActualizarSeleccionadosDestino();
+            }
+        }
+
+        private void ActualizarSeleccionadosProducto()
+        {
+            int cantidadSeleccionados = dtProducto.AsEnumerable()
+                .Count(r => r.Field<bool>("SeleccionarProducto"));
+
+            lblSeleccionadoProducto.Text = $"REGISTROS PRODUCTOS SELECCIONADOS: {cantidadSeleccionados}";
+        }
+
+        private void dgvProducto_CurrentCellDirtyStateChanged(object sender, EventArgs e)
+        {
+            if (dgvProducto.IsCurrentCellDirty)
+            {
+                dgvProducto.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
+        }
+
+        private void dgvProducto_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex >= 0 && dgvProducto.Columns[e.ColumnIndex].Name == "SeleccionarProducto")
+            {
+                ActualizarSeleccionadosProducto();
+            }
+        }
 
         private void txtClienteID_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -1230,7 +1459,7 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
                     }
                     else
                     {
-                        var filasCoincidentesDestino = dtDestino.Select($"CiudadPrincipal = '{ciudadDestinoID}'");
+                        var filasCoincidentesDestino = dtDestino.Select($"Ciudad = '{ciudadDestinoID}'");
                         foreach (var fila in filasCoincidentesDestino)
                             fila["SeleccionarDestino"] = true;
                     }
@@ -1288,48 +1517,30 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
                 GenerarTablaRecuperada(registros, productosSeleccionados, origenesSeleccionados, destinosSeleccionados);
             }
         }
-
-
-        public List<CotizacionRegistro> ObtenerCotizacionesDesdeDetalle(
-    List<ProductoSeleccionado> productos,
-    List<CiudadOrigen> origenes,
-    List<CiudadDestino> destinos,
-    DataTable dtDetalle)
+        private List<CotizacionRegistro> ObtenerCotizacionesDesdeDetalle(
+            List<ProductoSeleccionado> productos,
+            List<CiudadOrigen> origenes,
+            List<CiudadDestino> destinos,
+            DataTable dtDetalle)
         {
             var registros = new List<CotizacionRegistro>();
 
-            foreach (var producto in productos)
+            foreach (DataRow row in dtDetalle.Rows)
             {
-                foreach (var destino in destinos)
+                registros.Add(new CotizacionRegistro
                 {
-                    foreach (var origen in origenes)
-                    {
-                        // Buscar el precio en dtDetalle para esta combinación
-                        var filas = dtDetalle.Select(
-                            $"ProductoID = '{producto.ProductoID}' AND CiudadOrigenID = '{origen.CiudadID}' AND CiudadDestinoID = '{destino.CiudadID}'");
-
-                        decimal precio = 0;
-                        if (filas.Length > 0)
-                            precio = Convert.ToDecimal(filas[0]["Precio"]);
-
-                        registros.Add(new CotizacionRegistro
-                        {
-                            ProductoID = producto.ProductoID,
-                            CiudadOrigenID = origen.CiudadID,
-                            CiudadDestinoID = destino.CiudadID,
-                            PrecioNormal = precio
-                        });
-                    }
-                }
+                    ProductoID = row["ProductoID"].ToString(),
+                    CiudadOrigenID = row["CiudadOrigenID"].ToString(),
+                    CiudadDestinoID = row["CiudadDestinoID"].ToString(),
+                    PrecioNormal = row["Precio"] != DBNull.Value ? Convert.ToDecimal(row["Precio"]) : 0
+                });
             }
 
             return registros;
         }
-        private void GenerarTablaRecuperada(
-        List<CotizacionRegistro> registros,
-        List<ProductoSeleccionado> productos,
-        List<CiudadOrigen> origenes,
-        List<CiudadDestino> destinos)
+
+        private void GenerarTablaRecuperada(List<CotizacionRegistro> registros,List<ProductoSeleccionado> productos,
+       List<CiudadOrigen> origenes,List<CiudadDestino> destinos)
         {
             tlpRegistroFinal.Controls.Clear();
             tlpRegistroFinal.ColumnStyles.Clear();
@@ -1337,28 +1548,29 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
 
             tlpRegistroFinal.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
 
+            // 🔹 Columnas: 1 para destinos + productos + extra
             int totalColumnas = 1 + productos.Count + 1;
             tlpRegistroFinal.ColumnCount = totalColumnas;
-            tlpRegistroFinal.RowCount = 2;
+            tlpRegistroFinal.RowCount = 2; // solo encabezado + detalle
 
-            tlpRegistroFinal.RowStyles.Add(new RowStyle(SizeType.Percent, 30));
-            tlpRegistroFinal.RowStyles.Add(new RowStyle(SizeType.Percent, 70));
+            // 🔹 Configuración de filas
+            tlpRegistroFinal.RowStyles.Add(new RowStyle(SizeType.Absolute, 30)); // encabezado
+            tlpRegistroFinal.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); // detalle
 
-            tlpRegistroFinal.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 250));
+            // 🔹 Configuración de columnas
+            tlpRegistroFinal.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 250)); // columna destinos
             foreach (var p in productos)
                 tlpRegistroFinal.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 150));
-            tlpRegistroFinal.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            tlpRegistroFinal.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100)); // columna extra
 
-            // Encabezado
+            // 🔹 Encabezado fila 0
             string origenesConcat = string.Join(", ", origenes.Select(o => o.Nombre));
             tlpRegistroFinal.Controls.Add(new Label
             {
                 Text = origenesConcat,
                 TextAlign = ContentAlignment.MiddleCenter,
                 Dock = DockStyle.Fill,
-                Font = new System.Drawing.Font("Segoe UI", 9, FontStyle.Bold),
-                AutoSize = false,
-                MaximumSize = new Size(250, 0)
+                Font = new System.Drawing.Font("Segoe UI", 9, FontStyle.Bold)
             }, 0, 0);
 
             for (int i = 0; i < productos.Count; i++)
@@ -1368,14 +1580,17 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
                     Text = productos[i].Nombre,
                     TextAlign = ContentAlignment.MiddleCenter,
                     Dock = DockStyle.Fill,
-                    Font = new System.Drawing.Font("Segoe UI", 9, FontStyle.Bold),
-                    AutoSize = false,
-                    MaximumSize = new Size(200, 0)
+                    Font = new System.Drawing.Font("Segoe UI", 9, FontStyle.Bold)
                 }, 1 + i, 0);
             }
 
-            // Destinos con centrado
-            var panelDestinos = new Panel { Dock = DockStyle.Fill, AutoScroll = true };
+            // Fila 1 → destinos con scroll y centrado igual que tlpCotizacion
+            var panelDestinos = new Panel
+            {
+                Dock = DockStyle.Fill,
+                AutoScroll = true
+            };
+
             var contentDestinos = new FlowLayoutPanel
             {
                 AutoSize = true,
@@ -1402,7 +1617,6 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
 
             panelDestinos.Controls.Add(contentDestinos);
 
-            // 🔹 Centrado vertical y horizontal como en el primer método
             panelDestinos.Resize += (s, e) =>
             {
                 var contentSize = contentDestinos.PreferredSize;
@@ -1420,26 +1634,32 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
 
             tlpRegistroFinal.Controls.Add(panelDestinos, 0, 1);
 
-            // Precios desde registros (mejor que dtDetalle)
+
+            // 🔹 Fila 1 → precios por producto (un solo NumericUpDown por producto)
             for (int i = 0; i < productos.Count; i++)
             {
                 var reg = registros.FirstOrDefault(r => r.ProductoID == productos[i].ProductoID);
-                decimal precio = reg != null ? reg.PrecioNormal : 0;
 
                 var nudPrecio = new NumericUpDown
                 {
                     Anchor = AnchorStyles.None,
-                    Size = new Size(120, 40),
                     DecimalPlaces = 2,
                     Maximum = 1000000,
                     Minimum = 0,
-                    Font = new System.Drawing.Font("Segoe UI", 12, FontStyle.Regular),
-                    Value = precio,
+                    Font = new System.Drawing.Font("Segoe UI", 12),
+                    Value = reg != null ? reg.PrecioNormal : 0,
                     Enabled = false
+                    
                 };
 
                 tlpRegistroFinal.Controls.Add(nudPrecio, 1 + i, 1);
             }
+
+            // 🔹 Guardar referencias
+            registrosGenerados = registros;
+            productosGenerados = productos;
+            origenesGenerados = origenes;
+            destinosGenerados = destinos;
         }
 
         private void cargarOrigen()

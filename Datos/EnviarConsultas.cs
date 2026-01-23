@@ -1448,6 +1448,44 @@ namespace DatosVentasAdmin
 
             return tabla;
         }
+        public DataTable SP_ProductosPreciosENAC(dynamic a)
+        {
+            SqlDataReader leer = null;
+            SqlCommand comando = new SqlCommand();
+            DataTable tabla = new DataTable();
+
+            if (tabla.Rows.Count > 0)
+            {
+                tabla.Rows.Clear();
+                tabla.Clear();
+            }
+
+            comando.Connection = Conexion.AbrirConexion(4);
+
+            comando.Parameters.AddWithValue("@Opcion", a.Opcion ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@ProductoPrecioID", a.ProductoPrecioID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@PromedioID", a.PromedioID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@PromedioDesde", a.PromedioDesde ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@PromedioHasta", a.PromedioHasta ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@PromedioGDesde", a.PromedioGDesde ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@PromedioGHasta", a.PromedioGHasta ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@ProductoID", a.ProductoID ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Precio", a.Precio ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@UPosteo", a.UPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@FPosteo", a.FPosteo ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@PC", a.PC ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Estado", a.Estado ?? (object)DBNull.Value);
+
+            comando.CommandText = "ENAC.dbo.SP_ProductosPrecios";
+            comando.CommandType = CommandType.StoredProcedure;
+
+            leer = comando.ExecuteReader();
+            tabla.Load(leer);
+
+            Conexion.CerrarConexion();
+
+            return tabla;
+        }
 
     }
 }

@@ -180,6 +180,9 @@ namespace LogicaVentasAdmin
         }
         private void TxtCliente_KeyPress(object sender, KeyPressEventArgs e)
         {
+
+           
+
             // Solo ejecutamos si presiona Enter
             if (e.KeyChar == (char)Keys.Enter)
             {
@@ -279,6 +282,16 @@ namespace LogicaVentasAdmin
                 {
                     DgvClientes.DataSource = null;
                 }
+            }
+
+            if (char.IsControl(e.KeyChar))
+            {
+                return;
+            }
+
+            if (!(char.IsLetterOrDigit(e.KeyChar) || e.KeyChar == ' '))
+            {
+                e.Handled = true;
             }
 
         }

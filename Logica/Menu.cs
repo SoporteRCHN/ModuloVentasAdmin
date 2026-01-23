@@ -542,5 +542,21 @@ namespace LogicaVentasAdmin
         public string PC { get; set; }
         public bool? Estado { get; set; }
     }
+    public class ProductosPreciosENAC
+    {
+        public string Opcion { get; set; }
+        public int? ProductoPrecioID { get; set; }
+        public int? PromedioID { get; set; }
+        public int? PromedioDesde { get; set; }
+        public int? PromedioHasta { get; set; }
+        public int? PromedioGDesde { get; set; }
+        public int? PromedioGHasta { get; set; }
+        public string ProductoID { get; set; }
+        public decimal? Precio { get; set; }
+        public string UPosteo { get; set; }
+        public DateTime? FPosteo { get; set; }
+        public string PC { get; set; }
+        public bool? Estado { get; set; }
+    }
 
 }

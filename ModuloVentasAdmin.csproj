@@ -99,6 +99,12 @@
     <Compile Include="frmCotizaciones.Designer.cs">
       <DependentUpon>frmCotizaciones.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmTablaDescuentos.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTablaDescuentos.Designer.cs">
+      <DependentUpon>frmTablaDescuentos.cs</DependentUpon>
+    </Compile>
     <Compile Include="LoginMenu\DynamicMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -128,6 +134,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmCotizaciones.resx">
       <DependentUpon>frmCotizaciones.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTablaDescuentos.resx">
+      <DependentUpon>frmTablaDescuentos.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LoginMenu\DynamicMain.resx">
       <DependentUpon>DynamicMain.cs</DependentUpon>
