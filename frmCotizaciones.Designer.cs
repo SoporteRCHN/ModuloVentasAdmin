@@ -423,8 +423,8 @@
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.08791F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 3.952569F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 7.114625F));
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 13.04348F));
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 64.03162F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 12.39669F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 64.87603F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 27F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 43F));
             this.tableLayoutPanel4.Size = new System.Drawing.Size(993, 398);
@@ -442,17 +442,18 @@
             this.tableLayoutPanel8.Name = "tableLayoutPanel8";
             this.tableLayoutPanel8.RowCount = 1;
             this.tableLayoutPanel8.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel8.Size = new System.Drawing.Size(326, 25);
+            this.tableLayoutPanel8.Size = new System.Drawing.Size(326, 24);
             this.tableLayoutPanel8.TabIndex = 8;
             // 
             // pictureBox4
             // 
             this.pictureBox4.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBox4.Image = global::ModuloVentasAdmin.Properties.Resources.blue_Checkmark_22px;
-            this.pictureBox4.Location = new System.Drawing.Point(4, 4);
-            this.pictureBox4.Margin = new System.Windows.Forms.Padding(4);
+            this.pictureBox4.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox4.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBox4.Name = "pictureBox4";
-            this.pictureBox4.Size = new System.Drawing.Size(22, 17);
+            this.pictureBox4.Size = new System.Drawing.Size(30, 24);
+            this.pictureBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox4.TabIndex = 130;
             this.pictureBox4.TabStop = false;
             // 
@@ -477,17 +478,18 @@
             this.tableLayoutPanel7.Name = "tableLayoutPanel7";
             this.tableLayoutPanel7.RowCount = 1;
             this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel7.Size = new System.Drawing.Size(325, 25);
+            this.tableLayoutPanel7.Size = new System.Drawing.Size(325, 24);
             this.tableLayoutPanel7.TabIndex = 8;
             // 
             // pictureBox3
             // 
             this.pictureBox3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBox3.Image = global::ModuloVentasAdmin.Properties.Resources.blue_Checkmark_22px;
-            this.pictureBox3.Location = new System.Drawing.Point(4, 4);
-            this.pictureBox3.Margin = new System.Windows.Forms.Padding(4);
+            this.pictureBox3.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox3.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(22, 17);
+            this.pictureBox3.Size = new System.Drawing.Size(30, 24);
+            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox3.TabIndex = 131;
             this.pictureBox3.TabStop = false;
             // 
@@ -542,17 +544,18 @@
             this.tableLayoutPanel6.Name = "tableLayoutPanel6";
             this.tableLayoutPanel6.RowCount = 1;
             this.tableLayoutPanel6.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel6.Size = new System.Drawing.Size(324, 25);
+            this.tableLayoutPanel6.Size = new System.Drawing.Size(324, 24);
             this.tableLayoutPanel6.TabIndex = 7;
             // 
             // pictureBox2
             // 
             this.pictureBox2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBox2.Image = global::ModuloVentasAdmin.Properties.Resources.blue_Checkmark_22px;
-            this.pictureBox2.Location = new System.Drawing.Point(4, 4);
-            this.pictureBox2.Margin = new System.Windows.Forms.Padding(4);
+            this.pictureBox2.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox2.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(22, 17);
+            this.pictureBox2.Size = new System.Drawing.Size(30, 24);
+            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox2.TabIndex = 130;
             this.pictureBox2.TabStop = false;
             // 
@@ -573,14 +576,14 @@
             this.dgvOrigen.BackgroundColor = System.Drawing.Color.White;
             this.dgvOrigen.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvOrigen.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvOrigen.Location = new System.Drawing.Point(3, 173);
+            this.dgvOrigen.Location = new System.Drawing.Point(3, 172);
             this.dgvOrigen.Name = "dgvOrigen";
             this.dgvOrigen.RowHeadersVisible = false;
             this.dgvOrigen.RowTemplate.DefaultCellStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.dgvOrigen.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.Gainsboro;
             this.dgvOrigen.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.dgvOrigen.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvOrigen.Size = new System.Drawing.Size(324, 149);
+            this.dgvOrigen.Size = new System.Drawing.Size(324, 151);
             this.dgvOrigen.TabIndex = 9;
             this.dgvOrigen.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvOrigen_CellContentClick);
             this.dgvOrigen.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvOrigen_CellValueChanged);
@@ -594,14 +597,14 @@
             this.dgvDestino.BackgroundColor = System.Drawing.Color.White;
             this.dgvDestino.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvDestino.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvDestino.Location = new System.Drawing.Point(333, 173);
+            this.dgvDestino.Location = new System.Drawing.Point(333, 172);
             this.dgvDestino.Name = "dgvDestino";
             this.dgvDestino.RowHeadersVisible = false;
             this.dgvDestino.RowTemplate.DefaultCellStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.dgvDestino.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.Gainsboro;
             this.dgvDestino.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.dgvDestino.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvDestino.Size = new System.Drawing.Size(325, 149);
+            this.dgvDestino.Size = new System.Drawing.Size(325, 151);
             this.dgvDestino.TabIndex = 10;
             this.dgvDestino.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvDestino_CellContentClick);
             this.dgvDestino.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvDestino_CellValueChanged);
@@ -615,14 +618,14 @@
             this.dgvProducto.BackgroundColor = System.Drawing.Color.White;
             this.dgvProducto.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvProducto.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvProducto.Location = new System.Drawing.Point(664, 173);
+            this.dgvProducto.Location = new System.Drawing.Point(664, 172);
             this.dgvProducto.Name = "dgvProducto";
             this.dgvProducto.RowHeadersVisible = false;
             this.dgvProducto.RowTemplate.DefaultCellStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.dgvProducto.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.Gainsboro;
             this.dgvProducto.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.dgvProducto.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvProducto.Size = new System.Drawing.Size(326, 149);
+            this.dgvProducto.Size = new System.Drawing.Size(326, 151);
             this.dgvProducto.TabIndex = 11;
             this.dgvProducto.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvProducto_CellContentClick);
             this.dgvProducto.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvProducto_CellValueChanged);
@@ -633,10 +636,10 @@
             this.tableLayoutPanel4.SetColumnSpan(this.btnAgregar, 3);
             this.btnAgregar.Dock = System.Windows.Forms.DockStyle.Fill;
             this.btnAgregar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAgregar.Location = new System.Drawing.Point(0, 352);
+            this.btnAgregar.Location = new System.Drawing.Point(0, 353);
             this.btnAgregar.Margin = new System.Windows.Forms.Padding(0);
             this.btnAgregar.Name = "btnAgregar";
-            this.btnAgregar.Size = new System.Drawing.Size(993, 46);
+            this.btnAgregar.Size = new System.Drawing.Size(993, 45);
             this.btnAgregar.TabIndex = 12;
             this.btnAgregar.Text = "AGREGAR REGISTRO";
             this.btnAgregar.UseVisualStyleBackColor = true;
@@ -925,7 +928,7 @@
             // lblSeleccionadoOrigen
             // 
             this.lblSeleccionadoOrigen.AutoSize = true;
-            this.lblSeleccionadoOrigen.Location = new System.Drawing.Point(3, 325);
+            this.lblSeleccionadoOrigen.Location = new System.Drawing.Point(3, 326);
             this.lblSeleccionadoOrigen.Name = "lblSeleccionadoOrigen";
             this.lblSeleccionadoOrigen.Size = new System.Drawing.Size(229, 13);
             this.lblSeleccionadoOrigen.TabIndex = 16;
@@ -934,7 +937,7 @@
             // lblSeleccionadoDestino
             // 
             this.lblSeleccionadoDestino.AutoSize = true;
-            this.lblSeleccionadoDestino.Location = new System.Drawing.Point(333, 325);
+            this.lblSeleccionadoDestino.Location = new System.Drawing.Point(333, 326);
             this.lblSeleccionadoDestino.Name = "lblSeleccionadoDestino";
             this.lblSeleccionadoDestino.Size = new System.Drawing.Size(245, 13);
             this.lblSeleccionadoDestino.TabIndex = 17;
@@ -943,7 +946,7 @@
             // lblSeleccionadoProducto
             // 
             this.lblSeleccionadoProducto.AutoSize = true;
-            this.lblSeleccionadoProducto.Location = new System.Drawing.Point(664, 325);
+            this.lblSeleccionadoProducto.Location = new System.Drawing.Point(664, 326);
             this.lblSeleccionadoProducto.Name = "lblSeleccionadoProducto";
             this.lblSeleccionadoProducto.Size = new System.Drawing.Size(252, 13);
             this.lblSeleccionadoProducto.TabIndex = 18;

@@ -1734,6 +1734,7 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
                 DataRow rowNacional = dtDestino.NewRow();
                 rowNacional["Ciudad"] = 0;
                 rowNacional["Nombre"] = "A NIVEL NACIONAL";
+                rowNacional["CiudadPrincipal"] = 0;
                 dtDestino.Rows.InsertAt(rowNacional, 0);
 
                 // Si no existe la columna Seleccionar en el DataTable, la agregamos
@@ -1823,6 +1824,16 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
                 chkCol.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
                 dgvProducto.Columns.Add(chkCol);
 
+                // Columna GrupoID
+                DataGridViewTextBoxColumn colGrupoID = new DataGridViewTextBoxColumn();
+                colGrupoID.DataPropertyName = "GrupoID";
+                colGrupoID.HeaderText = "GrupoID";
+                colGrupoID.Width = 275;
+                colGrupoID.ReadOnly = true;
+                colGrupoID.Name = "GrupoID";
+                colGrupoID.Visible = false;
+                dgvProducto.Columns.Add(colGrupoID);
+
                 // Columna Nombre
                 DataGridViewTextBoxColumn colNombre = new DataGridViewTextBoxColumn();
                 colNombre.DataPropertyName = "Nombre";
@@ -1840,7 +1851,10 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
                 colProducto.Name = "Producto";
                 dgvProducto.Columns.Add(colProducto);
 
+                //dgvProducto.DataSource = dtProducto;
+                //dtProducto = dtProducto.AsEnumerable().OrderBy(r => r.Field<string>("GrupoID")).CopyToDataTable();
                 dgvProducto.DataSource = dtProducto;
+
             }
         }
     }
