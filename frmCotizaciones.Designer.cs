@@ -32,7 +32,6 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.btnNuevaCotizacion = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
             this.tableLayoutPanel12 = new System.Windows.Forms.TableLayoutPanel();
             this.label11 = new System.Windows.Forms.Label();
@@ -43,32 +42,23 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
-            this.btnGuardarNacional = new System.Windows.Forms.Button();
-            this.btnLimpiar = new System.Windows.Forms.Button();
-            this.btnCancelar = new System.Windows.Forms.Button();
-            this.btnPDF = new System.Windows.Forms.Button();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel8 = new System.Windows.Forms.TableLayoutPanel();
-            this.pictureBox4 = new System.Windows.Forms.PictureBox();
             this.txtProducto = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel7 = new System.Windows.Forms.TableLayoutPanel();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.txtDestino = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.tableLayoutPanel6 = new System.Windows.Forms.TableLayoutPanel();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.txtOrigen = new System.Windows.Forms.TextBox();
             this.dgvOrigen = new System.Windows.Forms.DataGridView();
             this.dgvDestino = new System.Windows.Forms.DataGridView();
             this.dgvProducto = new System.Windows.Forms.DataGridView();
-            this.btnAgregar = new System.Windows.Forms.Button();
             this.tableLayoutPanel9 = new System.Windows.Forms.TableLayoutPanel();
             this.label12 = new System.Windows.Forms.Label();
             this.txtClienteID = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
-            this.btnCliente = new System.Windows.Forms.Button();
             this.txtClienteNombre = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel13 = new System.Windows.Forms.TableLayoutPanel();
             this.rbdNombre = new System.Windows.Forms.RadioButton();
@@ -82,12 +72,22 @@
             this.label3 = new System.Windows.Forms.Label();
             this.cmbImpuesto = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.tlpRegistroFinal = new System.Windows.Forms.TableLayoutPanel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.btnAgregar = new System.Windows.Forms.Button();
             this.lblSeleccionadoOrigen = new System.Windows.Forms.Label();
             this.lblSeleccionadoDestino = new System.Windows.Forms.Label();
             this.lblSeleccionadoProducto = new System.Windows.Forms.Label();
+            this.tlpRegistroFinal = new System.Windows.Forms.TableLayoutPanel();
+            this.label1 = new System.Windows.Forms.Label();
+            this.btnNuevaCotizacion = new System.Windows.Forms.Button();
+            this.btnGuardarNacional = new System.Windows.Forms.Button();
+            this.btnLimpiar = new System.Windows.Forms.Button();
+            this.btnCancelar = new System.Windows.Forms.Button();
+            this.btnPDF = new System.Windows.Forms.Button();
+            this.pictureBox4 = new System.Windows.Forms.PictureBox();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.btnCliente = new System.Windows.Forms.Button();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -99,11 +99,8 @@
             this.tableLayoutPanel5.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             this.tableLayoutPanel8.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
             this.tableLayoutPanel7.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.tableLayoutPanel6.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvOrigen)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDestino)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvProducto)).BeginInit();
@@ -111,6 +108,9 @@
             this.tableLayoutPanel13.SuspendLayout();
             this.tableLayoutPanel10.SuspendLayout();
             this.tableLayoutPanel11.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -170,24 +170,6 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.Size = new System.Drawing.Size(993, 43);
             this.tableLayoutPanel2.TabIndex = 0;
-            // 
-            // btnNuevaCotizacion
-            // 
-            this.btnNuevaCotizacion.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(102)))), ((int)(((byte)(118)))));
-            this.btnNuevaCotizacion.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnNuevaCotizacion.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnNuevaCotizacion.ForeColor = System.Drawing.Color.White;
-            this.btnNuevaCotizacion.Image = global::ModuloVentasAdmin.Properties.Resources.Plus_28px;
-            this.btnNuevaCotizacion.Location = new System.Drawing.Point(773, 0);
-            this.btnNuevaCotizacion.Margin = new System.Windows.Forms.Padding(0);
-            this.btnNuevaCotizacion.Name = "btnNuevaCotizacion";
-            this.btnNuevaCotizacion.Size = new System.Drawing.Size(220, 43);
-            this.btnNuevaCotizacion.TabIndex = 0;
-            this.btnNuevaCotizacion.Text = "NUEVA COTIZACIÓN";
-            this.btnNuevaCotizacion.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btnNuevaCotizacion.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnNuevaCotizacion.UseVisualStyleBackColor = false;
-            this.btnNuevaCotizacion.Click += new System.EventHandler(this.btnNuevaCotizacion_Click);
             // 
             // label10
             // 
@@ -325,73 +307,6 @@
             this.tableLayoutPanel5.Size = new System.Drawing.Size(993, 50);
             this.tableLayoutPanel5.TabIndex = 2;
             // 
-            // btnGuardarNacional
-            // 
-            this.btnGuardarNacional.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(97)))), ((int)(((byte)(172)))), ((int)(((byte)(112)))));
-            this.btnGuardarNacional.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnGuardarNacional.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnGuardarNacional.ForeColor = System.Drawing.Color.White;
-            this.btnGuardarNacional.Image = global::ModuloVentasAdmin.Properties.Resources.TikTok_Verified_Account_28px;
-            this.btnGuardarNacional.Location = new System.Drawing.Point(747, 3);
-            this.btnGuardarNacional.Name = "btnGuardarNacional";
-            this.btnGuardarNacional.Size = new System.Drawing.Size(243, 44);
-            this.btnGuardarNacional.TabIndex = 0;
-            this.btnGuardarNacional.Text = "GUARDAR ";
-            this.btnGuardarNacional.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btnGuardarNacional.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnGuardarNacional.UseVisualStyleBackColor = false;
-            this.btnGuardarNacional.Click += new System.EventHandler(this.btnGuardarNacional_Click);
-            // 
-            // btnLimpiar
-            // 
-            this.btnLimpiar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnLimpiar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnLimpiar.Image = global::ModuloVentasAdmin.Properties.Resources.sync_28px;
-            this.btnLimpiar.Location = new System.Drawing.Point(499, 3);
-            this.btnLimpiar.Name = "btnLimpiar";
-            this.btnLimpiar.Size = new System.Drawing.Size(242, 44);
-            this.btnLimpiar.TabIndex = 3;
-            this.btnLimpiar.Text = "LIMPIAR REGISTROS";
-            this.btnLimpiar.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btnLimpiar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnLimpiar.UseVisualStyleBackColor = true;
-            this.btnLimpiar.Click += new System.EventHandler(this.btnLimpiar_Click);
-            // 
-            // btnCancelar
-            // 
-            this.btnCancelar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(136)))), ((int)(((byte)(80)))));
-            this.btnCancelar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnCancelar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCancelar.ForeColor = System.Drawing.Color.White;
-            this.btnCancelar.Image = global::ModuloVentasAdmin.Properties.Resources.white_cancel_28px;
-            this.btnCancelar.Location = new System.Drawing.Point(251, 3);
-            this.btnCancelar.Name = "btnCancelar";
-            this.btnCancelar.Size = new System.Drawing.Size(242, 44);
-            this.btnCancelar.TabIndex = 2;
-            this.btnCancelar.Text = "CANCELAR";
-            this.btnCancelar.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btnCancelar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnCancelar.UseVisualStyleBackColor = false;
-            this.btnCancelar.Click += new System.EventHandler(this.btnCancelar_Click);
-            // 
-            // btnPDF
-            // 
-            this.btnPDF.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(102)))), ((int)(((byte)(118)))));
-            this.btnPDF.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnPDF.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnPDF.ForeColor = System.Drawing.Color.White;
-            this.btnPDF.Image = global::ModuloVentasAdmin.Properties.Resources.pdf_28px;
-            this.btnPDF.Location = new System.Drawing.Point(3, 3);
-            this.btnPDF.Name = "btnPDF";
-            this.btnPDF.Size = new System.Drawing.Size(242, 44);
-            this.btnPDF.TabIndex = 4;
-            this.btnPDF.Text = "DESCARGAR";
-            this.btnPDF.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btnPDF.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnPDF.UseVisualStyleBackColor = false;
-            this.btnPDF.Visible = false;
-            this.btnPDF.Click += new System.EventHandler(this.btnPDF_Click_1);
-            // 
             // tableLayoutPanel4
             // 
             this.tableLayoutPanel4.ColumnCount = 3;
@@ -445,18 +360,6 @@
             this.tableLayoutPanel8.Size = new System.Drawing.Size(326, 24);
             this.tableLayoutPanel8.TabIndex = 8;
             // 
-            // pictureBox4
-            // 
-            this.pictureBox4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox4.Image = global::ModuloVentasAdmin.Properties.Resources.blue_Checkmark_22px;
-            this.pictureBox4.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox4.Margin = new System.Windows.Forms.Padding(0);
-            this.pictureBox4.Name = "pictureBox4";
-            this.pictureBox4.Size = new System.Drawing.Size(30, 24);
-            this.pictureBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox4.TabIndex = 130;
-            this.pictureBox4.TabStop = false;
-            // 
             // txtProducto
             // 
             this.txtProducto.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -480,18 +383,6 @@
             this.tableLayoutPanel7.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel7.Size = new System.Drawing.Size(325, 24);
             this.tableLayoutPanel7.TabIndex = 8;
-            // 
-            // pictureBox3
-            // 
-            this.pictureBox3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox3.Image = global::ModuloVentasAdmin.Properties.Resources.blue_Checkmark_22px;
-            this.pictureBox3.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox3.Margin = new System.Windows.Forms.Padding(0);
-            this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(30, 24);
-            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox3.TabIndex = 131;
-            this.pictureBox3.TabStop = false;
             // 
             // txtDestino
             // 
@@ -547,18 +438,6 @@
             this.tableLayoutPanel6.Size = new System.Drawing.Size(324, 24);
             this.tableLayoutPanel6.TabIndex = 7;
             // 
-            // pictureBox2
-            // 
-            this.pictureBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox2.Image = global::ModuloVentasAdmin.Properties.Resources.blue_Checkmark_22px;
-            this.pictureBox2.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox2.Margin = new System.Windows.Forms.Padding(0);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(30, 24);
-            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox2.TabIndex = 130;
-            this.pictureBox2.TabStop = false;
-            // 
             // txtOrigen
             // 
             this.txtOrigen.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -584,7 +463,7 @@
             this.dgvOrigen.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.dgvOrigen.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvOrigen.Size = new System.Drawing.Size(324, 151);
-            this.dgvOrigen.TabIndex = 9;
+            this.dgvOrigen.TabIndex = 0;
             this.dgvOrigen.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvOrigen_CellContentClick);
             this.dgvOrigen.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvOrigen_CellValueChanged);
             this.dgvOrigen.CurrentCellDirtyStateChanged += new System.EventHandler(this.dgvOrigen_CurrentCellDirtyStateChanged);
@@ -605,7 +484,7 @@
             this.dgvDestino.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.dgvDestino.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvDestino.Size = new System.Drawing.Size(325, 151);
-            this.dgvDestino.TabIndex = 10;
+            this.dgvDestino.TabIndex = 1;
             this.dgvDestino.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvDestino_CellContentClick);
             this.dgvDestino.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvDestino_CellValueChanged);
             this.dgvDestino.CurrentCellDirtyStateChanged += new System.EventHandler(this.dgvDestino_CurrentCellDirtyStateChanged);
@@ -626,24 +505,10 @@
             this.dgvProducto.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.dgvProducto.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvProducto.Size = new System.Drawing.Size(326, 151);
-            this.dgvProducto.TabIndex = 11;
+            this.dgvProducto.TabIndex = 2;
             this.dgvProducto.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvProducto_CellContentClick);
             this.dgvProducto.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvProducto_CellValueChanged);
             this.dgvProducto.CurrentCellDirtyStateChanged += new System.EventHandler(this.dgvProducto_CurrentCellDirtyStateChanged);
-            // 
-            // btnAgregar
-            // 
-            this.tableLayoutPanel4.SetColumnSpan(this.btnAgregar, 3);
-            this.btnAgregar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnAgregar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAgregar.Location = new System.Drawing.Point(0, 353);
-            this.btnAgregar.Margin = new System.Windows.Forms.Padding(0);
-            this.btnAgregar.Name = "btnAgregar";
-            this.btnAgregar.Size = new System.Drawing.Size(993, 45);
-            this.btnAgregar.TabIndex = 12;
-            this.btnAgregar.Text = "AGREGAR REGISTRO";
-            this.btnAgregar.UseVisualStyleBackColor = true;
-            this.btnAgregar.Click += new System.EventHandler(this.btnAgregar_Click);
             // 
             // tableLayoutPanel9
             // 
@@ -690,7 +555,7 @@
             this.txtClienteID.Location = new System.Drawing.Point(114, 33);
             this.txtClienteID.Name = "txtClienteID";
             this.txtClienteID.Size = new System.Drawing.Size(281, 20);
-            this.txtClienteID.TabIndex = 4;
+            this.txtClienteID.TabIndex = 0;
             this.txtClienteID.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtClienteID_KeyDown);
             this.txtClienteID.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtClienteID_KeyPress);
             // 
@@ -704,21 +569,6 @@
             this.label8.TabIndex = 1;
             this.label8.Text = "CODIGO:";
             // 
-            // btnCliente
-            // 
-            this.btnCliente.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(102)))), ((int)(((byte)(118)))));
-            this.btnCliente.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnCliente.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCliente.ForeColor = System.Drawing.Color.White;
-            this.btnCliente.Image = global::ModuloVentasAdmin.Properties.Resources.search_16px;
-            this.btnCliente.Location = new System.Drawing.Point(398, 29);
-            this.btnCliente.Margin = new System.Windows.Forms.Padding(0);
-            this.btnCliente.Name = "btnCliente";
-            this.btnCliente.Size = new System.Drawing.Size(62, 29);
-            this.btnCliente.TabIndex = 2;
-            this.btnCliente.UseVisualStyleBackColor = false;
-            this.btnCliente.Click += new System.EventHandler(this.btnCliente_Click);
-            // 
             // txtClienteNombre
             // 
             this.txtClienteNombre.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
@@ -731,7 +581,7 @@
             this.txtClienteNombre.Name = "txtClienteNombre";
             this.txtClienteNombre.ReadOnly = true;
             this.txtClienteNombre.Size = new System.Drawing.Size(432, 20);
-            this.txtClienteNombre.TabIndex = 3;
+            this.txtClienteNombre.TabIndex = 2;
             // 
             // tableLayoutPanel13
             // 
@@ -822,7 +672,7 @@
             this.txtAtencion.Location = new System.Drawing.Point(115, 3);
             this.txtAtencion.Name = "txtAtencion";
             this.txtAtencion.Size = new System.Drawing.Size(875, 20);
-            this.txtAtencion.TabIndex = 4;
+            this.txtAtencion.TabIndex = 0;
             this.txtAtencion.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtAtencion_KeyPress);
             // 
             // tableLayoutPanel11
@@ -855,7 +705,7 @@
             this.cmbTipoCotizacion.Location = new System.Drawing.Point(112, 3);
             this.cmbTipoCotizacion.Name = "cmbTipoCotizacion";
             this.cmbTipoCotizacion.Size = new System.Drawing.Size(378, 21);
-            this.cmbTipoCotizacion.TabIndex = 1;
+            this.cmbTipoCotizacion.TabIndex = 0;
             this.cmbTipoCotizacion.SelectedIndexChanged += new System.EventHandler(this.cmbTipoCotizacion_SelectedIndexChanged);
             // 
             // label3
@@ -878,7 +728,7 @@
             this.cmbImpuesto.Location = new System.Drawing.Point(628, 3);
             this.cmbImpuesto.Name = "cmbImpuesto";
             this.cmbImpuesto.Size = new System.Drawing.Size(356, 21);
-            this.cmbImpuesto.TabIndex = 3;
+            this.cmbImpuesto.TabIndex = 1;
             // 
             // label2
             // 
@@ -891,39 +741,19 @@
             this.label2.TabIndex = 0;
             this.label2.Text = "TIPO COTIZACIÓN:";
             // 
-            // tlpRegistroFinal
+            // btnAgregar
             // 
-            this.tlpRegistroFinal.AutoScroll = true;
-            this.tlpRegistroFinal.ColumnCount = 1;
-            this.tlpRegistroFinal.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tlpRegistroFinal.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tlpRegistroFinal.Location = new System.Drawing.Point(3, 407);
-            this.tlpRegistroFinal.Name = "tlpRegistroFinal";
-            this.tlpRegistroFinal.RowCount = 1;
-            this.tlpRegistroFinal.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tlpRegistroFinal.Size = new System.Drawing.Size(993, 165);
-            this.tlpRegistroFinal.TabIndex = 4;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(43, 9);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(191, 18);
-            this.label1.TabIndex = 130;
-            this.label1.Text = "Cotizaciones Generadas";
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::ModuloVentasAdmin.Properties.Resources.blue_Checkmark_22px;
-            this.pictureBox1.Location = new System.Drawing.Point(18, 8);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(24, 22);
-            this.pictureBox1.TabIndex = 131;
-            this.pictureBox1.TabStop = false;
+            this.tableLayoutPanel4.SetColumnSpan(this.btnAgregar, 3);
+            this.btnAgregar.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnAgregar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAgregar.Location = new System.Drawing.Point(0, 353);
+            this.btnAgregar.Margin = new System.Windows.Forms.Padding(0);
+            this.btnAgregar.Name = "btnAgregar";
+            this.btnAgregar.Size = new System.Drawing.Size(993, 45);
+            this.btnAgregar.TabIndex = 3;
+            this.btnAgregar.Text = "AGREGAR REGISTRO";
+            this.btnAgregar.UseVisualStyleBackColor = true;
+            this.btnAgregar.Click += new System.EventHandler(this.btnAgregar_Click);
             // 
             // lblSeleccionadoOrigen
             // 
@@ -951,6 +781,176 @@
             this.lblSeleccionadoProducto.Size = new System.Drawing.Size(252, 13);
             this.lblSeleccionadoProducto.TabIndex = 18;
             this.lblSeleccionadoProducto.Text = "REGISTROS PRODUCTOS SELECCIONADOS:   0";
+            // 
+            // tlpRegistroFinal
+            // 
+            this.tlpRegistroFinal.AutoScroll = true;
+            this.tlpRegistroFinal.ColumnCount = 1;
+            this.tlpRegistroFinal.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tlpRegistroFinal.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tlpRegistroFinal.Location = new System.Drawing.Point(3, 407);
+            this.tlpRegistroFinal.Name = "tlpRegistroFinal";
+            this.tlpRegistroFinal.RowCount = 1;
+            this.tlpRegistroFinal.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tlpRegistroFinal.Size = new System.Drawing.Size(993, 165);
+            this.tlpRegistroFinal.TabIndex = 0;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Century Gothic", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(43, 9);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(191, 18);
+            this.label1.TabIndex = 130;
+            this.label1.Text = "Cotizaciones Generadas";
+            // 
+            // btnNuevaCotizacion
+            // 
+            this.btnNuevaCotizacion.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(102)))), ((int)(((byte)(118)))));
+            this.btnNuevaCotizacion.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnNuevaCotizacion.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnNuevaCotizacion.ForeColor = System.Drawing.Color.White;
+            this.btnNuevaCotizacion.Image = global::ModuloVentasAdmin.Properties.Resources.Plus_28px;
+            this.btnNuevaCotizacion.Location = new System.Drawing.Point(773, 0);
+            this.btnNuevaCotizacion.Margin = new System.Windows.Forms.Padding(0);
+            this.btnNuevaCotizacion.Name = "btnNuevaCotizacion";
+            this.btnNuevaCotizacion.Size = new System.Drawing.Size(220, 43);
+            this.btnNuevaCotizacion.TabIndex = 0;
+            this.btnNuevaCotizacion.Text = "NUEVA COTIZACIÓN";
+            this.btnNuevaCotizacion.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnNuevaCotizacion.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnNuevaCotizacion.UseVisualStyleBackColor = false;
+            this.btnNuevaCotizacion.Click += new System.EventHandler(this.btnNuevaCotizacion_Click);
+            // 
+            // btnGuardarNacional
+            // 
+            this.btnGuardarNacional.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(97)))), ((int)(((byte)(172)))), ((int)(((byte)(112)))));
+            this.btnGuardarNacional.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnGuardarNacional.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnGuardarNacional.ForeColor = System.Drawing.Color.White;
+            this.btnGuardarNacional.Image = global::ModuloVentasAdmin.Properties.Resources.TikTok_Verified_Account_28px;
+            this.btnGuardarNacional.Location = new System.Drawing.Point(747, 3);
+            this.btnGuardarNacional.Name = "btnGuardarNacional";
+            this.btnGuardarNacional.Size = new System.Drawing.Size(243, 44);
+            this.btnGuardarNacional.TabIndex = 0;
+            this.btnGuardarNacional.Text = "GUARDAR ";
+            this.btnGuardarNacional.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnGuardarNacional.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnGuardarNacional.UseVisualStyleBackColor = false;
+            this.btnGuardarNacional.Click += new System.EventHandler(this.btnGuardarNacional_Click);
+            // 
+            // btnLimpiar
+            // 
+            this.btnLimpiar.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnLimpiar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnLimpiar.Image = global::ModuloVentasAdmin.Properties.Resources.sync_28px;
+            this.btnLimpiar.Location = new System.Drawing.Point(499, 3);
+            this.btnLimpiar.Name = "btnLimpiar";
+            this.btnLimpiar.Size = new System.Drawing.Size(242, 44);
+            this.btnLimpiar.TabIndex = 1;
+            this.btnLimpiar.Text = "LIMPIAR REGISTROS";
+            this.btnLimpiar.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnLimpiar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnLimpiar.UseVisualStyleBackColor = true;
+            this.btnLimpiar.Click += new System.EventHandler(this.btnLimpiar_Click);
+            // 
+            // btnCancelar
+            // 
+            this.btnCancelar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(136)))), ((int)(((byte)(80)))));
+            this.btnCancelar.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnCancelar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCancelar.ForeColor = System.Drawing.Color.White;
+            this.btnCancelar.Image = global::ModuloVentasAdmin.Properties.Resources.white_cancel_28px;
+            this.btnCancelar.Location = new System.Drawing.Point(251, 3);
+            this.btnCancelar.Name = "btnCancelar";
+            this.btnCancelar.Size = new System.Drawing.Size(242, 44);
+            this.btnCancelar.TabIndex = 2;
+            this.btnCancelar.Text = "CANCELAR";
+            this.btnCancelar.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnCancelar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnCancelar.UseVisualStyleBackColor = false;
+            this.btnCancelar.Click += new System.EventHandler(this.btnCancelar_Click);
+            // 
+            // btnPDF
+            // 
+            this.btnPDF.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(102)))), ((int)(((byte)(118)))));
+            this.btnPDF.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnPDF.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnPDF.ForeColor = System.Drawing.Color.White;
+            this.btnPDF.Image = global::ModuloVentasAdmin.Properties.Resources.pdf_28px;
+            this.btnPDF.Location = new System.Drawing.Point(3, 3);
+            this.btnPDF.Name = "btnPDF";
+            this.btnPDF.Size = new System.Drawing.Size(242, 44);
+            this.btnPDF.TabIndex = 3;
+            this.btnPDF.Text = "DESCARGAR";
+            this.btnPDF.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnPDF.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnPDF.UseVisualStyleBackColor = false;
+            this.btnPDF.Visible = false;
+            this.btnPDF.Click += new System.EventHandler(this.btnPDF_Click_1);
+            // 
+            // pictureBox4
+            // 
+            this.pictureBox4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox4.Image = global::ModuloVentasAdmin.Properties.Resources.blue_Checkmark_22px;
+            this.pictureBox4.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox4.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBox4.Name = "pictureBox4";
+            this.pictureBox4.Size = new System.Drawing.Size(30, 24);
+            this.pictureBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox4.TabIndex = 130;
+            this.pictureBox4.TabStop = false;
+            // 
+            // pictureBox3
+            // 
+            this.pictureBox3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox3.Image = global::ModuloVentasAdmin.Properties.Resources.blue_Checkmark_22px;
+            this.pictureBox3.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox3.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(30, 24);
+            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox3.TabIndex = 131;
+            this.pictureBox3.TabStop = false;
+            // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox2.Image = global::ModuloVentasAdmin.Properties.Resources.blue_Checkmark_22px;
+            this.pictureBox2.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox2.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(30, 24);
+            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox2.TabIndex = 130;
+            this.pictureBox2.TabStop = false;
+            // 
+            // btnCliente
+            // 
+            this.btnCliente.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(84)))), ((int)(((byte)(102)))), ((int)(((byte)(118)))));
+            this.btnCliente.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnCliente.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCliente.ForeColor = System.Drawing.Color.White;
+            this.btnCliente.Image = global::ModuloVentasAdmin.Properties.Resources.search_16px;
+            this.btnCliente.Location = new System.Drawing.Point(398, 29);
+            this.btnCliente.Margin = new System.Windows.Forms.Padding(0);
+            this.btnCliente.Name = "btnCliente";
+            this.btnCliente.Size = new System.Drawing.Size(62, 29);
+            this.btnCliente.TabIndex = 1;
+            this.btnCliente.UseVisualStyleBackColor = false;
+            this.btnCliente.Click += new System.EventHandler(this.btnCliente_Click);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::ModuloVentasAdmin.Properties.Resources.blue_Checkmark_22px;
+            this.pictureBox1.Location = new System.Drawing.Point(18, 8);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(24, 22);
+            this.pictureBox1.TabIndex = 131;
+            this.pictureBox1.TabStop = false;
             // 
             // frmCotizaciones
             // 
@@ -980,13 +980,10 @@
             this.tableLayoutPanel4.PerformLayout();
             this.tableLayoutPanel8.ResumeLayout(false);
             this.tableLayoutPanel8.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
             this.tableLayoutPanel7.ResumeLayout(false);
             this.tableLayoutPanel7.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.tableLayoutPanel6.ResumeLayout(false);
             this.tableLayoutPanel6.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvOrigen)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDestino)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvProducto)).EndInit();
@@ -998,6 +995,9 @@
             this.tableLayoutPanel10.PerformLayout();
             this.tableLayoutPanel11.ResumeLayout(false);
             this.tableLayoutPanel11.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

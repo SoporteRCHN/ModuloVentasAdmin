@@ -213,6 +213,16 @@ namespace ModuloVentasAdmin.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap whatsapp_3992601 {
+            get {
+                object obj = ResourceManager.GetObject("whatsapp_3992601", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap white_cancel_28px {
             get {
                 object obj = ResourceManager.GetObject("white_cancel_28px", resourceCulture);

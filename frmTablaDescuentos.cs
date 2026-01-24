@@ -15,8 +15,9 @@ namespace ModuloVentasAdmin
 {
     public partial class frmTablaDescuentos : Form
     {
-        public Dictionary<string, decimal> PreciosSeleccionados { get; private set; }
+        public Dictionary<string, (decimal Precio, string Medidas)> PreciosSeleccionados { get; private set; }
         public string _vClienteID = String.Empty;
+        DataTable dtDescuentos = new DataTable();
         clsLogica logica = new clsLogica();
         public frmTablaDescuentos(string _Cliente, string _ClienteID)
         {
@@ -37,13 +38,44 @@ namespace ModuloVentasAdmin
             {
                 Opcion = "Listado"
             };
-            DataTable dtDescuentos = logica.SP_ProductosPreciosENAC(getDescuentos);
+            dtDescuentos = logica.SP_ProductosPreciosENAC(getDescuentos);
 
             if (dtDescuentos.Rows.Count > 0)
             {
                 GenerarTablaDescuentos(dtDescuentos);
             }
         }
+
+        private void dgvDescuentos_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                var fila = dgvDescuentos.Rows[e.RowIndex];
+                PreciosSeleccionados = new Dictionary<string, (decimal Precio, string Medidas)>();
+
+                for (int c = 2; c < dgvDescuentos.Columns.Count; c++)
+                {
+                    string productoNombre = dgvDescuentos.Columns[c].HeaderText;
+                    string valorCelda = fila.Cells[c].Value?.ToString() ?? "0";
+
+                    if (decimal.TryParse(valorCelda, out decimal precio))
+                    {
+                        var row = dtDescuentos.AsEnumerable()
+                            .FirstOrDefault(r => r.Field<string>("Nombre") == productoNombre);
+
+                        if (row != null)
+                        {
+                            string medidas = row.Field<string>("Medidas");
+                            PreciosSeleccionados[productoNombre] = (precio, medidas);
+                        }
+                    }
+                }
+
+                this.DialogResult = DialogResult.OK;
+                this.Close();
+            }
+        }
+
         private void GenerarTablaDescuentos(DataTable dtDescuentos)
         {
             // Limpiar configuración previa
@@ -102,10 +134,10 @@ namespace ModuloVentasAdmin
             foreach (var rango in rangos)
             {
                 var fila = new List<string>
-        {
-            rango.Promedio,
-            rango.PromedioDiario
-        };
+            {
+                rango.Promedio,
+                rango.PromedioDiario
+            };
 
                 foreach (var p in productos)
                 {
@@ -206,7 +238,7 @@ namespace ModuloVentasAdmin
             return count;
         }
 
-        
+
 
         private void dtpHasta_ValueChanged(object sender, EventArgs e)
         {
@@ -218,30 +250,12 @@ namespace ModuloVentasAdmin
             cargarHistorial(_vClienteID);
         }
 
-   
+        
 
-        private void dgvDescuentos_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        private void btnCancelar_Click(object sender, EventArgs e)
         {
-            if (e.RowIndex >= 0)
-            {
-                var fila = dgvDescuentos.Rows[e.RowIndex];
-                PreciosSeleccionados = new Dictionary<string, decimal>();
-
-                for (int c = 2; c < dgvDescuentos.Columns.Count; c++)
-                {
-                    string productoNombre = dgvDescuentos.Columns[c].HeaderText;
-                    string valorCelda = fila.Cells[c].Value?.ToString() ?? "0";
-
-                    if (decimal.TryParse(valorCelda, out decimal precio))
-                    {
-                        PreciosSeleccionados[productoNombre] = precio;
-                    }
-                }
-
-                this.DialogResult = DialogResult.OK;
-                this.Close();
-            }
+            this.DialogResult = DialogResult.Cancel;
+            this.Close();
         }
-
     }
 }

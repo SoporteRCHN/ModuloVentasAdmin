@@ -25,7 +25,7 @@ namespace ModuloVentasAdmin
     public partial class frmCotizaciones : Form
     {
         public int OrigenID, DestinoID, ProductoID, _EncabezadoID, _DetalleID = 0;
-        public string NombreOrigen, NombreDestino, NombreProducto = "";
+        public string NombreOrigen, NombreDestino, NombreProducto, _RutaArchivo = "";
         public bool _TerminosExisten, _estaActualizando = false;
 
         AutoCompleteStringCollection listaNombres = new AutoCompleteStringCollection();
@@ -40,7 +40,7 @@ namespace ModuloVentasAdmin
         public DataTable dtEncabezado = new DataTable();
         public DataTable dtDetalle = new DataTable();
         public DataTable dtGruposProductos = new DataTable();
-        public DataTable dtDescuentos = new DataTable();
+        public DataTable dtDescuentosLocal = new DataTable();
 
         // Variables de clase para mantener lo que generaste
         public List<CotizacionRegistro> registrosGenerados;
@@ -109,6 +109,7 @@ namespace ModuloVentasAdmin
                 dgvCotizaciones.Columns["Descripcion"].Width = 250;
                 dgvCotizaciones.Columns["Nombre"].Width = 200;
                 dgvCotizaciones.Columns["Atencion"].Width = 250;
+                dgvCotizaciones.Columns["Archivo"].Visible = false;
                 dgvCotizaciones.Columns["Impuesto"].Width = 250;
 
                 if (dtGetCotizaciones == null || dtGetCotizaciones.Rows.Count == 0)
@@ -278,8 +279,7 @@ namespace ModuloVentasAdmin
                 }
             }
 
-            //Coloco los valores de los productos seleccionados
-            bool hayDescuentos = dtDescuentos.AsEnumerable()
+            bool hayDescuentos = dtDescuentosLocal.AsEnumerable()
                 .Any(row => productosGenerados.Any(p => p.ProductoID == row["ProductoID"].ToString()));
 
             if (hayDescuentos)
@@ -350,27 +350,36 @@ namespace ModuloVentasAdmin
         }
 
 
-        private void AplicarPreciosEnRegistroFinal(Dictionary<string, decimal> precios)
+        private void AplicarPreciosEnRegistroFinal(Dictionary<string, (decimal Precio, string Medidas)> precios)
         {
-            for (int c = 1; c < tlpRegistroFinal.ColumnCount - 1; c++) 
+            for (int c = 1; c < tlpRegistroFinal.ColumnCount - 1; c++)
             {
                 var header = tlpRegistroFinal.GetControlFromPosition(c, 0) as Label;
                 if (header == null) continue;
 
                 string productoNombre = header.Text;
+                if (string.IsNullOrEmpty(productoNombre)) continue;
 
                 if (precios.ContainsKey(productoNombre))
                 {
-                    var nud = tlpRegistroFinal.GetControlFromPosition(c, 1) as NumericUpDown;
+                    // 🔹 Actualizar precio
+                    var nud = tlpRegistroFinal.GetControlFromPosition(c, 2) as NumericUpDown;
                     if (nud != null)
                     {
-                        nud.Value = precios[productoNombre];
+                        nud.Value = precios[productoNombre].Precio;
+                    }
+
+                    // 🔹 Actualizar medidas (fila 1 debajo del encabezado)
+                    var lblMedida = tlpRegistroFinal.GetControlFromPosition(c, 1) as Label;
+                    if (lblMedida != null)
+                    {
+                        lblMedida.Text = precios[productoNombre].Medidas;
                     }
                 }
             }
         }
-
-        private void GenerarTablaRegistroFinal(List<CotizacionRegistro> registros, List<ProductoSeleccionado> productos, List<frmCotizacionDinamica.CiudadOrigen> origenes, List<CiudadDestino> destinos)
+        private void GenerarTablaRegistroFinal( List<CotizacionRegistro> registros, List<ProductoSeleccionado> productos,
+            List<frmCotizacionDinamica.CiudadOrigen> origenes, List<CiudadDestino> destinos)
         {
             tlpRegistroFinal.Controls.Clear();
             tlpRegistroFinal.ColumnStyles.Clear();
@@ -378,101 +387,100 @@ namespace ModuloVentasAdmin
 
             tlpRegistroFinal.CellBorderStyle = TableLayoutPanelCellBorderStyle.Single;
 
-            int totalColumnas = 1 + productos.Count + 1; // +1 columna extra en blanco
+            int totalColumnas = 1 + productos.Count + 1;
             tlpRegistroFinal.ColumnCount = totalColumnas;
-            tlpRegistroFinal.RowCount = 2;
+            tlpRegistroFinal.RowCount = 3;
 
-            // Alturas: 30% encabezado, 70% detalle
-            tlpRegistroFinal.RowStyles.Add(new RowStyle(SizeType.Percent, 30));
-            tlpRegistroFinal.RowStyles.Add(new RowStyle(SizeType.Percent, 70));
+            // 🔹 Fila 0 y 1 se ajustan automáticamente, fila 2 ocupa el resto
+            tlpRegistroFinal.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // encabezado
+            tlpRegistroFinal.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // medidas
+            tlpRegistroFinal.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); // detalle
 
             // Columna 0 fija para ciudades
             tlpRegistroFinal.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 250));
 
-            // Columnas de productos (máximo 200px)
             foreach (var p in productos)
                 tlpRegistroFinal.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 150));
 
-            // Columna extra en blanco → absorbe espacio sobrante
             tlpRegistroFinal.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
-            // Encabezado fila 0 → nombres de orígenes concatenados
+            // 🔹 Encabezado de orígenes (fila 0 y 1 con RowSpan)
             string origenesConcat = string.Join(", ", origenes.Select(o => o.Nombre));
-            tlpRegistroFinal.Controls.Add(new Label
+            var lblOrigenes = new Label
             {
                 Text = origenesConcat,
                 TextAlign = ContentAlignment.MiddleCenter,
                 Dock = DockStyle.Fill,
                 Font = new System.Drawing.Font("Segoe UI", 9, FontStyle.Bold),
-                AutoSize = false,
-                MaximumSize = new Size(250, 0)
-            }, 0, 0);
+                AutoSize = true,
+                AutoEllipsis = false,
+                Padding = new Padding(0, 2, 0, 2)
+            };
 
-            for (int i = 0; i < productos.Count; i++)
-            {
-                tlpRegistroFinal.Controls.Add(new Label
-                {
-                    Text = productos[i].Nombre,
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    Dock = DockStyle.Fill,
-                    Font = new System.Drawing.Font("Segoe UI", 9, FontStyle.Bold),
-                    AutoSize = false,
-                    MaximumSize = new Size(200, 0)
-                }, 1 + i, 0);
-            }
-
-            // Fila 1 → destinos con scroll y centrado igual que tlpCotizacion
-            var panelDestinos = new Panel
+            tlpRegistroFinal.Controls.Add(lblOrigenes, 0, 0);
+            tlpRegistroFinal.SetRowSpan(lblOrigenes, 2);
+            // 🔹 Fila 2 columna 0 → destinos
+            var panelDestinos = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
+                ColumnCount = 1,
+                RowCount = destinos.Count,
                 AutoScroll = true
             };
 
-            var contentDestinos = new FlowLayoutPanel
-            {
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                FlowDirection = FlowDirection.TopDown,
-                WrapContents = false,
-                Margin = new Padding(0),
-                Padding = new Padding(0)
-            };
+            panelDestinos.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
-            foreach (var destino in destinos)
+            for (int i = 0; i < destinos.Count; i++)
             {
+                panelDestinos.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
                 var lbl = new Label
                 {
-                    Text = destino.Nombre,
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    AutoSize = false,
-                    Width = 250,
-                    Height = 26,
+                    Text = destinos[i].Nombre,
+                    TextAlign = ContentAlignment.MiddleCenter, 
+                    Dock = DockStyle.Fill,                    
+                    Font = new System.Drawing.Font("Segoe UI", 9, FontStyle.Regular),
+                    AutoSize = true,
                     Margin = new Padding(0)
                 };
-                contentDestinos.Controls.Add(lbl);
+
+                panelDestinos.Controls.Add(lbl, 0, i);
             }
 
-            panelDestinos.Controls.Add(contentDestinos);
+            tlpRegistroFinal.Controls.Add(panelDestinos, 0, 2);
 
-            panelDestinos.Resize += (s, e) =>
-            {
-                var contentSize = contentDestinos.PreferredSize;
-                panelDestinos.AutoScrollMinSize = contentSize;
 
-                var client = panelDestinos.ClientSize;
-                int x = Math.Max(0, (client.Width - contentSize.Width) / 2);
-                int y = Math.Max(0, (client.Height - contentSize.Height) / 2);
-
-                if (contentSize.Height > client.Height)
-                    y = 0;
-
-                contentDestinos.Location = new Point(x, y);
-            };
-
-            tlpRegistroFinal.Controls.Add(panelDestinos, 0, 1);
-
+            // 🔹 Columnas de productos
             for (int i = 0; i < productos.Count; i++)
             {
+                string nombre = productos[i].Nombre;
+
+                // Fila 0 → nombre del producto
+                var lblNombre = new Label
+                {
+                    Text = nombre,
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Dock = DockStyle.Fill,
+                    Font = new System.Drawing.Font("Segoe UI", 9, FontStyle.Bold),
+                    AutoSize = true,
+                    AutoEllipsis = false,
+                    Padding = new Padding(0, 10, 0, 10)
+                };
+                tlpRegistroFinal.Controls.Add(lblNombre, 1 + i, 0);
+
+                // Fila 1 → medidas
+                var lblMedida = new Label
+                {
+                    Text = "",
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Dock = DockStyle.Fill,
+                    Font = new System.Drawing.Font("Segoe UI", 9, FontStyle.Italic),
+                    AutoSize = true,
+                    AutoEllipsis = false
+                };
+                tlpRegistroFinal.Controls.Add(lblMedida, 1 + i, 1);
+
+                // Fila 2 → precio
                 var reg = registros.FirstOrDefault(r => r.ProductoID == productos[i].ProductoID);
 
                 var nudPrecio = new NumericUpDown
@@ -487,34 +495,30 @@ namespace ModuloVentasAdmin
                     Enabled = true
                 };
 
-                // 🔹 Inicial: si arranca en 0 → color alerta
                 nudPrecio.BackColor = nudPrecio.Value == 0
                     ? Color.FromArgb(242, 175, 138)
                     : Color.White;
 
-                // 🔹 Evento en tiempo real
                 nudPrecio.ValueChanged += (s, e) =>
                 {
                     var nud = (NumericUpDown)s;
                     nud.BackColor = nud.Value == 0
-                        ? Color.FromArgb(242, 175, 138) // alerta
-                        : Color.White; // valor válido
+                        ? Color.FromArgb(242, 175, 138)
+                        : Color.White;
                 };
 
-                // 🔹 Evento al salir del control (detecta vacío o 0)
                 nudPrecio.Leave += (s, e) =>
                 {
                     var nud = (NumericUpDown)s;
                     if (string.IsNullOrWhiteSpace(nud.Text) || nud.Value == 0)
-                        nud.BackColor = Color.FromArgb(242, 175, 138); // alerta
+                        nud.BackColor = Color.FromArgb(242, 175, 138);
                     else
-                        nud.BackColor = Color.White; // valor válido
+                        nud.BackColor = Color.White;
                 };
 
                 nudPrecio.ResetText();
-                tlpRegistroFinal.Controls.Add(nudPrecio, 1 + i, 1);
+                tlpRegistroFinal.Controls.Add(nudPrecio, 1 + i, 2);
             }
-
         }
 
         private List<ProductoSeleccionado> ObtenerProductosSeleccionados()
@@ -582,7 +586,7 @@ namespace ModuloVentasAdmin
         {
             for (int p = 0; p < productosGenerados.Count; p++)
             {
-                var control = tlpRegistroFinal.GetControlFromPosition(1 + p, 1);
+                var control = tlpRegistroFinal.GetControlFromPosition(1 + p, 2);
                 if (control is NumericUpDown nud)
                 {
                     decimal nuevoPrecio = nud.Value;
@@ -606,44 +610,74 @@ namespace ModuloVentasAdmin
 
         private void btnGuardarNacional_Click(object sender, EventArgs e)
         {
-            if (String.IsNullOrWhiteSpace(txtClienteNombre.Text) && String.IsNullOrWhiteSpace(txtClienteID.Text))
+
+            if (btnGuardarNacional.Text == "GUARDAR") 
             {
-                MessageBox.Show("Aun no ha seleccionado un cliente.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (tlpRegistroFinal.RowCount <= 0)
-            {
-                MessageBox.Show("Aun no ha agregado los registros de la cotizacion.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (registrosGenerados != null && productosGenerados != null && origenesGenerados != null && destinosGenerados != null)
-            {
-                // Actualizar registros con los valores actuales del NumericUpDown
-                ActualizarRegistrosDesdeTabla();
-
-                bool precioVacio = productosSinPrecio();
-
-                if (precioVacio) 
+                if (String.IsNullOrWhiteSpace(txtClienteNombre.Text) && String.IsNullOrWhiteSpace(txtClienteID.Text))
                 {
-                    Toast.Mostrar("Faltan ingresar precios en productos.", TipoAlerta.Warning);
+                    MessageBox.Show("Aun no ha seleccionado un cliente.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                // Guardar y generar PDF con los valores actualizados
-                guardarEncabezado(registrosGenerados, origenesGenerados, destinosGenerados, productosGenerados);
-                GenerarPDFCotizacion(registrosGenerados, productosGenerados, origenesGenerados, destinosGenerados, dtTerminos);
+                if (tlpRegistroFinal.RowCount <= 0)
+                {
+                    MessageBox.Show("Aun no ha agregado los registros de la cotizacion.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
 
-                LimpiarTodo();
-                cargarCotizaciones();
-                tabControl1.SelectedIndex = 0;
+                if (registrosGenerados != null && productosGenerados != null && origenesGenerados != null && destinosGenerados != null)
+                {
+                    // Actualizar registros con los valores actuales del NumericUpDown
+                    ActualizarRegistrosDesdeTabla();
+
+                    bool precioVacio = productosSinPrecio();
+
+                    if (precioVacio)
+                    {
+                        Toast.Mostrar("Faltan ingresar precios en productos.", TipoAlerta.Warning);
+                        return;
+                    }
+
+                    // Guardar y generar PDF con los valores actualizados
+                   
+                    GenerarPDFCotizacion(registrosGenerados, productosGenerados, origenesGenerados, destinosGenerados, dtTerminos);
+                    guardarEncabezado(registrosGenerados, origenesGenerados, destinosGenerados, productosGenerados);
+
+                    LimpiarTodo();
+                    cargarCotizaciones();
+                    tabControl1.SelectedIndex = 0;
+                }
+                else
+                {
+                    MessageBox.Show("Primero debe generar la cotización antes de guardarla.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
             else
             {
-                MessageBox.Show("Primero debe generar la cotización antes de guardarla.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                string nombreArchivo = System.IO.Path.GetFileName(_RutaArchivo);
+                enviarCotizacion(nombreArchivo);
+            }
+            
+        }
+        private void enviarCotizacion(String RutaArchivo)
+        {
+            Form MensajeAdvertencia = new Form();
+            using (frmMensajePersonalizado Mensaje = new frmMensajePersonalizado(RutaArchivo))
+            {
+                MensajeAdvertencia.StartPosition = FormStartPosition.CenterScreen;
+                MensajeAdvertencia.FormBorderStyle = FormBorderStyle.None;
+                MensajeAdvertencia.Opacity = .70d;
+                MensajeAdvertencia.BackColor = Color.Black;
+                MensajeAdvertencia.WindowState = FormWindowState.Maximized;
+                MensajeAdvertencia.Location = this.Location;
+                MensajeAdvertencia.ShowInTaskbar = false;
+                Mensaje.Owner = MensajeAdvertencia;
+                MensajeAdvertencia.Show();
+                Mensaje.ShowDialog();
+                MensajeAdvertencia.Dispose();
             }
         }
+
         private void cargarGruposProductos() 
         {
             ProductosGruposENAC getGrupos = new ProductosGruposENAC 
@@ -666,6 +700,7 @@ namespace ModuloVentasAdmin
                 Atencion = txtAtencion.Text,
                 ImpuestoID = Convert.ToInt32(cmbImpuesto.SelectedValue),
                 EstadoSeguimiento = 1,//Enviado como ingresado
+                Archivo = _RutaArchivo,
                 UPosteo = DynamicMain.usuarionlogin,
                 FPosteo = DateTime.Now,
                 PC = System.Environment.MachineName,
@@ -725,9 +760,9 @@ namespace ModuloVentasAdmin
             }
 
             if (todoGuardado)
-                MessageBox.Show("Cotización guardada correctamente.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Toast.Mostrar("Cotizacion guardada exitosamente.", TipoAlerta.Success);
             else
-                MessageBox.Show("Ha ocurrido un error al guardar la cotización.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Toast.Mostrar("Ha ocurrido un error al guardar la cotizacion", TipoAlerta.Error);
         }
         private void cargarTerminos()
         {
@@ -772,11 +807,19 @@ namespace ModuloVentasAdmin
             }
         }
 
-        private void GenerarPDFCotizacion(List<CotizacionRegistro> registros,List<ProductoSeleccionado> productos,List<frmCotizacionDinamica.CiudadOrigen> origenes,
-List<CiudadDestino> destinos,DataTable dtTerminos)
+        private void GenerarPDFCotizacion(List<CotizacionRegistro> registros,List<ProductoSeleccionado> productos,
+    List<frmCotizacionDinamica.CiudadOrigen> origenes,  List<CiudadDestino> destinos,  DataTable dtTerminos)
         {
             Document doc = new Document(PageSize.LETTER, 40, 40, 40, 40);
-            string path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Cotizacion.pdf");
+            //string path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Cotizacion.pdf");
+            // 🔹 Carpeta destino en el servidor
+            string rutaDestino = @"\\192.168.1.179\CotizacionesEspecificas";
+            Directory.CreateDirectory(rutaDestino); // crea la carpeta si no existe
+
+            // 🔹 Nombre único usando GUID
+            string nombreArchivo = "Cotizacion-" + Guid.NewGuid().ToString() + ".pdf";
+            string path = System.IO.Path.Combine(rutaDestino, nombreArchivo);
+            _RutaArchivo = path;
 
             using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
             {
@@ -786,57 +829,54 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
                 var fontHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10);
                 var fontCell = FontFactory.GetFont(FontFactory.HELVETICA, 10);
 
-                // 🔹 Encabezado con logos y título
-                PdfPTable headerTable = new PdfPTable(3);
+                // 🔹 Encabezado con logos (misma fila)
+                PdfPTable headerTable = new PdfPTable(2);
                 headerTable.WidthPercentage = 100;
-                headerTable.SetWidths(new float[] { 120, 150, 100f });
+                headerTable.SetWidths(new float[] { 150f, 150f });
 
                 // Logo izquierda
                 iTextSharp.text.Image logoIzq = iTextSharp.text.Image.GetInstance(@"\\192.168.1.179\Logos\RCHondurasColor.png");
-                logoIzq.ScaleAbsolute(120, 100);
-                PdfPCell cellLogoIzq = new PdfPCell(logoIzq);
-                cellLogoIzq.Border = Rectangle.NO_BORDER;
-                cellLogoIzq.HorizontalAlignment = Element.ALIGN_LEFT;
-                cellLogoIzq.VerticalAlignment = Element.ALIGN_MIDDLE;
+                logoIzq.ScaleAbsolute(140, 130); // 🔹 tamaño uniforme
+                PdfPCell cellLogoIzq = new PdfPCell(logoIzq)
+                {
+                    Border = Rectangle.NO_BORDER,
+                    HorizontalAlignment = Element.ALIGN_LEFT,
+                    VerticalAlignment = Element.ALIGN_MIDDLE // 🔹 centrado vertical
+                };
                 headerTable.AddCell(cellLogoIzq);
-
-                // Texto central
-                var fontTitulo = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
-                PdfPCell cellTitulo = new PdfPCell(new Phrase("COTIZACION", fontTitulo));
-                cellTitulo.Border = Rectangle.NO_BORDER;
-                cellTitulo.HorizontalAlignment = Element.ALIGN_CENTER;
-                cellTitulo.VerticalAlignment = Element.ALIGN_MIDDLE;
-                headerTable.AddCell(cellTitulo);
 
                 // Logo derecha
                 iTextSharp.text.Image logoDer = iTextSharp.text.Image.GetInstance(@"\\192.168.1.179\Logos\RCPaqueteria.png");
-                logoDer.ScaleAbsolute(120, 15);
-                PdfPCell cellLogoDer = new PdfPCell(logoDer);
-                cellLogoDer.Border = Rectangle.NO_BORDER;
-                cellLogoDer.HorizontalAlignment = Element.ALIGN_RIGHT;
-                cellLogoDer.VerticalAlignment = Element.ALIGN_MIDDLE;
+                logoDer.ScaleAbsolute(150, 40); // 🔹 mismo tamaño que el izquierdo
+                PdfPCell cellLogoDer = new PdfPCell(logoDer)
+                {
+                    Border = Rectangle.NO_BORDER,
+                    HorizontalAlignment = Element.ALIGN_RIGHT,
+                    VerticalAlignment = Element.ALIGN_MIDDLE // 🔹 centrado vertical
+                };
                 headerTable.AddCell(cellLogoDer);
 
-                // 🔹 Opcional: altura fija para toda la fila
-                headerTable.DefaultCell.FixedHeight = 50;
-
                 doc.Add(headerTable);
+
+                // 🔹 Título "COTIZACION" debajo de los logos
+                var fontTitulo = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 18);
+                Paragraph titulo = new Paragraph("COTIZACION", fontTitulo)
+                {
+                    Alignment = Element.ALIGN_CENTER,
+                    SpacingBefore = 10f,
+                    SpacingAfter = 20f
+                };
+                doc.Add(titulo);
+
+
 
                 // 🔹 Cliente y Fecha
                 PdfPTable clienteFechaTable = new PdfPTable(2);
                 clienteFechaTable.WidthPercentage = 100;
                 clienteFechaTable.SetWidths(new float[] { 250f, 180f });
 
-                PdfPCell cellCliente = new PdfPCell(new Phrase("CLIENTE: " + txtClienteNombre.Text, fontCell));
-                cellCliente.Border = Rectangle.NO_BORDER;
-                cellCliente.HorizontalAlignment = Element.ALIGN_LEFT;
-                clienteFechaTable.AddCell(cellCliente);
-
-                PdfPCell cellFecha = new PdfPCell(new Phrase("FECHA: " + DateTime.Now.ToString("dd/MM/yyyy"), fontCell));
-                cellFecha.Border = iTextSharp.text.Rectangle.NO_BORDER;
-                cellFecha.HorizontalAlignment = Element.ALIGN_RIGHT;
-                clienteFechaTable.AddCell(cellFecha);
-
+                clienteFechaTable.AddCell(new PdfPCell(new Phrase("CLIENTE: " + txtClienteNombre.Text, fontCell)) { Border = Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_LEFT });
+                clienteFechaTable.AddCell(new PdfPCell(new Phrase("FECHA: " + DateTime.Now.ToString("dd/MM/yyyy"), fontCell)) { Border = Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_RIGHT });
                 doc.Add(clienteFechaTable);
 
                 // 🔹 Atención y Código
@@ -844,19 +884,10 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
                 atencionCodigoTable.WidthPercentage = 100;
                 atencionCodigoTable.SetWidths(new float[] { 250f, 250f });
 
-                PdfPCell cellAtencion = new PdfPCell(new Phrase("ATENCIÓN:  " + txtAtencion.Text, fontCell));
-                cellAtencion.Border = Rectangle.NO_BORDER;
-                cellAtencion.HorizontalAlignment = Element.ALIGN_LEFT;
-                atencionCodigoTable.AddCell(cellAtencion);
-
-                PdfPCell cellCodigo = new PdfPCell(new Phrase("CÓDIGO:  " + txtClienteID.Text, fontCell));
-                cellCodigo.Border = Rectangle.NO_BORDER;
-                cellCodigo.HorizontalAlignment = Element.ALIGN_RIGHT;
-                atencionCodigoTable.AddCell(cellCodigo);
-
+                atencionCodigoTable.AddCell(new PdfPCell(new Phrase("ATENCIÓN:  " + txtAtencion.Text, fontCell)) { Border = Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_LEFT });
+                atencionCodigoTable.AddCell(new PdfPCell(new Phrase("CÓDIGO:  " + txtClienteID.Text, fontCell)) { Border = Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_RIGHT });
                 doc.Add(atencionCodigoTable);
 
-                // 🔹 Espacio
                 doc.Add(new Paragraph("\n"));
 
                 // 🔹 Agrupar productos por GrupoID
@@ -864,11 +895,7 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
                                           join g in dtGruposProductos.AsEnumerable()
                                           on p.ProductoID equals g.Field<string>("ProductoID") into gj
                                           from subg in gj.DefaultIfEmpty()
-                                          select new
-                                          {
-                                              Producto = p,
-                                              GrupoID = subg != null ? subg.Field<int>("GrupoID") : (int?)null
-                                          })
+                                          select new { Producto = p, GrupoID = subg != null ? subg.Field<int>("GrupoID") : (int?)null })
                                           .GroupBy(x => x.GrupoID)
                                           .OrderBy(g => g.Key ?? int.MaxValue)
                                           .ToList();
@@ -877,11 +904,6 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
 
                 foreach (var grupo in productosAgrupados)
                 {
-                    int? grupoID = grupo.Key;
-
-                    // 🔹 Título de grupo
-                    var fontGrupo = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 8);
-               
                     var productosDelGrupo = grupo.Select(x => x.Producto).ToList();
 
                     for (int start = 0; start < productosDelGrupo.Count; start += maxColsPorBloque)
@@ -894,43 +916,71 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
                         for (int i = 1; i < widths.Length; i++) widths[i] = 100f;
                         table.SetWidths(widths);
 
-                        // 🔹 Fila 1: encabezado
+                        // 🔹 Fila 1: encabezado (origen ocupa fila 1 y 2 con RowSpan)
                         string origenesConcat = string.Join(", ", origenes.Select(o => o.Nombre));
-                        PdfPCell cellOrigen = new PdfPCell(new Phrase("SUCURSAL REMITENTE: " + origenesConcat, fontHeader));
-                        cellOrigen.HorizontalAlignment = Element.ALIGN_CENTER;
-                        cellOrigen.VerticalAlignment = Element.ALIGN_MIDDLE;
-                        cellOrigen.PaddingTop = 10f;
-                        cellOrigen.PaddingBottom = 10f;
+                        PdfPCell cellOrigen = new PdfPCell(new Phrase("SUCURSAL REMITENTE: " + origenesConcat, fontHeader))
+                        {
+                            HorizontalAlignment = Element.ALIGN_CENTER,
+                            VerticalAlignment = Element.ALIGN_MIDDLE,
+                            PaddingTop = 10f,
+                            PaddingBottom = 10f,
+                            BackgroundColor = new BaseColor(185, 203, 226) // 🔹 color de fondo
+                        };
+                        cellOrigen.Rowspan = 2; // 🔹 ocupa encabezado y medidas
                         table.AddCell(cellOrigen);
 
                         for (int i = 0; i < maxColsPorBloque; i++)
                         {
                             if (start + i < productosDelGrupo.Count)
                             {
-                                PdfPCell cellProd = new PdfPCell(new Phrase(productosDelGrupo[start + i].Nombre, fontHeader));
-                                cellProd.HorizontalAlignment = Element.ALIGN_CENTER;
-                                cellProd.VerticalAlignment = Element.ALIGN_MIDDLE;
-                                cellProd.PaddingTop = 10f;
-                                cellProd.PaddingBottom = 10f;
+                                PdfPCell cellProd = new PdfPCell(new Phrase(productosDelGrupo[start + i].Nombre, fontHeader))
+                                {
+                                    HorizontalAlignment = Element.ALIGN_CENTER,
+                                    VerticalAlignment = Element.ALIGN_MIDDLE,
+                                    PaddingTop = 10f,
+                                    PaddingBottom = 10f,
+                                    BackgroundColor = new BaseColor(185, 203, 226) // 🔹 color de fondo
+                                };
                                 table.AddCell(cellProd);
                             }
                             else
                             {
-                                PdfPCell empty = new PdfPCell(new Phrase("", fontHeader));
-                                empty.Border = Rectangle.NO_BORDER;
-                                empty.PaddingTop = 10f;
-                                empty.PaddingBottom = 10f;
-                                table.AddCell(empty);
+                                table.AddCell(new PdfPCell(new Phrase("", fontHeader)) { Border = Rectangle.NO_BORDER });
                             }
                         }
 
-                        // 🔹 Fila 2: destinos + precios
+                        // 🔹 Fila 2: medidas (sin título "MEDIDAS")
+                        for (int i = 0; i < maxColsPorBloque; i++)
+                        {
+                            if (start + i < productosDelGrupo.Count)
+                            {
+                                // Buscar la medida desde tlpRegistroFinal
+                                int columnaGlobal = productos.FindIndex(p => p.ProductoID == productosDelGrupo[start + i].ProductoID);
+                                var controlMedida = tlpRegistroFinal.GetControlFromPosition(1 + columnaGlobal, 1);
+                                string medidas = "";
+                                if (controlMedida is Label lblMedida)
+                                    medidas = lblMedida.Text;
+
+                                PdfPCell cellMedida = new PdfPCell(new Phrase(medidas, fontHeader)) // 🔹 fontHeader = negrita
+                                {
+                                    HorizontalAlignment = Element.ALIGN_CENTER,
+                                    VerticalAlignment = Element.ALIGN_MIDDLE,
+                                    PaddingTop = 5f,
+                                    PaddingBottom = 5f,
+                                    BackgroundColor = new BaseColor(250, 255, 73) // 🔹 color amarillo
+                                };
+                                table.AddCell(cellMedida);
+                            }
+                            else
+                            {
+                                table.AddCell(new PdfPCell(new Phrase("", fontHeader)) { Border = Rectangle.NO_BORDER });
+                            }
+                        }
+
+
+                        // 🔹 Fila 3: destinos + precios
                         string destinosConcat = string.Join("\n", destinos.Select(d => d.Nombre));
-                        PdfPCell cellDestinos = new PdfPCell(new Phrase(destinosConcat, fontCell));
-                        cellDestinos.HorizontalAlignment = Element.ALIGN_CENTER;
-                        cellDestinos.VerticalAlignment = Element.ALIGN_MIDDLE;
-                        cellDestinos.PaddingTop = 10f;
-                        cellDestinos.PaddingBottom = 10f;
+                        PdfPCell cellDestinos = new PdfPCell(new Phrase(destinosConcat, fontCell)) { HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_MIDDLE, PaddingTop = 10f, PaddingBottom = 10f };
                         table.AddCell(cellDestinos);
 
                         for (int i = 0; i < maxColsPorBloque; i++)
@@ -940,20 +990,12 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
                                 var reg = registros.FirstOrDefault(r => r.ProductoID == productosDelGrupo[start + i].ProductoID);
                                 string precio = reg != null ? reg.PrecioNormal.ToString("N2") : "0.00";
 
-                                PdfPCell cellPrecio = new PdfPCell(new Phrase(precio, fontCell));
-                                cellPrecio.HorizontalAlignment = Element.ALIGN_CENTER;
-                                cellPrecio.VerticalAlignment = Element.ALIGN_MIDDLE;
-                                cellPrecio.PaddingTop = 10f;
-                                cellPrecio.PaddingBottom = 10f;
+                                PdfPCell cellPrecio = new PdfPCell(new Phrase(precio, fontCell)) { HorizontalAlignment = Element.ALIGN_CENTER, VerticalAlignment = Element.ALIGN_MIDDLE, PaddingTop = 10f, PaddingBottom = 10f };
                                 table.AddCell(cellPrecio);
                             }
                             else
                             {
-                                PdfPCell empty = new PdfPCell(new Phrase("", fontCell));
-                                empty.Border = Rectangle.NO_BORDER;
-                                empty.PaddingTop = 10f;
-                                empty.PaddingBottom = 10f;
-                                table.AddCell(empty);
+                                table.AddCell(new PdfPCell(new Phrase("", fontCell)) { Border = Rectangle.NO_BORDER });
                             }
                         }
 
@@ -994,7 +1036,7 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
                 cellLineaDer.AddElement(new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(1f, 60f, BaseColor.BLACK, Element.ALIGN_CENTER, -2))));
                 cellLineaDer.AddElement(new Paragraph("Aprobado Por Cliente", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)) { Alignment = Element.ALIGN_CENTER });
                 cellLineaDer.AddElement(new Paragraph("Firma y Sello", FontFactory.GetFont(FontFactory.HELVETICA, 9)) { Alignment = Element.ALIGN_CENTER });
-                cellLineaDer.AddElement(new Paragraph(txtAtencion.Text, FontFactory.GetFont(FontFactory.HELVETICA, 9)) { Alignment = Element.ALIGN_CENTER });
+                cellLineaDer.AddElement(new Paragraph(txtClienteNombre.Text, FontFactory.GetFont(FontFactory.HELVETICA, 9)) { Alignment = Element.ALIGN_CENTER });
                 firmasTable.AddCell(cellLineaDer);
 
                 doc.Add(firmasTable);
@@ -1004,7 +1046,8 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
             }
 
             System.Diagnostics.Process.Start(path);
-            Toast.Mostrar("PDF guardado en el escritorio.", TipoAlerta.Success);
+            enviarCotizacion(nombreArchivo);
+            Toast.Mostrar("PDF generado con exito.", TipoAlerta.Success);
         }
 
         private void btnCliente_Click(object sender, EventArgs e)
@@ -1073,7 +1116,7 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
             btnPDF.Visible = false;
             btnGuardarNacional.Visible = true;
             btnLimpiar.Visible = true;
-
+            btnGuardarNacional.Text = "GUARDAR";
 
             NombreOrigen = string.Empty;
             NombreDestino = string.Empty;
@@ -1153,7 +1196,6 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
                 _EncabezadoID = Convert.ToInt32(dgvCotizaciones.CurrentRow.Cells["EncabezadoID"].Value);
                 recuperarEncabezado(_EncabezadoID);
 
-                btnGuardarNacional.Enabled = false;
                 txtClienteNombre.Enabled = false;
                 txtClienteID.Enabled = false;
                 txtAtencion.Enabled = false;
@@ -1170,9 +1212,10 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
                 btnCliente.Enabled = false;
                 btnCancelar.Enabled = true;
                 btnPDF.Visible = true;
-                btnGuardarNacional.Visible = false;
+                //btnGuardarNacional.Visible = false;
+                //btnGuardarNacional.Enabled = false;
                 btnLimpiar.Visible = false;
-
+                btnGuardarNacional.Text = "Enviar";
                 tabControl1.SelectedIndex = 1; 
             }
         }
@@ -1191,7 +1234,7 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
                 txtAtencion.Text = dtEncabezado.Rows[0]["Atencion"].ToString();
                 cmbTipoCotizacion.SelectedValue = Convert.ToInt32(dtEncabezado.Rows[0]["TipoCotizacionID"].ToString());
                 cmbImpuesto.SelectedValue = Convert.ToInt32(dtEncabezado.Rows[0]["ImpuestoID"].ToString());
-
+                _RutaArchivo = dtEncabezado.Rows[0]["Archivo"].ToString();
                 recuperarDetalle(_EncabezadoID);
             }
         }
@@ -1252,7 +1295,9 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
         {
             //ActualizarRegistrosDesdeTabla();
 
-            GenerarPDFCotizacion(registrosGenerados, productosGenerados, origenesGenerados, destinosGenerados, dtTerminos);
+           // GenerarPDFCotizacion(registrosGenerados, productosGenerados, origenesGenerados, destinosGenerados, dtTerminos);
+
+            System.Diagnostics.Process.Start(_RutaArchivo);
         }
 
         private void rbdNombre_CheckedChanged(object sender, EventArgs e)
@@ -1320,7 +1365,7 @@ List<CiudadDestino> destinos,DataTable dtTerminos)
             {
                 Opcion = "ListadoDistinct"
             };
-            dtDescuentos = logica.SP_ProductosPreciosENAC(getDescuentos);
+            dtDescuentosLocal = logica.SP_ProductosPreciosENAC(getDescuentos);
         }
 
         private void txtAtencion_KeyPress(object sender, KeyPressEventArgs e)

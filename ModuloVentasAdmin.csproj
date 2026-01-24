@@ -23,8 +23,8 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>true</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <MinimumRequiredVersion>1.0.0.0</MinimumRequiredVersion>
-    <ApplicationRevision>1</ApplicationRevision>
+    <MinimumRequiredVersion>1.0.0.1</MinimumRequiredVersion>
+    <ApplicationRevision>2</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -99,6 +99,12 @@
     <Compile Include="frmCotizaciones.Designer.cs">
       <DependentUpon>frmCotizaciones.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmMensajePersonalizado.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMensajePersonalizado.Designer.cs">
+      <DependentUpon>frmMensajePersonalizado.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmTablaDescuentos.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -134,6 +140,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmCotizaciones.resx">
       <DependentUpon>frmCotizaciones.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMensajePersonalizado.resx">
+      <DependentUpon>frmMensajePersonalizado.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmTablaDescuentos.resx">
       <DependentUpon>frmTablaDescuentos.cs</DependentUpon>
@@ -251,6 +260,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\search_16px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\whatsapp_3992601.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

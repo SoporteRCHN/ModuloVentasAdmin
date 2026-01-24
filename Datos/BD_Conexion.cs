@@ -12,7 +12,7 @@ namespace DatosVentasAdmin
 
     public class BD_Conexion
     {
-        public static string servidor = "192.168.1.180";
+        public static string servidor = "192.168.1.179";
         public static string servidorENAC = "192.168.1.52";
         public static string servidorINTER = "192.168.1.50";
         private static string cadena = "";

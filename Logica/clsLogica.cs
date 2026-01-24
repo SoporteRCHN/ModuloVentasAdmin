@@ -239,6 +239,12 @@ namespace LogicaVentasAdmin
             tabla = enviar.SP_ProductosPreciosENAC(a);
             return tabla;
         }
+        public DataTable SP_ProductosDescripcionENAC(ProductosDescripcionENAC a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_ProductosDescripcionENAC(a);
+            return tabla;
+        }
 
     }
 }

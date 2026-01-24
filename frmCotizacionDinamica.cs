@@ -220,6 +220,7 @@ namespace ModuloVentasAdmin
         {
             public string ProductoID { get; set; }
             public string Nombre { get; set; }
+
         }
         public class CotizacionRegistro
         {

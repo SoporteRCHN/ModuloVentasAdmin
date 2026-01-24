@@ -482,6 +482,7 @@ namespace LogicaVentasAdmin
         public string Atencion { get; set; }
         public int? ImpuestoID { get; set; }
         public int? EstadoSeguimiento { get; set; }
+        public string Archivo { get; set; }
         public string UPosteo { get; set; }
         public DateTime? FPosteo { get; set; }
         public string PC { get; set; }
@@ -553,6 +554,17 @@ namespace LogicaVentasAdmin
         public int? PromedioGHasta { get; set; }
         public string ProductoID { get; set; }
         public decimal? Precio { get; set; }
+        public string UPosteo { get; set; }
+        public DateTime? FPosteo { get; set; }
+        public string PC { get; set; }
+        public bool? Estado { get; set; }
+    }
+    public class ProductosDescripcionENAC
+    {
+        public string Opcion { get; set; }
+        public long? ID { get; set; }
+        public string ProductoID { get; set; }
+        public string Descripcion { get; set; }
         public string UPosteo { get; set; }
         public DateTime? FPosteo { get; set; }
         public string PC { get; set; }
