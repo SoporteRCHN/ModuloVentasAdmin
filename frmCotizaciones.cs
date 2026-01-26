@@ -27,7 +27,7 @@ namespace ModuloVentasAdmin
     {
         public int OrigenID, DestinoID, ProductoID, _EncabezadoID, _DetalleID = 0;
         public string NombreOrigen, NombreDestino, NombreProducto, _RutaArchivo, _NombreArchivo = "";
-        public bool _TerminosExisten, _estaActualizando = false;
+        public bool _TerminosExisten, _estaActualizando, datosCargados = false;
 
         AutoCompleteStringCollection listaNombres = new AutoCompleteStringCollection();
 
@@ -1196,6 +1196,8 @@ namespace ModuloVentasAdmin
         {
             if (dgvCotizaciones.Rows.Count > 0) 
             {
+                if (!datosCargados) { Toast.Mostrar("Registros aún procesando, espere un momento...", TipoAlerta.Warning); return; }
+
                 _EncabezadoID = Convert.ToInt32(dgvCotizaciones.CurrentRow.Cells["EncabezadoID"].Value);
                 recuperarEncabezado(_EncabezadoID);
 
@@ -1366,6 +1368,7 @@ namespace ModuloVentasAdmin
 
             await Task.WhenAll(tareaDestino, tareaProductos);
 
+            datosCargados = true; // 🔹 marcar que ya terminó
             Toast.Mostrar("Datos cargados correctamente", TipoAlerta.Success);
         }
 
@@ -1529,13 +1532,16 @@ namespace ModuloVentasAdmin
                     }
                 }
 
-                // 🔹 Marcamos coincidencias de PRODUCTO
-                foreach (DataRow rowDetalle in dtDetalle.Rows)
+                // 🔹 Marcamos coincidencias de PRODUCTO (blindaje: validar columna)
+                if (dtProducto.Columns.Contains("Producto"))
                 {
-                    string productoID = rowDetalle["ProductoID"].ToString();
-                    var filasCoincidentesProducto = dtProducto.Select($"Producto = '{productoID}'");
-                    foreach (var fila in filasCoincidentesProducto)
-                        fila["SeleccionarProducto"] = true;
+                    foreach (DataRow rowDetalle in dtDetalle.Rows)
+                    {
+                        string productoID = rowDetalle["ProductoID"].ToString();
+                        var filasCoincidentesProducto = dtProducto.Select($"Producto = '{productoID}'");
+                        foreach (var fila in filasCoincidentesProducto)
+                            fila["SeleccionarProducto"] = true;
+                    }
                 }
 
                 // 🔹 Refrescamos los DataGridView
@@ -1543,7 +1549,7 @@ namespace ModuloVentasAdmin
                 dgvDestino.Refresh();
                 dgvProducto.Refresh();
 
-                // 🔹 Construimos listas de seleccionados (blindadas con ?? new List<>)
+                // 🔹 Construimos listas de seleccionados
                 var origenesSeleccionados = dtOrigen?.AsEnumerable()
                     .Where(r => r.Field<bool>("SeleccionarOrigen"))
                     .Select(r => new CiudadOrigen
@@ -1581,6 +1587,7 @@ namespace ModuloVentasAdmin
                 GenerarTablaRecuperada(registros, productosSeleccionados, origenesSeleccionados, destinosSeleccionados);
             }
         }
+
         private List<CotizacionRegistro> ObtenerCotizacionesDesdeDetalle(
             List<ProductoSeleccionado> productos,
             List<CiudadOrigen> origenes,
@@ -1855,16 +1862,26 @@ namespace ModuloVentasAdmin
         }
         private void cargarProductos()
         {
-            ProductosENAC getProducto = new ProductosENAC { Opcion = "Listado" };
+            ProductosENAC getProducto = new ProductosENAC
+            {
+                Opcion = "Listado"
+            };
             var dt = logica.SP_ProductosENAC(getProducto);
 
             if (dt.Rows.Count > 0)
             {
+                // 🔹 Blindaje: asegurar columna SeleccionarProducto
                 if (!dt.Columns.Contains("SeleccionarProducto"))
                 {
                     dt.Columns.Add("SeleccionarProducto", typeof(bool));
                     foreach (DataRow row in dt.Rows)
                         row["SeleccionarProducto"] = false;
+                }
+
+                // 🔹 Blindaje: asegurar columna Producto
+                if (!dt.Columns.Contains("Producto"))
+                {
+                    dt.Columns.Add("Producto", typeof(string));
                 }
 
                 // 🔹 Actualizar el DataGridView en el hilo de la UI
@@ -1873,6 +1890,7 @@ namespace ModuloVentasAdmin
                     dgvProducto.AutoGenerateColumns = false;
                     dgvProducto.Columns.Clear();
 
+                    // Columna CheckBox
                     DataGridViewCheckBoxColumn chkCol = new DataGridViewCheckBoxColumn
                     {
                         Name = "SeleccionarProducto",
@@ -1884,6 +1902,7 @@ namespace ModuloVentasAdmin
                     chkCol.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
                     dgvProducto.Columns.Add(chkCol);
 
+                    // Columna GrupoID
                     DataGridViewTextBoxColumn colGrupoID = new DataGridViewTextBoxColumn
                     {
                         DataPropertyName = "GrupoID",
@@ -1895,6 +1914,7 @@ namespace ModuloVentasAdmin
                     };
                     dgvProducto.Columns.Add(colGrupoID);
 
+                    // Columna Nombre
                     DataGridViewTextBoxColumn colNombre = new DataGridViewTextBoxColumn
                     {
                         DataPropertyName = "Nombre",
@@ -1905,6 +1925,7 @@ namespace ModuloVentasAdmin
                     };
                     dgvProducto.Columns.Add(colNombre);
 
+                    // Columna Producto
                     DataGridViewTextBoxColumn colProducto = new DataGridViewTextBoxColumn
                     {
                         DataPropertyName = "Producto",
@@ -1915,8 +1936,11 @@ namespace ModuloVentasAdmin
 
                     dgvProducto.DataSource = dt;
                 });
+
+                dtProducto = dt; // 🔹 Guardar referencia global
             }
         }
+
 
     }
 }
