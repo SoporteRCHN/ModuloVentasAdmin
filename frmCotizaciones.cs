@@ -19,13 +19,14 @@ using Rectangle = iTextSharp.text.Rectangle;
 using iTextSharp.text.pdf.parser;
 using ModuloVentasAdmin;
 using System.Runtime.CompilerServices;
+using Org.BouncyCastle.Asn1.Cmp;
 
 namespace ModuloVentasAdmin
 {
     public partial class frmCotizaciones : Form
     {
         public int OrigenID, DestinoID, ProductoID, _EncabezadoID, _DetalleID = 0;
-        public string NombreOrigen, NombreDestino, NombreProducto, _RutaArchivo = "";
+        public string NombreOrigen, NombreDestino, NombreProducto, _RutaArchivo, _NombreArchivo = "";
         public bool _TerminosExisten, _estaActualizando = false;
 
         AutoCompleteStringCollection listaNombres = new AutoCompleteStringCollection();
@@ -54,8 +55,8 @@ namespace ModuloVentasAdmin
         {
             InitializeComponent();
             cargarOrigen();
-            cargarDestino();
-            cargarProductos();
+            //cargarDestino();
+           // cargarProductos();
             cargarTipos();
             cargarTerminos();
             cargarImpuestos();
@@ -642,7 +643,7 @@ namespace ModuloVentasAdmin
                    
                     GenerarPDFCotizacion(registrosGenerados, productosGenerados, origenesGenerados, destinosGenerados, dtTerminos);
                     guardarEncabezado(registrosGenerados, origenesGenerados, destinosGenerados, productosGenerados);
-
+                    enviarCotizacion(_RutaArchivo, _NombreArchivo);
                     LimpiarTodo();
                     cargarCotizaciones();
                     tabControl1.SelectedIndex = 0;
@@ -655,14 +656,14 @@ namespace ModuloVentasAdmin
             else
             {
                 string nombreArchivo = System.IO.Path.GetFileName(_RutaArchivo);
-                enviarCotizacion(nombreArchivo);
+                enviarCotizacion(nombreArchivo, nombreArchivo);
             }
             
         }
-        private void enviarCotizacion(String RutaArchivo)
+        private void enviarCotizacion(String RutaArchivo, String NombreArchivo)
         {
             Form MensajeAdvertencia = new Form();
-            using (frmMensajePersonalizado Mensaje = new frmMensajePersonalizado(RutaArchivo))
+            using (frmMensajePersonalizado Mensaje = new frmMensajePersonalizado(RutaArchivo, NombreArchivo))
             {
                 MensajeAdvertencia.StartPosition = FormStartPosition.CenterScreen;
                 MensajeAdvertencia.FormBorderStyle = FormBorderStyle.None;
@@ -820,6 +821,7 @@ namespace ModuloVentasAdmin
             string nombreArchivo = "Cotizacion-" + Guid.NewGuid().ToString() + ".pdf";
             string path = System.IO.Path.Combine(rutaDestino, nombreArchivo);
             _RutaArchivo = path;
+            _NombreArchivo = nombreArchivo;
 
             using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
             {
@@ -1045,9 +1047,9 @@ namespace ModuloVentasAdmin
                 doc.Close();
             }
 
-            System.Diagnostics.Process.Start(path);
-            enviarCotizacion(nombreArchivo);
-            Toast.Mostrar("PDF generado con exito.", TipoAlerta.Success);
+           // System.Diagnostics.Process.Start(path);
+            //enviarCotizacion(nombreArchivo);
+           // Toast.Mostrar("PDF generado con exito.", TipoAlerta.Success);
         }
 
         private void btnCliente_Click(object sender, EventArgs e)
@@ -1076,6 +1078,7 @@ namespace ModuloVentasAdmin
 
                 MensajeAdvertencia.Dispose();
             }
+            txtAtencion.Focus();
         }
 
         private void btnLimpiar_Click(object sender, EventArgs e)
@@ -1345,20 +1348,28 @@ namespace ModuloVentasAdmin
 
         private void txtClienteID_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Enter)
+            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab)
             {
                 if (String.IsNullOrWhiteSpace(txtClienteID.Text))
                     return;
 
                 e.SuppressKeyPress = true;
                 cargarClientes();
+
+                txtAtencion.Focus();
             }
         }
-
-        private void frmCotizaciones_Load(object sender, EventArgs e)
+        private async void frmCotizacionDinamica_Load(object sender, EventArgs e)
         {
+            var tareaDestino = Task.Run(() => cargarDestino());
+            var tareaProductos = Task.Run(() => cargarProductos());
 
+            await Task.WhenAll(tareaDestino, tareaProductos);
+
+            Toast.Mostrar("Datos cargados correctamente", TipoAlerta.Success);
         }
+
+
         private void cargarDescuentos() 
         {
             ProductosPreciosENAC getDescuentos = new ProductosPreciosENAC
@@ -1442,6 +1453,14 @@ namespace ModuloVentasAdmin
             if (dgvProducto.IsCurrentCellDirty)
             {
                 dgvProducto.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
+        }
+
+        private void txtClienteID_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.Tab)
+            {
+                e.IsInputKey = true; // 🔹 obliga a tratar Tab como tecla de entrada
             }
         }
 
@@ -1836,71 +1855,68 @@ namespace ModuloVentasAdmin
         }
         private void cargarProductos()
         {
-            ProductosENAC getProducto = new ProductosENAC
-            {
-                Opcion = "Listado"
-            };
-            dtProducto = logica.SP_ProductosENAC(getProducto);
+            ProductosENAC getProducto = new ProductosENAC { Opcion = "Listado" };
+            var dt = logica.SP_ProductosENAC(getProducto);
 
-            if (dtProducto.Rows.Count > 0)
+            if (dt.Rows.Count > 0)
             {
-                // Si no existe la columna Seleccionar en el DataTable, la agregamos
-                if (!dtProducto.Columns.Contains("SeleccionarProducto"))
+                if (!dt.Columns.Contains("SeleccionarProducto"))
                 {
-                    dtProducto.Columns.Add("SeleccionarProducto", typeof(bool));
-
-                    // Inicializamos todas las filas en false
-                    foreach (DataRow row in dtProducto.Rows)
-                    {
+                    dt.Columns.Add("SeleccionarProducto", typeof(bool));
+                    foreach (DataRow row in dt.Rows)
                         row["SeleccionarProducto"] = false;
-                    }
                 }
 
-                dgvProducto.AutoGenerateColumns = false;
-                dgvProducto.Columns.Clear();
+                // 🔹 Actualizar el DataGridView en el hilo de la UI
+                this.Invoke((MethodInvoker)delegate
+                {
+                    dgvProducto.AutoGenerateColumns = false;
+                    dgvProducto.Columns.Clear();
 
-                // Columna CheckBox
-                DataGridViewCheckBoxColumn chkCol = new DataGridViewCheckBoxColumn();
-                chkCol.Name = "SeleccionarProducto";
-                chkCol.HeaderText = "✔";
-                chkCol.Width = 50;
-                chkCol.DataPropertyName = "SeleccionarProducto";
-                chkCol.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                chkCol.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                dgvProducto.Columns.Add(chkCol);
+                    DataGridViewCheckBoxColumn chkCol = new DataGridViewCheckBoxColumn
+                    {
+                        Name = "SeleccionarProducto",
+                        HeaderText = "✔",
+                        Width = 50,
+                        DataPropertyName = "SeleccionarProducto"
+                    };
+                    chkCol.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    chkCol.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    dgvProducto.Columns.Add(chkCol);
 
-                // Columna GrupoID
-                DataGridViewTextBoxColumn colGrupoID = new DataGridViewTextBoxColumn();
-                colGrupoID.DataPropertyName = "GrupoID";
-                colGrupoID.HeaderText = "GrupoID";
-                colGrupoID.Width = 275;
-                colGrupoID.ReadOnly = true;
-                colGrupoID.Name = "GrupoID";
-                colGrupoID.Visible = false;
-                dgvProducto.Columns.Add(colGrupoID);
+                    DataGridViewTextBoxColumn colGrupoID = new DataGridViewTextBoxColumn
+                    {
+                        DataPropertyName = "GrupoID",
+                        HeaderText = "GrupoID",
+                        Width = 275,
+                        ReadOnly = true,
+                        Name = "GrupoID",
+                        Visible = false
+                    };
+                    dgvProducto.Columns.Add(colGrupoID);
 
-                // Columna Nombre
-                DataGridViewTextBoxColumn colNombre = new DataGridViewTextBoxColumn();
-                colNombre.DataPropertyName = "Nombre";
-                colNombre.HeaderText = "Nombre";
-                colNombre.Width = 275;
-                colNombre.ReadOnly = true;
-                colNombre.Name = "Nombre";
-                dgvProducto.Columns.Add(colNombre);
+                    DataGridViewTextBoxColumn colNombre = new DataGridViewTextBoxColumn
+                    {
+                        DataPropertyName = "Nombre",
+                        HeaderText = "Nombre",
+                        Width = 275,
+                        ReadOnly = true,
+                        Name = "Nombre"
+                    };
+                    dgvProducto.Columns.Add(colNombre);
 
-                // Columna Producto (oculta)
-                DataGridViewTextBoxColumn colProducto = new DataGridViewTextBoxColumn();
-                colProducto.DataPropertyName = "Producto";
-                colProducto.HeaderText = "Producto";
-                // colProducto.Visible = false;
-                colProducto.Name = "Producto";
-                dgvProducto.Columns.Add(colProducto);
+                    DataGridViewTextBoxColumn colProducto = new DataGridViewTextBoxColumn
+                    {
+                        DataPropertyName = "Producto",
+                        HeaderText = "Producto",
+                        Name = "Producto"
+                    };
+                    dgvProducto.Columns.Add(colProducto);
 
-                //dgvProducto.DataSource = dtProducto;
-                //dtProducto = dtProducto.AsEnumerable().OrderBy(r => r.Field<string>("GrupoID")).CopyToDataTable();
-                dgvProducto.DataSource = dtProducto;
-
+                    dgvProducto.DataSource = dt;
+                });
             }
         }
+
     }
 }

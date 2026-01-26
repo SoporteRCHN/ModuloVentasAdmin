@@ -355,9 +355,9 @@ namespace ModuloVentasAdmin
                 // Padre sin hijos → abrir formulario
                 switch (clickedButton.Text.Trim())
                 {
-                    case "COTIZACIONES":
-                        LanzarForm(new frmCotizaciones(), "HOME / ADMINISTRAR COTIZACIONES");
-                        break;
+                    //case "NUEVA COTIZACION":
+                    //    LanzarForm(new frmCotizaciones(), "HOME / ADMINISTRAR COTIZACIONES");
+                    //    break;
                 }
                 return;
             }
@@ -393,13 +393,11 @@ namespace ModuloVentasAdmin
             // Hijo sin hijos → abrir formulario
             switch (clickedButton.Text.Trim())
             {
-                case "ADMINISTRAR PERFILES":
-                    DynamicMain.Instance.SeguimientoUsuario("INSERTAR", 43);
-                   // LanzarForm(new frmPerfilesUsuarios(), "HOME / ADMINISTRAR PERFILES");
+                case "NUEVA COTIZACION":
+                    LanzarForm(new frmCotizaciones(), "HOME / NUEVA COTIZACION");
                     break;
-                case "PERFILES PERMISOS":
-                    DynamicMain.Instance.SeguimientoUsuario("INSERTAR", 44);
-                    //LanzarForm(new frmPerfilesPermisos(), "HOME / PERMISOS DE PERFILES");
+                case "COTIZACION EXISTENTE":
+                    LanzarForm(new frmCotizacionExistente(), "HOME / COTIZACION EXISTENTE");
                     break;
             }
         }

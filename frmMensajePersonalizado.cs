@@ -8,11 +8,12 @@ namespace ModuloVentasAdmin
     public partial class frmMensajePersonalizado : Form
     {
         HttpClient httpClient = new HttpClient();
-        public string _RutaArchivo;
-        public frmMensajePersonalizado(string RutaArchivo)
+        public string _RutaArchivo, _NombreArchivo;
+        public frmMensajePersonalizado(string RutaArchivo, string NombreArchivo)
         {
             InitializeComponent();
             _RutaArchivo = RutaArchivo;
+            _NombreArchivo = NombreArchivo;
         }
 
         private void txtNumero_KeyUp(object sender, KeyEventArgs e)
@@ -30,9 +31,9 @@ namespace ModuloVentasAdmin
 
         private void btnProcesar_Click(object sender, EventArgs e)
         {
-            EnviarDocumento(_RutaArchivo);
+            EnviarDocumento(_NombreArchivo);
         }
-        private async void EnviarDocumento(string _RutaArchivo)
+        private async void EnviarDocumento(string _NombreArchivo)
         {
             if (txtNumero.Text.Trim().Length != 8)
             {
@@ -42,14 +43,14 @@ namespace ModuloVentasAdmin
 
             try
             {
-                string url = "https://app.rapidocargo.online:3000/emitirEventoCotizacionNegociacion/" + _RutaArchivo + "/" + txtNumero.Text;
+                string url = "https://app.rapidocargo.online:3000/emitirEventoCotizacionNegociacion/" + _NombreArchivo + "/" + txtNumero.Text;
                 string response = await httpClient.GetStringAsync(url);
                 Toast.Mostrar("Documento enviado exitosamente.", TipoAlerta.Success);
                 this.Close();
             }
             catch (Exception)
             {
-                Toast.Mostrar("Error al enviar cotizacion", TipoAlerta.Success);
+                Toast.Mostrar("Error al enviar cotizacion", TipoAlerta.Error);
             }
             
         }
@@ -65,6 +66,12 @@ namespace ModuloVentasAdmin
                 e.Handled = true; 
                 btnProcesar.Focus(); 
             }
+        }
+
+        private void btnPDF_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start(_RutaArchivo);
+            Toast.Mostrar("PDF generado exitosamente.", TipoAlerta.Success);
         }
     }
 }

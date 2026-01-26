@@ -30,7 +30,6 @@
         {
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.btnCancelar = new System.Windows.Forms.Button();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.label2 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -41,8 +40,6 @@
             this.panel3 = new System.Windows.Forms.Panel();
             this.lblFacturaPromedio = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label11 = new System.Windows.Forms.Label();
             this.lblValorPromedio = new System.Windows.Forms.Label();
             this.lblCantidad = new System.Windows.Forms.Label();
             this.lblValor = new System.Windows.Forms.Label();
@@ -54,6 +51,8 @@
             this.label3 = new System.Windows.Forms.Label();
             this.dtpDesde = new System.Windows.Forms.DateTimePicker();
             this.lblCliente = new System.Windows.Forms.Label();
+            this.btnCancelar = new System.Windows.Forms.Button();
+            this.btnConsulta = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -95,24 +94,6 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.Size = new System.Drawing.Size(860, 54);
             this.tableLayoutPanel2.TabIndex = 1;
-            // 
-            // btnCancelar
-            // 
-            this.btnCancelar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(136)))), ((int)(((byte)(80)))));
-            this.btnCancelar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btnCancelar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnCancelar.ForeColor = System.Drawing.Color.White;
-            this.btnCancelar.Image = global::ModuloVentasAdmin.Properties.Resources.white_cancel_28px;
-            this.btnCancelar.Location = new System.Drawing.Point(649, 4);
-            this.btnCancelar.Margin = new System.Windows.Forms.Padding(4);
-            this.btnCancelar.Name = "btnCancelar";
-            this.btnCancelar.Size = new System.Drawing.Size(207, 46);
-            this.btnCancelar.TabIndex = 1;
-            this.btnCancelar.Text = "CANCELAR ";
-            this.btnCancelar.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btnCancelar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnCancelar.UseVisualStyleBackColor = false;
-            this.btnCancelar.Click += new System.EventHandler(this.btnCancelar_Click);
             // 
             // tableLayoutPanel3
             // 
@@ -209,10 +190,9 @@
             // 
             // panel3
             // 
+            this.panel3.Controls.Add(this.btnConsulta);
             this.panel3.Controls.Add(this.lblFacturaPromedio);
             this.panel3.Controls.Add(this.label9);
-            this.panel3.Controls.Add(this.textBox1);
-            this.panel3.Controls.Add(this.label11);
             this.panel3.Controls.Add(this.lblValorPromedio);
             this.panel3.Controls.Add(this.lblCantidad);
             this.panel3.Controls.Add(this.lblValor);
@@ -232,7 +212,7 @@
             // 
             // lblFacturaPromedio
             // 
-            this.lblFacturaPromedio.Location = new System.Drawing.Point(145, 173);
+            this.lblFacturaPromedio.Location = new System.Drawing.Point(145, 183);
             this.lblFacturaPromedio.Name = "lblFacturaPromedio";
             this.lblFacturaPromedio.Size = new System.Drawing.Size(62, 17);
             this.lblFacturaPromedio.TabIndex = 14;
@@ -242,34 +222,15 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(15, 173);
+            this.label9.Location = new System.Drawing.Point(15, 183);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(122, 17);
             this.label9.TabIndex = 13;
             this.label9.Text = "Facturas Promedio:";
             // 
-            // textBox1
-            // 
-            this.textBox1.BackColor = System.Drawing.Color.White;
-            this.textBox1.Location = new System.Drawing.Point(15, 229);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(190, 37);
-            this.textBox1.TabIndex = 12;
-            // 
-            // label11
-            // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(15, 210);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(69, 17);
-            this.label11.TabIndex = 11;
-            this.label11.Text = "Dirección:";
-            // 
             // lblValorPromedio
             // 
-            this.lblValorPromedio.Location = new System.Drawing.Point(145, 123);
+            this.lblValorPromedio.Location = new System.Drawing.Point(145, 126);
             this.lblValorPromedio.Name = "lblValorPromedio";
             this.lblValorPromedio.Size = new System.Drawing.Size(62, 17);
             this.lblValorPromedio.TabIndex = 10;
@@ -278,7 +239,7 @@
             // 
             // lblCantidad
             // 
-            this.lblCantidad.Location = new System.Drawing.Point(145, 148);
+            this.lblCantidad.Location = new System.Drawing.Point(145, 154);
             this.lblCantidad.Name = "lblCantidad";
             this.lblCantidad.Size = new System.Drawing.Size(62, 17);
             this.lblCantidad.TabIndex = 9;
@@ -306,7 +267,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(15, 123);
+            this.label6.Location = new System.Drawing.Point(15, 126);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(103, 17);
             this.label6.TabIndex = 6;
@@ -315,7 +276,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(15, 148);
+            this.label5.Location = new System.Drawing.Point(15, 154);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(121, 17);
             this.label5.TabIndex = 5;
@@ -338,7 +299,6 @@
             this.dtpHasta.Name = "dtpHasta";
             this.dtpHasta.Size = new System.Drawing.Size(93, 22);
             this.dtpHasta.TabIndex = 3;
-            this.dtpHasta.ValueChanged += new System.EventHandler(this.dtpHasta_ValueChanged);
             // 
             // label3
             // 
@@ -357,7 +317,6 @@
             this.dtpDesde.Name = "dtpDesde";
             this.dtpDesde.Size = new System.Drawing.Size(93, 22);
             this.dtpDesde.TabIndex = 1;
-            this.dtpDesde.ValueChanged += new System.EventHandler(this.dtpDesde_ValueChanged);
             // 
             // lblCliente
             // 
@@ -368,6 +327,37 @@
             this.lblCliente.Size = new System.Drawing.Size(11, 13);
             this.lblCliente.TabIndex = 0;
             this.lblCliente.Text = "-";
+            // 
+            // btnCancelar
+            // 
+            this.btnCancelar.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(136)))), ((int)(((byte)(80)))));
+            this.btnCancelar.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnCancelar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCancelar.ForeColor = System.Drawing.Color.White;
+            this.btnCancelar.Image = global::ModuloVentasAdmin.Properties.Resources.white_cancel_28px;
+            this.btnCancelar.Location = new System.Drawing.Point(649, 4);
+            this.btnCancelar.Margin = new System.Windows.Forms.Padding(4);
+            this.btnCancelar.Name = "btnCancelar";
+            this.btnCancelar.Size = new System.Drawing.Size(207, 46);
+            this.btnCancelar.TabIndex = 1;
+            this.btnCancelar.Text = "CANCELAR ";
+            this.btnCancelar.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnCancelar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnCancelar.UseVisualStyleBackColor = false;
+            this.btnCancelar.Click += new System.EventHandler(this.btnCancelar_Click);
+            // 
+            // btnConsulta
+            // 
+            this.btnConsulta.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(97)))), ((int)(((byte)(172)))), ((int)(((byte)(112)))));
+            this.btnConsulta.Font = new System.Drawing.Font("Century Gothic", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnConsulta.ForeColor = System.Drawing.Color.White;
+            this.btnConsulta.Location = new System.Drawing.Point(24, 224);
+            this.btnConsulta.Name = "btnConsulta";
+            this.btnConsulta.Size = new System.Drawing.Size(183, 40);
+            this.btnConsulta.TabIndex = 15;
+            this.btnConsulta.Text = "CONSULTAR";
+            this.btnConsulta.UseVisualStyleBackColor = false;
+            this.btnConsulta.Click += new System.EventHandler(this.btnConsulta_Click);
             // 
             // frmTablaDescuentos
             // 
@@ -416,10 +406,9 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Label lblValorPromedio;
         private System.Windows.Forms.Label lblFacturaPromedio;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Button btnConsulta;
     }
 }

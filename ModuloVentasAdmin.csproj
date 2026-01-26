@@ -23,8 +23,8 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>true</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <MinimumRequiredVersion>1.0.0.1</MinimumRequiredVersion>
-    <ApplicationRevision>2</ApplicationRevision>
+    <MinimumRequiredVersion>1.0.0.2</MinimumRequiredVersion>
+    <ApplicationRevision>3</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -99,6 +99,12 @@
     <Compile Include="frmCotizaciones.Designer.cs">
       <DependentUpon>frmCotizaciones.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmCotizacionExistente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCotizacionExistente.Designer.cs">
+      <DependentUpon>frmCotizacionExistente.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmMensajePersonalizado.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -140,6 +146,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmCotizaciones.resx">
       <DependentUpon>frmCotizaciones.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCotizacionExistente.resx">
+      <DependentUpon>frmCotizacionExistente.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmMensajePersonalizado.resx">
       <DependentUpon>frmMensajePersonalizado.cs</DependentUpon>

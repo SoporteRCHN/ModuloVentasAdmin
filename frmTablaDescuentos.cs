@@ -238,24 +238,15 @@ namespace ModuloVentasAdmin
             return count;
         }
 
-
-
-        private void dtpHasta_ValueChanged(object sender, EventArgs e)
-        {
-            cargarHistorial(_vClienteID);
-        }
-
-        private void dtpDesde_ValueChanged(object sender, EventArgs e)
-        {
-            cargarHistorial(_vClienteID);
-        }
-
-        
-
         private void btnCancelar_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
+        }
+
+        private void btnConsulta_Click(object sender, EventArgs e)
+        {
+            cargarHistorial(_vClienteID);
         }
     }
 }

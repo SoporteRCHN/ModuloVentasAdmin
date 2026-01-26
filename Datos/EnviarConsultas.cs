@@ -1157,7 +1157,7 @@ namespace DatosVentasAdmin
             leer = comando.ExecuteReader();
             tabla.Load(leer);
 
-            Conexion.CerrarConexion();
+            //Conexion.CerrarConexion();
 
             return tabla;
         }
