@@ -331,47 +331,79 @@ namespace ModuloVentasAdmin
 
         private void MostrarPDF(byte[] pdfBytes)
         {
-            string tempPath = Path.Combine(Path.GetTempPath(), "CotizacionTemp.pdf");
-            File.WriteAllBytes(tempPath, pdfBytes);
-            System.Diagnostics.Process.Start(tempPath); // abre con el visor de PDF instalado
-        }
-        private void EnviarPDF(byte[] pdfBytes)
-        {
-            string rutaDestino = @"\\192.168.1.179\CotizacionesEspecificas";
+            // 🔹 Obtener ruta del escritorio del usuario actual
+            string rutaDestino = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             Directory.CreateDirectory(rutaDestino);
-
             string nombreArchivo = "Cotizacion-Temporal.pdf";
             string path = Path.Combine(rutaDestino, nombreArchivo);
 
-            if (File.Exists(path))
+            try
             {
-                File.Delete(path);
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+                File.WriteAllBytes(path, pdfBytes);
+                System.Diagnostics.Process.Start(path); // abre con el visor de PDF instalado
             }
+            catch (Exception ex)
+            {
+                Toast.Mostrar("Ocurrio un error al generar PDF.", TipoAlerta.Error);
+            }
+        }
+        private void EnviarPDF(byte[] pdfBytes)
+        {
+            // 🔹 Obtener ruta del escritorio del usuario actual
+            string rutaDestino = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            Directory.CreateDirectory(rutaDestino);
 
-            // 🔹 Guardar temporalmente el PDF
-            File.WriteAllBytes(path, pdfBytes);
-            enviarCotizacion(path, nombreArchivo);
+            string nombreArchivo = "Cotizacion-Temporal.pdf";
+
+
+            string path = Path.Combine(rutaDestino, nombreArchivo);
+
+            try
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+
+                // 🔹 Guardar temporalmente el PDF en el escritorio
+                File.WriteAllBytes(path, pdfBytes);
+
+                enviarCotizacion(path, nombreArchivo);
+            }
+            catch (Exception ex) 
+            {
+                Toast.Mostrar("Ocurrio un error al generar PDF.",TipoAlerta.Error);
+            }
         }
 
-        private void enviarCotizacion(String RutaArchivo, String NombreArchivo)
+
+        private void enviarCotizacion(string RutaArchivo, string NombreArchivo)
         {
             Form MensajeAdvertencia = new Form();
             using (frmMensajePersonalizado Mensaje = new frmMensajePersonalizado(RutaArchivo, NombreArchivo))
             {
                 MensajeAdvertencia.StartPosition = FormStartPosition.CenterScreen;
                 MensajeAdvertencia.FormBorderStyle = FormBorderStyle.None;
-                MensajeAdvertencia.Opacity = .70d;
+                MensajeAdvertencia.Opacity = 0.70d;
                 MensajeAdvertencia.BackColor = Color.Black;
                 MensajeAdvertencia.WindowState = FormWindowState.Maximized;
-                MensajeAdvertencia.Location = this.Location;
                 MensajeAdvertencia.ShowInTaskbar = false;
-                Mensaje.Owner = MensajeAdvertencia;
+                MensajeAdvertencia.TopMost = true; // 🔹 Mantener encima de todo
+
+                // Mostrar overlay
                 MensajeAdvertencia.Show();
-                Mensaje.ShowDialog();
+
+                // 🔹 Ahora el mensaje personalizado se muestra sobre el overlay
+                Mensaje.StartPosition = FormStartPosition.CenterParent;
+                Mensaje.ShowDialog(MensajeAdvertencia);
+
                 MensajeAdvertencia.Dispose();
             }
         }
-
 
         private void mostrarPagina(int page)
         {
@@ -472,11 +504,35 @@ namespace ModuloVentasAdmin
             }
         }
 
-        private void btnProcesar_Click(object sender, EventArgs e)
+        private async void btnProcesar_Click(object sender, EventArgs e)
         {
-            _EnviaWSP = true;
-            EnviarPDF(GenerarPDFCotizacionesAgrupado(dtCotizaciones, dtTerminos));
+            if (dgvCotizaciones.Rows.Count <= 0)
+            {
+                Toast.Mostrar("No se obtuvo informacion de este cliente.", TipoAlerta.Warning);
+                return;
+            }
+
+            Toast.Mostrar("Generando Archivo PDF, por favor espere...", TipoAlerta.Info);
+            Cursor.Current = Cursors.WaitCursor;
+            btnProcesar.Enabled = false;
+
+            try
+            {
+                // 🔹 Generar PDF en segundo plano
+                var pdfBytes = await Task.Run(() => GenerarPDFCotizacionesAgrupado(dtCotizaciones, dtTerminos));
+
+                // 🔹 Enviar PDF después de generarlo
+                await Task.Run(() => EnviarPDF(pdfBytes));
+
+                Toast.Mostrar("Archivo PDF procesado y enviado exitosamente.", TipoAlerta.Success);
+                btnProcesar.Enabled = true;
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
+            }
         }
+
 
         private void rbdNombre_CheckedChanged(object sender, EventArgs e)
         {

@@ -394,6 +394,7 @@ namespace ModuloVentasAdmin
             switch (clickedButton.Text.Trim())
             {
                 case "NUEVA COTIZACION":
+
                     LanzarForm(new frmCotizaciones(), "HOME / NUEVA COTIZACION");
                     break;
                 case "COTIZACION EXISTENTE":
@@ -421,34 +422,42 @@ namespace ModuloVentasAdmin
                 System.Reflection.BindingFlags.SetProperty,
                 null, form, new object[] { true });
         }
+
         public void LanzarForm(Form childForm, string ubicacionLabel)
         {
+            // 🔹 Cerrar y limpiar el formulario activo
             if (activeForm != null)
             {
-                // Suscribirse al evento FormClosed del formulario activo
-                activeForm.FormClosed -= ActiveForm_FormClosed; // Desuscribirse para evitar múltiples suscripciones
+                activeForm.FormClosed -= ActiveForm_FormClosed;
                 activeForm.Close();
+                activeForm.Dispose();
+                activeForm = null;
             }
+
+            // 🔹 Limpiar el panel antes de agregar el nuevo form
+            pWorkspace.Controls.Clear();
+
+            // 🔹 Configurar el nuevo formulario
             activeForm = childForm;
-            activeForm.FormClosed += ActiveForm_FormClosed; // Suscribirse al evento FormClosed
+            activeForm.FormClosed += ActiveForm_FormClosed;
 
             childForm.TopLevel = false;
             childForm.FormBorderStyle = FormBorderStyle.None;
             childForm.Dock = DockStyle.Fill;
 
-            // Habilitar doble búfer para reducir parpadeo
             EnableDoubleBuffering(childForm);
 
-            this.pWorkspace.SuspendLayout(); // Suspender el diseño del panel principal
-            this.pWorkspace.Controls.Add(childForm);
-            this.pWorkspace.Tag = childForm;
+            pWorkspace.SuspendLayout();
+            pWorkspace.Controls.Add(childForm);
+            pWorkspace.Tag = childForm;
             childForm.BringToFront();
             childForm.Show();
-            this.pWorkspace.ResumeLayout(); // Reanudar el diseño del panel principal
+            pWorkspace.ResumeLayout();
 
-            // Actualizar el lblUbicacion con el valor proporcionado
+            // 🔹 Actualizar ubicación
             ActualizarUbicacion(ubicacionLabel);
         }
+
         public void SeguimientoUsuario(int _AccionID)
         {
             SeguimientoUsuario sendSeguimiento = new SeguimientoUsuario

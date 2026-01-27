@@ -20,6 +20,7 @@ using iTextSharp.text.pdf.parser;
 using ModuloVentasAdmin;
 using System.Runtime.CompilerServices;
 using Org.BouncyCastle.Asn1.Cmp;
+using System.Threading;
 
 namespace ModuloVentasAdmin
 {
@@ -29,6 +30,7 @@ namespace ModuloVentasAdmin
         public string NombreOrigen, NombreDestino, NombreProducto, _RutaArchivo, _NombreArchivo = "";
         public bool _TerminosExisten, _estaActualizando, datosCargados = false;
 
+        CancellationTokenSource cts;
         AutoCompleteStringCollection listaNombres = new AutoCompleteStringCollection();
 
         public DataTable dtOrigen = new DataTable();
@@ -1359,16 +1361,23 @@ namespace ModuloVentasAdmin
                 txtAtencion.Focus();
             }
         }
-        private async void frmCotizacionDinamica_Load(object sender, EventArgs e)
-        {
-            var tareaDestino = Task.Run(() => cargarDestino());
-            var tareaProductos = Task.Run(() => cargarProductos());
+    
 
-            await Task.WhenAll(tareaDestino, tareaProductos);
+        //private async void frmCotizacionDinamica_Load(object sender, EventArgs e)
+        //{
+        //    cts = new CancellationTokenSource();
 
-            datosCargados = true; // 🔹 marcar que ya terminó
-            Toast.Mostrar("Datos cargados correctamente", TipoAlerta.Success);
-        }
+        //    var tareaDestino = Task.Run(() => cargarDestino(cts.Token), cts.Token);
+        //    var tareaProductos = Task.Run(() => cargarProductos(cts.Token), cts.Token);
+
+        //    await Task.WhenAll(tareaDestino, tareaProductos);
+
+        //    if (!cts.IsCancellationRequested)
+        //    {
+        //        datosCargados = true;
+        //        Toast.Mostrar("Datos cargados correctamente", TipoAlerta.Success);
+        //    }
+        //}
 
 
         private void cargarDescuentos() 
@@ -1448,6 +1457,7 @@ namespace ModuloVentasAdmin
 
             lblSeleccionadoProducto.Text = $"REGISTROS PRODUCTOS SELECCIONADOS: {cantidadSeleccionados}";
         }
+
 
         private void dgvProducto_CurrentCellDirtyStateChanged(object sender, EventArgs e)
         {
@@ -1789,107 +1799,152 @@ namespace ModuloVentasAdmin
                 dgvOrigen.DataSource = dtOrigen;
             }
         }
-        private void cargarDestino()
+        // 🔹 Declarar el CancellationTokenSource a nivel de clase
+
+
+        private async void frmCotizaciones_Shown(object sender, EventArgs e)
         {
-            CiudadesENAC getDestino = new CiudadesENAC
+            cts = new CancellationTokenSource();
+
+            var tareaDestino = Task.Run(() => cargarDestino(cts.Token), cts.Token);
+            var tareaProductos = Task.Run(() => cargarProductos(cts.Token), cts.Token);
+
+            await Task.WhenAll(tareaDestino, tareaProductos);
+
+            if (!cts.IsCancellationRequested)
             {
-                Opcion = "ListadoTodas"
-            };
+                datosCargados = true;
+                Toast.Mostrar("Datos cargados correctamente", TipoAlerta.Success);
+            }
+        }
+     
+
+        // 🔹 Cancelar tareas si cierras el formulario
+        private void frmCotizacionDinamica_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            cts?.Cancel();
+        }
+
+        // =======================================================
+        // MÉTODO: cargarDestino con cancelación y BeginInvoke
+        // =======================================================
+        private void cargarDestino(CancellationToken token)
+        {
+            if (token.IsCancellationRequested)
+                return;
+
+            CiudadesENAC getDestino = new CiudadesENAC { Opcion = "ListadoTodas" };
             dtDestino = logica.SP_CiudadesENAC(getDestino);
+
+            if (token.IsCancellationRequested)
+                return;
 
             if (dtDestino.Rows.Count > 0)
             {
-                // Insertamos el registro especial al inicio
                 DataRow rowNacional = dtDestino.NewRow();
                 rowNacional["Ciudad"] = 0;
                 rowNacional["Nombre"] = "A NIVEL NACIONAL";
                 rowNacional["CiudadPrincipal"] = 0;
                 dtDestino.Rows.InsertAt(rowNacional, 0);
 
-                // Si no existe la columna Seleccionar en el DataTable, la agregamos
                 if (!dtDestino.Columns.Contains("SeleccionarDestino"))
                 {
                     dtDestino.Columns.Add("SeleccionarDestino", typeof(bool));
-                    // Inicializamos todas las filas en false
                     foreach (DataRow row in dtDestino.Rows)
                     {
+                        if (token.IsCancellationRequested)
+                            return;
                         row["SeleccionarDestino"] = false;
                     }
                 }
 
-                dgvDestino.AutoGenerateColumns = false;
-                dgvDestino.Columns.Clear();
+                // 🔹 Actualizar el DataGridView en el hilo de la UI
+                this.BeginInvoke((MethodInvoker)delegate
+                {
+                    dgvDestino.AutoGenerateColumns = false;
+                    dgvDestino.Columns.Clear();
 
-                // Columna CheckBox
-                DataGridViewCheckBoxColumn chkCol = new DataGridViewCheckBoxColumn();
-                chkCol.Name = "SeleccionarDestino";
-                chkCol.HeaderText = "✔";
-                chkCol.Width = 50;
-                chkCol.DataPropertyName = "SeleccionarDestino";
-                chkCol.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                chkCol.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                dgvDestino.Columns.Add(chkCol);
+                    DataGridViewCheckBoxColumn chkCol = new DataGridViewCheckBoxColumn
+                    {
+                        Name = "SeleccionarDestino",
+                        HeaderText = "✔",
+                        Width = 50,
+                        DataPropertyName = "SeleccionarDestino"
+                    };
+                    chkCol.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    chkCol.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    dgvDestino.Columns.Add(chkCol);
 
-                // Columna Nombre
-                DataGridViewTextBoxColumn colNombre = new DataGridViewTextBoxColumn();
-                colNombre.DataPropertyName = "Nombre";
-                colNombre.HeaderText = "Nombre";
-                colNombre.Width = 275;
-                colNombre.ReadOnly = true;
-                colNombre.Name = "Nombre";
-                dgvDestino.Columns.Add(colNombre);
+                    DataGridViewTextBoxColumn colNombre = new DataGridViewTextBoxColumn
+                    {
+                        DataPropertyName = "Nombre",
+                        HeaderText = "Nombre",
+                        Width = 275,
+                        ReadOnly = true,
+                        Name = "Nombre"
+                    };
+                    dgvDestino.Columns.Add(colNombre);
 
-                // Columna Ciudad (oculta)
-                DataGridViewTextBoxColumn colCiudad = new DataGridViewTextBoxColumn();
-                colCiudad.DataPropertyName = "Ciudad";
-                colCiudad.HeaderText = "Ciudad";
-                colCiudad.Visible = false;
-                colCiudad.Name = "Ciudad";
-                dgvDestino.Columns.Add(colCiudad);
+                    DataGridViewTextBoxColumn colCiudad = new DataGridViewTextBoxColumn
+                    {
+                        DataPropertyName = "Ciudad",
+                        HeaderText = "Ciudad",
+                        Visible = false,
+                        Name = "Ciudad"
+                    };
+                    dgvDestino.Columns.Add(colCiudad);
 
-                // Columna Ciudad (oculta)
-                DataGridViewTextBoxColumn colPrincipal = new DataGridViewTextBoxColumn();
-                colPrincipal.DataPropertyName = "CiudadPrincipal";
-                colPrincipal.HeaderText = "Principal";
-                // colPrincipal.Visible = false;
-                colPrincipal.Name = "CiudadPrincipal";
-                dgvDestino.Columns.Add(colPrincipal);
+                    DataGridViewTextBoxColumn colPrincipal = new DataGridViewTextBoxColumn
+                    {
+                        DataPropertyName = "CiudadPrincipal",
+                        HeaderText = "Principal",
+                        Name = "CiudadPrincipal"
+                    };
+                    dgvDestino.Columns.Add(colPrincipal);
 
-                dgvDestino.DataSource = dtDestino;
+                    dgvDestino.DataSource = dtDestino;
+                });
             }
         }
-        private void cargarProductos()
+
+        // =======================================================
+        // MÉTODO: cargarProductos con cancelación y BeginInvoke
+        // =======================================================
+        private void cargarProductos(CancellationToken token)
         {
-            ProductosENAC getProducto = new ProductosENAC
-            {
-                Opcion = "Listado"
-            };
+            if (token.IsCancellationRequested)
+                return;
+
+            ProductosENAC getProducto = new ProductosENAC { Opcion = "Listado" };
             var dt = logica.SP_ProductosENAC(getProducto);
+
+            if (token.IsCancellationRequested)
+                return;
 
             if (dt.Rows.Count > 0)
             {
-                // 🔹 Blindaje: asegurar columna SeleccionarProducto
                 if (!dt.Columns.Contains("SeleccionarProducto"))
                 {
                     dt.Columns.Add("SeleccionarProducto", typeof(bool));
                     foreach (DataRow row in dt.Rows)
+                    {
+                        if (token.IsCancellationRequested)
+                            return;
                         row["SeleccionarProducto"] = false;
+                    }
                 }
 
-                // 🔹 Blindaje: asegurar columna Producto
                 if (!dt.Columns.Contains("Producto"))
                 {
                     dt.Columns.Add("Producto", typeof(string));
                 }
 
                 // 🔹 Actualizar el DataGridView en el hilo de la UI
-                
-                this.Invoke((MethodInvoker)delegate
+                this.BeginInvoke((MethodInvoker)delegate
                 {
                     dgvProducto.AutoGenerateColumns = false;
                     dgvProducto.Columns.Clear();
 
-                    // Columna CheckBox
                     DataGridViewCheckBoxColumn chkCol = new DataGridViewCheckBoxColumn
                     {
                         Name = "SeleccionarProducto",
@@ -1901,7 +1956,6 @@ namespace ModuloVentasAdmin
                     chkCol.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
                     dgvProducto.Columns.Add(chkCol);
 
-                    // Columna GrupoID
                     DataGridViewTextBoxColumn colGrupoID = new DataGridViewTextBoxColumn
                     {
                         DataPropertyName = "GrupoID",
@@ -1913,7 +1967,6 @@ namespace ModuloVentasAdmin
                     };
                     dgvProducto.Columns.Add(colGrupoID);
 
-                    // Columna Nombre
                     DataGridViewTextBoxColumn colNombre = new DataGridViewTextBoxColumn
                     {
                         DataPropertyName = "Nombre",
@@ -1924,7 +1977,6 @@ namespace ModuloVentasAdmin
                     };
                     dgvProducto.Columns.Add(colNombre);
 
-                    // Columna Producto
                     DataGridViewTextBoxColumn colProducto = new DataGridViewTextBoxColumn
                     {
                         DataPropertyName = "Producto",
@@ -1939,6 +1991,7 @@ namespace ModuloVentasAdmin
                 dtProducto = dt; // 🔹 Guardar referencia global
             }
         }
+
 
 
     }

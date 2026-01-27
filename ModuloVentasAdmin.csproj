@@ -23,8 +23,8 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>true</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <MinimumRequiredVersion>1.0.0.5</MinimumRequiredVersion>
-    <ApplicationRevision>6</ApplicationRevision>
+    <MinimumRequiredVersion>1.0.0.8</MinimumRequiredVersion>
+    <ApplicationRevision>9</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -76,6 +76,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmAumentoPrecios.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAumentoPrecios.Designer.cs">
+      <DependentUpon>frmAumentoPrecios.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmCotizacionDinamica_BCK.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -136,6 +142,9 @@
     <Compile Include="Toast.cs">
       <SubType>Form</SubType>
     </Compile>
+    <EmbeddedResource Include="frmAumentoPrecios.resx">
+      <DependentUpon>frmAumentoPrecios.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmCotizacionDinamica_BCK.resx">
       <DependentUpon>frmCotizacionDinamica_BCK.cs</DependentUpon>
     </EmbeddedResource>

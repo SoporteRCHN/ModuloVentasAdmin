@@ -1120,6 +1120,7 @@ namespace DatosVentasAdmin
             }
 
             // Abrir conexión (ajusta el parámetro según tu configuración)
+            Conexion.CerrarConexion();
             comando.Connection = Conexion.AbrirConexion(4);
 
             // Parámetros del procedimiento
