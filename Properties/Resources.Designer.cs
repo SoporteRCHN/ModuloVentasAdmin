@@ -93,9 +93,29 @@ namespace ModuloVentasAdmin.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap circled_right_22px {
+            get {
+                object obj = ResourceManager.GetObject("circled_right_22px", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap close_24px {
             get {
                 object obj = ResourceManager.GetObject("close_24px", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap go_back_22px {
+            get {
+                object obj = ResourceManager.GetObject("go_back_22px", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

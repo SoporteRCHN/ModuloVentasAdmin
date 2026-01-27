@@ -815,7 +815,7 @@ namespace ModuloVentasAdmin
             //string path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Cotizacion.pdf");
             // 🔹 Carpeta destino en el servidor
             string rutaDestino = @"\\192.168.1.179\CotizacionesEspecificas";
-            Directory.CreateDirectory(rutaDestino); // crea la carpeta si no existe
+            Directory.CreateDirectory(rutaDestino);
 
             // 🔹 Nombre único usando GUID
             string nombreArchivo = "Cotizacion-" + Guid.NewGuid().ToString() + ".pdf";
@@ -869,8 +869,6 @@ namespace ModuloVentasAdmin
                     SpacingAfter = 20f
                 };
                 doc.Add(titulo);
-
-
 
                 // 🔹 Cliente y Fecha
                 PdfPTable clienteFechaTable = new PdfPTable(2);
@@ -1885,6 +1883,7 @@ namespace ModuloVentasAdmin
                 }
 
                 // 🔹 Actualizar el DataGridView en el hilo de la UI
+                
                 this.Invoke((MethodInvoker)delegate
                 {
                     dgvProducto.AutoGenerateColumns = false;
