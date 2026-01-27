@@ -353,10 +353,10 @@
             // 
             this.tableLayoutPanel2.ColumnCount = 4;
             this.tableLayoutPanel1.SetColumnSpan(this.tableLayoutPanel2, 2);
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 51.99063F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 14.28571F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 8.430913F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 48.24356F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.15925F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 6.557377F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 29.03981F));
             this.tableLayoutPanel2.Controls.Add(this.chkAplicar, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.txtDescuento, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.btnAplicar, 3, 0);
@@ -373,12 +373,12 @@
             // 
             this.chkAplicar.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.chkAplicar.AutoSize = true;
-            this.chkAplicar.Location = new System.Drawing.Point(78, 11);
+            this.chkAplicar.Location = new System.Drawing.Point(51, 11);
             this.chkAplicar.Name = "chkAplicar";
             this.chkAplicar.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.chkAplicar.Size = new System.Drawing.Size(141, 17);
+            this.chkAplicar.Size = new System.Drawing.Size(152, 17);
             this.chkAplicar.TabIndex = 0;
-            this.chkAplicar.Text = "APLICAR DESCUENTO";
+            this.chkAplicar.Text = "SOLICITAR DESCUENTO";
             this.chkAplicar.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.chkAplicar.UseVisualStyleBackColor = true;
             this.chkAplicar.CheckedChanged += new System.EventHandler(this.chkAplicar_CheckedChanged);
@@ -387,9 +387,9 @@
             // 
             this.txtDescuento.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtDescuento.Enabled = false;
-            this.txtDescuento.Location = new System.Drawing.Point(225, 9);
+            this.txtDescuento.Location = new System.Drawing.Point(209, 9);
             this.txtDescuento.Name = "txtDescuento";
-            this.txtDescuento.Size = new System.Drawing.Size(55, 20);
+            this.txtDescuento.Size = new System.Drawing.Size(63, 20);
             this.txtDescuento.TabIndex = 1;
             this.txtDescuento.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtDescuento_KeyPress);
             // 
@@ -400,12 +400,12 @@
             this.btnAplicar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnAplicar.ForeColor = System.Drawing.Color.White;
             this.btnAplicar.Image = global::ModuloVentasAdmin.Properties.Resources.TikTok_Verified_Account_28px;
-            this.btnAplicar.Location = new System.Drawing.Point(319, 0);
+            this.btnAplicar.Location = new System.Drawing.Point(303, 0);
             this.btnAplicar.Margin = new System.Windows.Forms.Padding(0);
             this.btnAplicar.Name = "btnAplicar";
-            this.btnAplicar.Size = new System.Drawing.Size(108, 39);
+            this.btnAplicar.Size = new System.Drawing.Size(124, 39);
             this.btnAplicar.TabIndex = 103;
-            this.btnAplicar.Text = "APLICAR";
+            this.btnAplicar.Text = "SOLICITAR";
             this.btnAplicar.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnAplicar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnAplicar.UseVisualStyleBackColor = false;
@@ -415,9 +415,9 @@
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(286, 12);
+            this.label4.Location = new System.Drawing.Point(278, 12);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(30, 15);
+            this.label4.Size = new System.Drawing.Size(22, 15);
             this.label4.TabIndex = 104;
             this.label4.Text = "%";
             // 

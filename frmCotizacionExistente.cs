@@ -53,6 +53,7 @@ namespace ModuloVentasAdmin
                     {
                         txtClienteNombre.Text = Mensaje.ClienteNombre;
                         txtClienteID.Text = Mensaje.ClienteId.ToString();
+                        cargarClientes();
                     }
                 }
 
@@ -134,14 +135,41 @@ namespace ModuloVentasAdmin
         }
         private byte[] GenerarPDFCotizacionesAgrupado(DataTable dtCotizaciones, DataTable dtTerminos)
         {
+           
             using (MemoryStream ms = new MemoryStream())
             {
-                Document doc = new Document(PageSize.LETTER, 40, 40, 40, 40);
+                // 🔹 Detectar cantidad máxima de productos
+                int maxProductos = dtCotizaciones.AsEnumerable()
+                    .GroupBy(r => r["OrigenID"].ToString())
+                    .Select(g => g.Select(r => r["Producto"].ToString()).Distinct().Count())
+                    .DefaultIfEmpty(0)
+                    .Max();
+
+                // 🔹 Si hay más de 8 productos, usar orientación horizontal
+                Document doc = maxProductos > 8
+                    ? new Document(PageSize.LEGAL.Rotate(), 20, 20, 20, 20)
+                    : new Document(PageSize.LETTER, 40, 40, 40, 40);
+
                 PdfWriter writer = PdfWriter.GetInstance(doc, ms);
                 doc.Open();
-                var destinoHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9);
-                var fontHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 7);
-                var fontCell = FontFactory.GetFont(FontFactory.HELVETICA, 9);
+                doc.Open();
+
+                // 🔹 Definir fuentes según cantidad de columnas
+                iTextSharp.text.Font destinoHeader, fontHeader, fontCell;
+
+                if (maxProductos > 8)
+                {
+                    destinoHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9);
+                    fontHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 6);
+                    fontCell = FontFactory.GetFont(FontFactory.HELVETICA, 8);
+                }
+                else
+                {
+                    destinoHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9);
+                    fontHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9);
+                    fontCell = FontFactory.GetFont(FontFactory.HELVETICA, 9);
+                }
+
 
                 // 🔹 Encabezado con logos
                 PdfPTable headerTable = new PdfPTable(2);
@@ -312,25 +340,17 @@ namespace ModuloVentasAdmin
             string rutaDestino = @"\\192.168.1.179\CotizacionesEspecificas";
             Directory.CreateDirectory(rutaDestino);
 
-            string nombreArchivo = "Cotizacion-" + Guid.NewGuid().ToString() + ".pdf";
+            string nombreArchivo = "Cotizacion-Temporal.pdf";
             string path = Path.Combine(rutaDestino, nombreArchivo);
+
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
 
             // 🔹 Guardar temporalmente el PDF
             File.WriteAllBytes(path, pdfBytes);
-
-            try
-            {
-                // 🔹 Usar el archivo en tu lógica de envío
-                enviarCotizacion(path, nombreArchivo);
-            }
-            finally
-            {
-                // 🔹 Eliminar el archivo después de enviar
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-            }
+            enviarCotizacion(path, nombreArchivo);
         }
 
         private void enviarCotizacion(String RutaArchivo, String NombreArchivo)
@@ -425,12 +445,33 @@ namespace ModuloVentasAdmin
             }
         }
 
-        private void btnPDF_Click(object sender, EventArgs e)
+        private async void btnPDF_Click(object sender, EventArgs e)
         {
-            _EnviaWSP = false;
-            MostrarPDF(GenerarPDFCotizacionesAgrupado(dtCotizaciones, dtTerminos));
-            Toast.Mostrar("Cotización generada exitosamente.", TipoAlerta.Success);
+            if (dgvCotizaciones.Rows.Count <= 0)
+            {
+                Toast.Mostrar("No se obtuvo informacion de este cliente.", TipoAlerta.Warning);
+                return;
+            }
+
+            Toast.Mostrar("Generando Archivo PDF, por favor espere...", TipoAlerta.Info);
+            Cursor.Current = Cursors.WaitCursor;
+            btnPDF.Enabled = false;
+            try
+            {
+                // 🔹 Generar PDF en segundo plano
+                var pdfBytes = await Task.Run(() => GenerarPDFCotizacionesAgrupado(dtCotizaciones, dtTerminos));
+
+                MostrarPDF(pdfBytes);
+
+                Toast.Mostrar("Archivo PDF generado exitosamente.", TipoAlerta.Success);
+                btnPDF.Enabled = true;
+            }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
+            }
         }
+
         private void btnProcesar_Click(object sender, EventArgs e)
         {
             _EnviaWSP = true;
