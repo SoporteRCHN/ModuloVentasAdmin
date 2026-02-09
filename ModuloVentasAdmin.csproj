@@ -23,8 +23,8 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>true</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <MinimumRequiredVersion>1.0.0.8</MinimumRequiredVersion>
-    <ApplicationRevision>9</ApplicationRevision>
+    <MinimumRequiredVersion>1.0.0.14</MinimumRequiredVersion>
+    <ApplicationRevision>15</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -112,6 +112,18 @@
     <Compile Include="frmCotizacionExistente.Designer.cs">
       <DependentUpon>frmCotizacionExistente.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmDescuentoPrecios.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDescuentoPrecios.Designer.cs">
+      <DependentUpon>frmDescuentoPrecios.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmLoading.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmLoading.Designer.cs">
+      <DependentUpon>FrmLoading.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmMensajePersonalizado.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -142,6 +154,12 @@
     <Compile Include="Toast.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="ToastDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ToastDialog.Designer.cs">
+      <DependentUpon>ToastDialog.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="frmAumentoPrecios.resx">
       <DependentUpon>frmAumentoPrecios.cs</DependentUpon>
     </EmbeddedResource>
@@ -159,6 +177,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmCotizacionExistente.resx">
       <DependentUpon>frmCotizacionExistente.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDescuentoPrecios.resx">
+      <DependentUpon>frmDescuentoPrecios.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmLoading.resx">
+      <DependentUpon>FrmLoading.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmMensajePersonalizado.resx">
       <DependentUpon>frmMensajePersonalizado.cs</DependentUpon>
@@ -182,6 +206,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Toast.resx">
+      <DependentUpon>Toast.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ToastDialog.resx">
+      <DependentUpon>ToastDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="ModuloVentasAdmin_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -288,6 +318,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\circled_right_22px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\close_window_20px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\loading.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\loading2.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

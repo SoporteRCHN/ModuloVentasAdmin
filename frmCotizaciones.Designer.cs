@@ -965,6 +965,7 @@
             this.Name = "frmCotizaciones";
             this.Text = "NUEVA COTIZACION";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmCotizacionDinamica_FormClosing);
+            this.Load += new System.EventHandler(this.frmCotizaciones_Load);
             this.Shown += new System.EventHandler(this.frmCotizaciones_Shown);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);

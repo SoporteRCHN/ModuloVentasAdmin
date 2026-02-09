@@ -53,6 +53,7 @@ namespace ModuloVentasAdmin
                     {
                         txtClienteNombre.Text = Mensaje.ClienteNombre;
                         txtClienteID.Text = Mensaje.ClienteId.ToString();
+                        cargarOrigenes();
                         cargarClientes();
                     }
                 }
@@ -69,6 +70,7 @@ namespace ModuloVentasAdmin
                     return;
 
                 e.SuppressKeyPress = true;
+                cargarOrigenes();
                 cargarClientes();
             }
         }
@@ -87,7 +89,7 @@ namespace ModuloVentasAdmin
             {
                 txtClienteID.Text = dtGetCliente.Rows[0]["ClienteID"].ToString();
                 txtClienteNombre.Text = dtGetCliente.Rows[0]["NombreCompleto"].ToString();
-                cargarCotizaciones();
+                cargarCotizaciones("0");
             }
             else
             {
@@ -97,8 +99,35 @@ namespace ModuloVentasAdmin
                 txtClienteID.Focus();
             }
         }
+        private void cargarOrigenes()
+        {
+            ClienteENAC getCotizacion = new ClienteENAC
+            {
+                Opcion = "BuscarPorCodigoDistinct",
+                Cliente = txtClienteID.Text
+            };
 
-        private void cargarCotizaciones()
+            DataTable dtDistintos = logica.SP_ClientesENAC(getCotizacion);
+
+            if (dtDistintos.Rows.Count > 0)
+            {
+                // Crear nueva fila "Todos"
+                DataRow filaTodos = dtDistintos.NewRow();
+                filaTodos["Origen"] = "TODOS";
+                filaTodos["OrigenID"] = 0; // puedes usar 0 o -1 como valor especial
+
+                // Insertar al inicio
+                dtDistintos.Rows.InsertAt(filaTodos, 0);
+
+                // Asignar al combo
+                cmbOrigen.DataSource = dtDistintos;
+                cmbOrigen.DisplayMember = "Origen";
+                cmbOrigen.ValueMember = "OrigenID";
+                cmbOrigen.SelectedIndex = 0;
+            }
+        }
+
+        private void cargarCotizaciones(string _OrigenRemitente)
         {
             string _Opcion = "getClientesNegociaciones";
 
@@ -106,6 +135,7 @@ namespace ModuloVentasAdmin
             {
                 Opcion = _Opcion,
                 Cliente = txtClienteID.Text,
+                Nombre = _OrigenRemitente
             };
             dtCotizaciones = logica.SP_ClientesENAC(getCotizacion);
 
@@ -559,6 +589,7 @@ namespace ModuloVentasAdmin
                         {
                             txtClienteNombre.Text = Mensaje.ClienteNombre;
                             txtClienteID.Text = Mensaje.ClienteId.ToString();
+                            cargarOrigenes();
                             cargarClientes();
                         }
                     }
@@ -598,6 +629,17 @@ namespace ModuloVentasAdmin
             e.Handled = true;
         }
 
+        private void cmbOrigen_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbOrigen.SelectedIndex == 0) 
+            {
+                cargarCotizaciones("0");
+            }
+            else
+            {
+                cargarCotizaciones(cmbOrigen.SelectedValue.ToString());
+            }
+        }
 
         private void rdbCodigo_CheckedChanged(object sender, EventArgs e)
         {

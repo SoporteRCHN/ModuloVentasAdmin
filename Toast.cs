@@ -185,6 +185,24 @@ namespace ModuloVentasAdmin
             Toast toast = new Toast(mensaje, tipo, duracionMs);
             toast.Show();
         }
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            // 
+            // Toast
+            // 
+            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Name = "Toast";
+            this.Load += new System.EventHandler(this.Toast_Load);
+            this.ResumeLayout(false);
+
+        }
+
+        private void Toast_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 
 }

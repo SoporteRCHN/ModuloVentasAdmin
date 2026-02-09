@@ -47,12 +47,14 @@
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.btnProcesar = new System.Windows.Forms.Button();
             this.btnPDF = new System.Windows.Forms.Button();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.chkAplicar = new System.Windows.Forms.CheckBox();
             this.txtDescuento = new System.Windows.Forms.TextBox();
             this.btnAplicar = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.cmbOrigen = new System.Windows.Forms.ComboBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCotizaciones)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
@@ -60,8 +62,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.btnSiguiente)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnAnterior)).BeginInit();
             this.tableLayoutPanel4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tableLayoutPanel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -179,13 +181,13 @@
             this.dgvCotizaciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.tableLayoutPanel1.SetColumnSpan(this.dgvCotizaciones, 5);
             this.dgvCotizaciones.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvCotizaciones.Location = new System.Drawing.Point(3, 90);
+            this.dgvCotizaciones.Location = new System.Drawing.Point(3, 105);
             this.dgvCotizaciones.Name = "dgvCotizaciones";
             this.dgvCotizaciones.RowHeadersVisible = false;
             this.dgvCotizaciones.RowTemplate.DefaultCellStyle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.dgvCotizaciones.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.Color.Gainsboro;
             this.dgvCotizaciones.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.dgvCotizaciones.Size = new System.Drawing.Size(925, 286);
+            this.dgvCotizaciones.Size = new System.Drawing.Size(925, 271);
             this.dgvCotizaciones.TabIndex = 142;
             // 
             // tableLayoutPanel1
@@ -207,13 +209,15 @@
             this.tableLayoutPanel1.Controls.Add(this.label7, 3, 1);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel4, 0, 4);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 3, 0);
+            this.tableLayoutPanel1.Controls.Add(this.label5, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.cmbOrigen, 1, 2);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(20, 50);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 5;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11.87335F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 6.860158F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 4.232804F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 76.98412F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 8.17942F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 73.08707F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 46F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(931, 426);
             this.tableLayoutPanel1.TabIndex = 143;
@@ -339,16 +343,6 @@
             this.btnPDF.UseVisualStyleBackColor = false;
             this.btnPDF.Click += new System.EventHandler(this.btnPDF_Click);
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::ModuloVentasAdmin.Properties.Resources.blue_Checkmark_22px;
-            this.pictureBox1.Location = new System.Drawing.Point(20, 21);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(24, 22);
-            this.pictureBox1.TabIndex = 133;
-            this.pictureBox1.TabStop = false;
-            // 
             // tableLayoutPanel2
             // 
             this.tableLayoutPanel2.ColumnCount = 4;
@@ -421,6 +415,40 @@
             this.label4.TabIndex = 104;
             this.label4.Text = "%";
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::ModuloVentasAdmin.Properties.Resources.blue_Checkmark_22px;
+            this.pictureBox1.Location = new System.Drawing.Point(20, 21);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(24, 22);
+            this.pictureBox1.TabIndex = 133;
+            this.pictureBox1.TabStop = false;
+            // 
+            // label5
+            // 
+            this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(0, 73);
+            this.label5.Margin = new System.Windows.Forms.Padding(0);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(87, 26);
+            this.label5.TabIndex = 146;
+            this.label5.Text = "FILTRAR POR ORIGEN:";
+            // 
+            // cmbOrigen
+            // 
+            this.cmbOrigen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmbOrigen.BackColor = System.Drawing.Color.White;
+            this.cmbOrigen.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbOrigen.ForeColor = System.Drawing.Color.Black;
+            this.cmbOrigen.FormattingEnabled = true;
+            this.cmbOrigen.Location = new System.Drawing.Point(90, 76);
+            this.cmbOrigen.Name = "cmbOrigen";
+            this.cmbOrigen.Size = new System.Drawing.Size(345, 21);
+            this.cmbOrigen.TabIndex = 147;
+            this.cmbOrigen.SelectedIndexChanged += new System.EventHandler(this.cmbOrigen_SelectedIndexChanged);
+            // 
             // frmCotizacionExistente
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -443,9 +471,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.btnSiguiente)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.btnAnterior)).EndInit();
             this.tableLayoutPanel4.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -478,5 +506,7 @@
         private System.Windows.Forms.CheckBox chkAplicar;
         private System.Windows.Forms.TextBox txtDescuento;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ComboBox cmbOrigen;
     }
 }

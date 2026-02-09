@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -106,7 +107,9 @@ namespace LogicaVentasAdmin
         public string Semanales { get; set; }
         public string Mensuales { get; set; }
         public string Quincenales { get; set; }
+        public string CampoGrande { get; set; }
     }
+
 
     public class Cliente
     {
@@ -569,6 +572,52 @@ namespace LogicaVentasAdmin
         public DateTime? FPosteo { get; set; }
         public string PC { get; set; }
         public bool? Estado { get; set; }
+    }
+    public class AumentoPreciosEncabezado
+    {
+        public string Opcion { get; set; }
+        public long? AumentoID { get; set; }
+        public int? TipoAumento { get; set; } // 1 Masivo, 2 Específico
+        public decimal? ValorAumento { get; set; }
+        public int? EstadoAprobacion { get; set; } // 1 Solicitado, 2 Aprobado, 3 Rechazado
+        public string Comentario { get; set; }
+        public string UPosteo { get; set; }
+        public DateTime? FPosteo { get; set; }
+        public string PC { get; set; }
+        public bool? Estado { get; set; }
+    }
+    public class AumentoPreciosDetalle
+    {
+        public string Opcion { get; set; }
+        public long? DetalleID { get; set; }
+        public long? AumentoID { get; set; }
+        public string ClienteID { get; set; }
+        public decimal? ValorAumento { get; set; }
+        public string Comentario { get; set; }
+        public string UPosteo { get; set; }
+        public DateTime? FPosteo { get; set; }
+        public string PC { get; set; }
+        public bool? Estado { get; set; }
+    }
+    public class TarifarioSucursal
+    {
+        public string Opcion { get; set; }
+        public long? TarifarioID { get; set; }
+        public string SucursalID { get; set; }
+        public string CiudadDestino { get; set; }
+        public int? Orden { get; set; }
+        public string UPosteo { get; set; }
+        public DateTime? FPosteo { get; set; }
+        public string PC { get; set; }
+        public bool? Estado { get; set; }
+    }
+    public class ProductoCiudadENAC
+    {
+        // Parámetros de entrada al SP
+        public string Opcion { get; set; }
+        public string Productos { get; set; }   // lista separada por coma
+        public string CiudadRemitente { get; set; }
+        public decimal? Descuento { get; set; }
     }
 
 }

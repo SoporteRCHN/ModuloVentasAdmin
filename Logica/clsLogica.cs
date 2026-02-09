@@ -246,5 +246,30 @@ namespace LogicaVentasAdmin
             return tabla;
         }
 
+        public DataTable SP_AumentoPreciosEncabezado(AumentoPreciosEncabezado a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_AumentoPreciosEncabezado(a);
+            return tabla;
+        }
+
+        public DataTable SP_AumentoPreciosDetalle(AumentoPreciosDetalle a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_AumentoPreciosDetalle(a);
+            return tabla;
+        }
+        public DataTable SP_TarifarioSucursales(TarifarioSucursal a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_TarifarioSucursales(a);
+            return tabla;
+        }
+        public DataTable SP_ProductosCiudadesENAC(ProductoCiudadENAC a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_ProductosCiudadesENAC(a);
+            return tabla;
+        }
     }
 }

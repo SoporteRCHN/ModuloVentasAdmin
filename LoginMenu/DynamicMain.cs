@@ -394,11 +394,16 @@ namespace ModuloVentasAdmin
             switch (clickedButton.Text.Trim())
             {
                 case "NUEVA COTIZACION":
-
                     LanzarForm(new frmCotizaciones(), "HOME / NUEVA COTIZACION");
                     break;
                 case "COTIZACION EXISTENTE":
                     LanzarForm(new frmCotizacionExistente(), "HOME / COTIZACION EXISTENTE");
+                    break;
+                case "AUMENTOS":
+                    LanzarForm(new frmAumentoPrecios(), "HOME / AUMENTOS DE PRECIOS");
+                    break;
+                case "DESCUENTOS":
+                    LanzarForm(new frmDescuentoPrecios(), "HOME / DESCUENTO DE PRECIOS");
                     break;
             }
         }

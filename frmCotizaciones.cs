@@ -1475,6 +1475,11 @@ namespace ModuloVentasAdmin
             }
         }
 
+        private void frmCotizaciones_Load(object sender, EventArgs e)
+        {
+
+        }
+
         private void dgvProducto_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex >= 0 && dgvProducto.Columns[e.ColumnIndex].Name == "SeleccionarProducto")

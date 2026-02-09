@@ -21,6 +21,7 @@ namespace LogicaVentasAdmin
         public int ClienteId { get; private set; } = 0;
         public string ClienteNombre { get; private set; } = "";
 
+        public int _TipoCosto = 0;
 
         public frmBuscarClientes()
         {
@@ -49,7 +50,8 @@ namespace LogicaVentasAdmin
         {
             ClienteENAC getClientes = new ClienteENAC
             {
-                Opcion = "BUSCAR"
+               // Opcion = "BUSCAR"
+                Opcion = "BUSCARMASIVO"
             };
             dtClientes = logica.SP_ClientesENAC(getClientes);
 
@@ -97,6 +99,14 @@ namespace LogicaVentasAdmin
                 colNombre.Width = 300;
                 colNombre.ReadOnly = true;
                 DgvClientes.Columns.Add(colNombre);
+
+                DataGridViewTextBoxColumn colTipoCosto = new DataGridViewTextBoxColumn();
+                colTipoCosto.DataPropertyName = "TipoCosto";
+                colTipoCosto.HeaderText = "TipoCosto";
+                colTipoCosto.Name = "TipoCosto";
+                colTipoCosto.Width = 300;
+                colTipoCosto.Visible = false;
+                DgvClientes.Columns.Add(colTipoCosto);
 
                 // Asignamos el DataSource
                 DgvClientes.DataSource = dtClientes.DefaultView;
@@ -168,6 +178,7 @@ namespace LogicaVentasAdmin
             {
                 ClienteId = Convert.ToInt32(filaSeleccionada.Cells["ClienteID"].Value);
                 ClienteNombre = filaSeleccionada.Cells["NombreCompleto"].Value.ToString();
+                _TipoCosto = Convert.ToInt32(filaSeleccionada.Cells["TipoCosto"].Value);
 
                 this.DialogResult = DialogResult.OK;
                 this.Close();
@@ -180,9 +191,6 @@ namespace LogicaVentasAdmin
         }
         private void TxtCliente_KeyPress(object sender, KeyPressEventArgs e)
         {
-
-           
-
             // Solo ejecutamos si presiona Enter
             if (e.KeyChar == (char)Keys.Enter)
             {
@@ -195,7 +203,7 @@ namespace LogicaVentasAdmin
                     // 🔹 Si está vacío → traer todos los clientes
                     ClienteENAC getClientes = new ClienteENAC
                     {
-                        Opcion = "BUSCAR"
+                        Opcion = "BUSCARMASIVO"
                     };
                     dtClientes = logica.SP_ClientesENAC(getClientes);
                 }
@@ -204,7 +212,7 @@ namespace LogicaVentasAdmin
                     // 🔹 Si es numérico → buscar por código
                     ClienteENAC getClientes = new ClienteENAC
                     {
-                        Opcion = "BuscarPorCodigo",
+                        Opcion = "BuscarPorCodigoBasico",
                         Cliente = filtro
                     };
                     dtClientes = logica.SP_ClientesENAC(getClientes);
@@ -266,6 +274,17 @@ namespace LogicaVentasAdmin
                     };
                     DgvClientes.Columns.Add(colNombre);
 
+                    // NombreCompleto
+                    DataGridViewTextBoxColumn colTipoCosto = new DataGridViewTextBoxColumn
+                    {
+                        DataPropertyName = "TipoCosto",
+                        HeaderText = "TipoCosto",
+                        Name = "TipoCosto",
+                        Width = 300,
+                        Visible = false 
+                    };
+                    DgvClientes.Columns.Add(colTipoCosto);
+
                     DgvClientes.DataSource = dtClientes.DefaultView;
 
                     DgvClientes.Focus();
@@ -276,7 +295,6 @@ namespace LogicaVentasAdmin
                         DgvClientes.Rows[0].Selected = true;
                         DgvClientes.CurrentCell = DgvClientes.Rows[0].Cells[0];
                     }
-
                 }
                 else
                 {
@@ -293,7 +311,6 @@ namespace LogicaVentasAdmin
             {
                 e.Handled = true;
             }
-
         }
 
 
