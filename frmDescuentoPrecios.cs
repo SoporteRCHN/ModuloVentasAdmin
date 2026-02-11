@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 
 namespace ModuloVentasAdmin
@@ -17,12 +18,16 @@ namespace ModuloVentasAdmin
         DataTable dtgetInfoAledano = new DataTable();
         DataTable dtgetInfoPrincipalDetalle = new DataTable();
         DataTable dtgetInfoAledanoDetalle = new DataTable();
+        DataTable dtgetInfoAledanoDetalleOUT = new DataTable();
+        DataTable _dtRegistroPrincipal = new DataTable();
+        DataTable _dtRegistroAledano =new DataTable();
 
         private List<ProductoSeleccionado> productosSeleccionados = new List<ProductoSeleccionado>();
         private List<DestinoRegistro> destinosSeleccionados = new List<DestinoRegistro>();
 
-        public string _Nombre, _Cliente = "";
-        public int _TipoCosto, _errorPrincipal, _errorAledano = 0;
+        public string _Nombre, _Cliente, _ProductoID = "";
+        public int _TipoCosto, _errorPrincipal, _errorAledano, _EncabezadoID, _PrincipalAledano, _CiudadesOUT = 0;
+        public decimal _Costo = 0;
         public frmDescuentoPrecios()
         {
             InitializeComponent();
@@ -52,7 +57,6 @@ namespace ModuloVentasAdmin
             public decimal Costo { get; set; }
         }
 
-
         private void rdbNombre_CheckedChanged(object sender, EventArgs e)
         {
             if (rdbNombre.Checked == true)
@@ -76,7 +80,12 @@ namespace ModuloVentasAdmin
                 _Nombre = dtGetCliente.Rows[0]["NombreCompleto"].ToString();
                 _Cliente = dtGetCliente.Rows[0]["ClienteID"].ToString();
                 _TipoCosto = Convert.ToInt32(dtGetCliente.Rows[0]["TipoCosto"]);
+
                 lblClienteINombre.Text = "TARIFARIO: " + _Cliente + " - " + _Nombre;
+                lblTipoCliente.Text = (_TipoCosto == 2) ? "Negociacion Especial" : "Cliente Normal";
+                txtValor.Text = "0";
+                txtNombreCliente.Text = _Nombre;
+       
 
                 Toast.Mostrar("Cliente " + _Nombre + " ha sido seleccionado.", TipoAlerta.Info);
             }
@@ -86,6 +95,12 @@ namespace ModuloVentasAdmin
                 lblClienteINombre.Text = "-";
                 _Nombre = String.Empty;
                 _Cliente = String.Empty;
+                lblTipoCliente.Text = "-";
+                txtValor.Enabled = false;
+                txtValor.Text = "0";
+                label4.Visible = false;
+                txtNombreCliente.Text = String.Empty;
+     
                 txtBuscar.Focus();
             }
         }
@@ -112,13 +127,26 @@ namespace ModuloVentasAdmin
                         _Nombre = Mensaje.ClienteNombre;
                         _Cliente = Mensaje.ClienteId.ToString();
                         _TipoCosto = Mensaje._TipoCosto;
+
                         lblClienteINombre.Text = "TARIFARIO: " + _Cliente + " - " + _Nombre;
+                        lblTipoCliente.Text = (_TipoCosto == 2) ? "Negociacion Especial" : "Cliente Normal";
+                        txtValor.Text = "0";
+                        txtNombreCliente.Text = _Nombre;
 
                         Toast.Mostrar("Cliente " + _Nombre + " ha sido seleccionado.", TipoAlerta.Info);
+            
                     }
                     else
                     {
+                        lblTipoCliente.Text = "-";
+                        txtValor.Enabled = false;
+                        txtValor.Text = "0";
+                        label4.Visible = false;
                         Toast.Mostrar("No se selecciono cliente.", TipoAlerta.Warning);
+                        txtBuscar.Text = String.Empty;
+                        txtNombreCliente.Text = String.Empty;
+                 
+                        txtBuscar.Focus();
                     }
                 }
                 MensajeAdvertencia.Dispose();
@@ -529,35 +557,89 @@ namespace ModuloVentasAdmin
         {
             string productosCsv = string.Join(",", productosSeleccionados.Select(p => p.ProductoID));
 
-            ProductoCiudadENAC getPrecios = new ProductoCiudadENAC
+            if (_TipoCosto == 1)
             {
-                Opcion = "ListadoCiudadPrincipal",
-                Productos = productosCsv, // aquí ya va "00001,00002,00003"
-                CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
-                Descuento = Convert.ToDecimal(txtValor.Text)
-            };
-           
-            dtgetInfoPrincipal = logica.SP_ProductosCiudadesENAC(getPrecios);
-
+                ProductoCiudadENAC getPrecios = new ProductoCiudadENAC
+                {
+                    Opcion = "ListadoCiudadPrincipal",
+                    Productos = productosCsv, // aquí ya va "00001,00002,00003"
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Descuento = Convert.ToDecimal(txtValor.Text)
+                };
+                dtgetInfoPrincipal = logica.SP_ProductosCiudadesENAC(getPrecios);
+            }
+            else if (_TipoCosto == 2) 
+            {
+                ProductoClienteCostos getPreciosClienteCostos = new ProductoClienteCostos
+                {
+                    Opcion = "ListadoCiudadPrincipal",
+                    Productos = productosCsv, // aquí ya va "00001,00002,00003"
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Descuento = Convert.ToDecimal(txtValor.Text),
+                    Cliente = _Cliente
+                };
+                dtgetInfoPrincipal = logica.SP_ProductosClienteCostos(getPreciosClienteCostos);
+            }
         }
         private void cargarPreciosAledanos()
         {
             string productosCsvAledano = string.Join(",", productosSeleccionados.Select(p => p.ProductoID));
-
-            ProductoCiudadENAC getPreciosAledanos = new ProductoCiudadENAC
+            if (_TipoCosto == 1)
             {
-                Opcion = "ListadoAledanoPrincipal",
-                Productos = productosCsvAledano, 
-                CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
-                Descuento = Convert.ToDecimal(txtValor.Text)
-            };
-            
-            dtgetInfoAledano = logica.SP_ProductosCiudadesENAC(getPreciosAledanos);
+                ProductoCiudadENAC getPreciosAledanos = new ProductoCiudadENAC
+                {
+                    Opcion = "ListadoAledanoPrincipal",
+                    Productos = productosCsvAledano,
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Descuento = Convert.ToDecimal(txtValor.Text)
+                };
+
+                dtgetInfoAledano = logica.SP_ProductosCiudadesENAC(getPreciosAledanos);
+            }
+            else if (_TipoCosto == 2) 
+            {
+                ProductoClienteCostos getPreciosClienteCostos = new ProductoClienteCostos
+                {
+                    Opcion = "ListadoAledanoPrincipal",
+                    Productos = productosCsvAledano, // aquí ya va "00001,00002,00003"
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Descuento = Convert.ToDecimal(txtValor.Text),
+                    Cliente = _Cliente
+                };
+                dtgetInfoAledano = logica.SP_ProductosClienteCostos(getPreciosClienteCostos);
+            }
         }
-     
 
         private void btnVistaPrevia_Click(object sender, EventArgs e)
         {
+            if (String.IsNullOrEmpty(_Cliente) || String.IsNullOrWhiteSpace(_Cliente)) 
+            {
+                Toast.Mostrar("Debe seleccionar un cliente primero.", TipoAlerta.Warning);
+                return;
+            }
+
+            bool haySeleccionado = false;
+
+            foreach (DataGridViewRow row in dgvProducto.Rows)
+            {
+                if (!row.IsNewRow)
+                {
+                    var cellValue = row.Cells["SeleccionarProducto"].Value;
+                    if (cellValue != null && Convert.ToBoolean(cellValue))
+                    {
+                        haySeleccionado = true;
+                        break; 
+                    }
+                }
+            }
+
+            if (!haySeleccionado)
+            {
+                Toast.Mostrar("No tiene productos seleccionados.", TipoAlerta.Warning);
+                return;
+            }
+           
+
             productosSeleccionados = null;
             dtgetInfoPrincipal = null;
             dtgetInfoAledano = null;
@@ -568,7 +650,12 @@ namespace ModuloVentasAdmin
             dgvTarifarioDetalle.DataSource = null;
             dgvAledanosDetalle.Columns.Clear();
             dgvAledanosDetalle.DataSource = null;
-            
+
+            if (String.IsNullOrWhiteSpace(txtValor.Text) || String.IsNullOrEmpty(txtValor.Text))
+            {
+                txtValor.Text = "0";
+            }
+
             productosSeleccionados = (from DataGridViewRow row in dgvProducto.Rows
                                       where Convert.ToBoolean(row.Cells["SeleccionarProducto"].Value) == true
                                       select new ProductoSeleccionado
@@ -577,6 +664,7 @@ namespace ModuloVentasAdmin
                                           Nombre = row.Cells["Nombre"].Value.ToString(),
                                           Seleccionado = true
                                       }).ToList();
+         
 
             cargarPreciosPrincipales(); //Recupero los precios de ciudades principales
             cargarPreciosAledanos(); // Recupero los precios de ciudades aledanos
@@ -588,32 +676,54 @@ namespace ModuloVentasAdmin
             if (tabControl1.SelectedTab == tabPage1)
             {
                 label4.Visible = false;
+                label10.Visible = false;
             }
             else if (tabControl1.SelectedTab == tabPage2)
             {
                 label4.Visible = true;
-                label4.Text = "Registros con precio desigual: " + _errorPrincipal;
+                label4.Text =  _errorPrincipal.ToString();
+
+                label10.Visible = false;
+
             }
             else if (tabControl1.SelectedTab == tabPage3)
             {
                 label4.Visible = true;
-                label4.Text = "Registros con precio desigual: " + _errorAledano;
+                label4.Text =  _errorAledano.ToString();
+
+
+                label10.Visible = true;
+                label10.Text = _CiudadesOUT.ToString();
             }
         }
 
         private void cargarPreciosPrincipalDetalle()
         {
             string productosCsv = string.Join(",", productosSeleccionados.Select(p => p.ProductoID));
-
-            ProductoCiudadENAC getPreciosDetalle = new ProductoCiudadENAC
+            if (_TipoCosto == 1)
             {
-                Opcion = "ListadoPrincipalDetalle",
-                Productos = productosCsv, // aquí ya va "00001,00002,00003"
-                CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
-                Descuento = Convert.ToDecimal(txtValor.Text)
-            };
+                ProductoCiudadENAC getPreciosDetalle = new ProductoCiudadENAC
+                {
+                    Opcion = "ListadoPrincipalDetalle",
+                    Productos = productosCsv, // aquí ya va "00001,00002,00003"
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Descuento = Convert.ToDecimal(txtValor.Text)
+                };
 
-            dtgetInfoPrincipalDetalle = logica.SP_ProductosCiudadesENAC(getPreciosDetalle);
+                dtgetInfoPrincipalDetalle = logica.SP_ProductosCiudadesENAC(getPreciosDetalle);
+            }
+            else if (_TipoCosto == 2) 
+            {
+                ProductoClienteCostos getPreciosClienteCostos = new ProductoClienteCostos
+                {
+                    Opcion = "ListadoPrincipalDetalle",
+                    Productos = productosCsv, // aquí ya va "00001,00002,00003"
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Descuento = Convert.ToDecimal(txtValor.Text),
+                    Cliente = _Cliente
+                };
+                dtgetInfoPrincipalDetalle = logica.SP_ProductosClienteCostos(getPreciosClienteCostos);
+            }
 
             if (dtgetInfoPrincipalDetalle.Rows.Count > 0)
             {
@@ -637,20 +747,60 @@ namespace ModuloVentasAdmin
             }
         }
 
-
+        private void AgregarOUT() 
+        {
+           ;
+        }
         private void cargarPreciosAledanosDetalle()
         {
             string productosCsvAledanosDetalle = string.Join(",", productosSeleccionados.Select(p => p.ProductoID));
 
-            ProductoCiudadENAC getPreciosAledanosDetalle = new ProductoCiudadENAC
+            if (_TipoCosto == 1)
             {
-                Opcion = "ListadoAledanoDetalle",
-                Productos = productosCsvAledanosDetalle,
-                CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
-                Descuento = Convert.ToDecimal(txtValor.Text)
-            };
+                ProductoCiudadENAC getPreciosAledanosDetalle = new ProductoCiudadENAC
+                {
+                    Opcion = "ListadoAledanoDetalle",
+                    Productos = productosCsvAledanosDetalle,
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Descuento = Convert.ToDecimal(txtValor.Text)
+                };
 
-            dtgetInfoAledanoDetalle = logica.SP_ProductosCiudadesENAC(getPreciosAledanosDetalle);
+                dtgetInfoAledanoDetalle = logica.SP_ProductosCiudadesENAC(getPreciosAledanosDetalle);
+
+
+                ProductoCiudadENAC getPreciosAledanosDetalleOUT = new ProductoCiudadENAC
+                {
+                    Opcion = "ListadoAledanoDetalleRegistroOUT",
+                    Productos = productosCsvAledanosDetalle,
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Descuento = Convert.ToDecimal(txtValor.Text)
+                };
+
+                dtgetInfoAledanoDetalleOUT = logica.SP_ProductosCiudadesENAC(getPreciosAledanosDetalleOUT);
+
+            }
+            else if (_TipoCosto == 2)
+            {
+                ProductoClienteCostos getPreciosClienteCostos = new ProductoClienteCostos
+                {
+                    Opcion = "ListadoAledanoDetalle",
+                    Productos = productosCsvAledanosDetalle, // aquí ya va "00001,00002,00003"
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Descuento = Convert.ToDecimal(txtValor.Text),
+                    Cliente = _Cliente
+                };
+                dtgetInfoAledanoDetalle = logica.SP_ProductosClienteCostos(getPreciosClienteCostos);
+
+                ProductoClienteCostos getPreciosClienteCostosOUT = new ProductoClienteCostos
+                {
+                    Opcion = "ListadoAledanoDetalleRegistroOUT",
+                    Productos = productosCsvAledanosDetalle, // aquí ya va "00001,00002,00003"
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Descuento = Convert.ToDecimal(txtValor.Text),
+                    Cliente = _Cliente
+                };
+                dtgetInfoAledanoDetalleOUT = logica.SP_ProductosClienteCostos(getPreciosClienteCostosOUT);
+            }
 
             if (dtgetInfoAledanoDetalle.Rows.Count > 0)
             {
@@ -669,9 +819,39 @@ namespace ModuloVentasAdmin
                 dgvAledanosDetalle.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
                 dgvAledanosDetalle.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
                 dgvAledanosDetalle.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                dgvAledanosDetalle.Columns["Orden"].Visible = false;
+                //dgvAledanosDetalle.Columns["Orden"].Visible = false;
                 dgvAledanosDetalle.Refresh();
             }
+
+            if (dtgetInfoAledanoDetalleOUT.Rows.Count > 0)
+            {
+                foreach (DataRow rowOut in dtgetInfoAledanoDetalleOUT.Rows)
+                {
+                    DataRow nuevaFila = dtgetInfoAledanoDetalle.NewRow();
+
+                    // 🔹 Usar el Orden que ya viene en OUT
+                    nuevaFila["Orden"] = rowOut["Orden"];
+                    nuevaFila["DestinoID"] = rowOut["Ciudad"];
+                    nuevaFila["CiudadDestino"] = rowOut["Nombre"];
+
+                    foreach (DataColumn col in dtgetInfoAledanoDetalle.Columns)
+                    {
+                        if (col.ColumnName != "Orden" && col.ColumnName != "DestinoID" && col.ColumnName != "CiudadDestino")
+                        {
+                            nuevaFila[col.ColumnName] = 0;
+                        }
+                    }
+
+                    dtgetInfoAledanoDetalle.Rows.Add(nuevaFila);
+                    _CiudadesOUT++;
+                }
+
+                dtgetInfoAledanoDetalle.DefaultView.Sort = "Orden ASC";
+                dgvAledanosDetalle.DataSource = dtgetInfoAledanoDetalle;
+                dgvAledanosDetalle.Refresh();
+            }
+
+
         }
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
@@ -679,26 +859,281 @@ namespace ModuloVentasAdmin
             if (tabControl1.SelectedTab == tabPage1)
             {
                 label4.Visible = false;
+                label10.Visible = false;
             }
-           else if (tabControl1.SelectedTab == tabPage2) 
+            else if (tabControl1.SelectedTab == tabPage2)
             {
                 label4.Visible = true;
-                label4.Text = "Registros con precio desigual: "+_errorPrincipal;
+                label4.Text = _errorPrincipal.ToString();
+
+                label10.Visible = false;
+
             }
-           else if (tabControl1.SelectedTab == tabPage3) 
+            else if (tabControl1.SelectedTab == tabPage3)
             {
                 label4.Visible = true;
-                label4.Text = "Registros con precio desigual: " + _errorAledano;
+                label4.Text = _errorAledano.ToString();
+
+
+                label10.Visible = true;
+                label10.Text = _CiudadesOUT.ToString();
+            }
+
+
+        }
+
+        private void txtValor_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != '.')
+            {
+                e.Handled = true;
+            }
+
+            if (e.KeyChar == '.' && (sender as TextBox).Text.Contains("."))
+            {
+                e.Handled = true;
             }
         }
 
+        private void btnGuardar_Click(object sender, EventArgs e)
+        {
+            DialogResult resultado = ToastDialog.Mostrar("Desea solicitar la aprobacion para otorgar el descuento a este cliente?", TipoAlerta.Info);
 
+            string _DesAprobacion = (_TipoCosto == 2) ? "DescuentoNegociacionEspecial" : "DescuentoPrecios";
+
+            if (resultado == DialogResult.OK)
+            {
+         
+                productosSeleccionados = (from DataGridViewRow row in dgvProducto.Rows
+                                          where Convert.ToBoolean(row.Cells["SeleccionarProducto"].Value) == true
+                                          select new ProductoSeleccionado
+                                          {
+                                              ProductoID = row.Cells["Producto"].Value.ToString(),
+                                              Nombre = row.Cells["Nombre"].Value.ToString(),
+                                              Seleccionado = true
+                                          }).ToList();
+
+                string productosCsvAledano = string.Join(",", productosSeleccionados.Select(p => p.ProductoID));
+
+                //Insertar en tabla para Aprobacion
+
+                CotizacionDescuento sendDescuento = new CotizacionDescuento 
+                {
+                    Opcion = "Agregar",
+                    TipoCosto = _TipoCosto,
+                    Cliente = _Cliente,
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Productos = productosCsvAledano,
+                    Descuento = Convert.ToDecimal(txtValor.Text),
+                    Impuesto = Convert.ToDecimal(txtImpuesto.Text),
+                    EstadoAprobacion = 1,
+                    UPosteo = DynamicMain.usuarionlogin,
+                    FPosteo = DateTime.Now,
+                    PC = System.Environment.MachineName,
+                    Estado = true
+                };
+                DataTable dtSendDescuento = logica.SP_CotizacionDescuento(sendDescuento);
+                if (dtSendDescuento.Rows.Count > 0 && dtSendDescuento.Rows[0]["Estado"].ToString() == "1") {
+
+                    Toast.Mostrar("Solicitud procesada correctamente.", TipoAlerta.Success);
+                    Limpiar();
+                }
+                else { Toast.Mostrar("Ocurrio un error al realizar la solicitud de aprobacion, Encabezado.", TipoAlerta.Error); }
+                               
+            }
+            else
+            {
+                Toast.Mostrar("Ha decidido no enviar la solicitud a aprobacion...", TipoAlerta.Warning);
+            }
+        }
+
+        //private void enviarAledanoDetalle() 
+        //{
+        //    foreach (DataRow item in _dtRegistroAledano.Rows)
+        //    {
+        //        CotizacionDescuentoDetalle sendDetalle = new CotizacionDescuentoDetalle
+        //        {
+        //            Opcion = "Agregar",
+        //            DescuentoID = _EncabezadoID,
+        //            PrincipalAledano = item["PrincipalAledano"].ToString(),
+        //            ProductoID = item["Producto"].ToString(),
+        //            CiudadRemitente = item["CiudadRemitente"].ToString(),
+        //            Costo = Convert.ToDecimal(item["CiudadRemitente"].ToString()),
+        //            EstadoAprobacion = 1,//Ingresado
+        //            UPosteo = DynamicMain.usuarionlogin,
+        //            FPosteo = DateTime.Now,
+        //            PC = System.Environment.MachineName,
+        //            Estado = true
+        //        };
+        //        DataTable dtSendDetalle = logica.SP_CotizacionDescuentoDetalle(sendDetalle);
+        //        if (dtSendDetalle.Rows.Count > 0 && dtSendDetalle.Rows[0]["Estado"].ToString() == "0")
+        //        {
+        //            Toast.Mostrar("Ocurrio un error al realizar la solicitud de aprobacion, Detalle.", TipoAlerta.Error);
+        //            return;
+        //        }
+        //    }
+        //}
+
+        private void chkISV_CheckedChanged(object sender, EventArgs e)
+        {
+            txtImpuesto.Enabled = (chkISV.Checked) ? true : false;
+            txtImpuesto.Text = (chkISV.Checked) ? txtImpuesto.Text : "0";
+        }
+
+        private int enviarEncabezado() 
+        {
+            CotizacionDescuentoEncabezado sendEncabezado = new CotizacionDescuentoEncabezado
+            {
+                Opcion  = "Agregar",
+                Tipo = _TipoCosto, 
+                ClienteID = _Cliente,
+                Descuento = Convert.ToDecimal(txtValor.Text),
+                Impuesto = Convert.ToDecimal(txtImpuesto.Text),
+                EstadoAprobacion = 1, //Ingresado
+                UPosteo =DynamicMain.usuarionlogin,
+                FPosteo = DateTime.Now,
+                PC = System.Environment.MachineName,
+                Estado = true
+            };
+
+            DataTable dtSendEncabezado = logica.SP_CotizacionDescuentoEncabezado(sendEncabezado);
+            if(dtSendEncabezado.Rows.Count>0 && dtSendEncabezado.Rows[0]["Estado"].ToString() == "1") 
+            {
+                return Convert.ToInt32(dtSendEncabezado.Rows[0]["UltimoDescuentoID"]);
+            }
+            else
+            {
+                return 0; 
+            }
+        }
+
+        private void txtImpuesto_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != '.')
+            {
+                e.Handled = true;
+            }
+
+            if (e.KeyChar == '.' && (sender as TextBox).Text.Contains("."))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void Limpiar() 
+        {
+            //Limpiamos todos los datagirdviews
+            dgvTarifario.DataSource = null;
+            dgvTarifarioDetalle.DataSource = null;
+            dgvAledanosDetalle.DataSource = null;
+
+            foreach (DataGridViewRow row in dgvProducto.Rows)
+            {
+                row.Cells["SeleccionarProducto"].Value = false;
+            }
+
+            //Limpar DataTables.
+            dtOrigenCompleto = null;
+            dtgetInfoPrincipal = null;
+            dtgetInfoAledano = null;
+            dtgetInfoPrincipalDetalle = null;
+            dtgetInfoAledanoDetalle = null;
+
+            //Limpiar resto de campos
+            rdbCodigo.Checked = true;
+            txtBuscar.Text = string.Empty;
+            txtNombreCliente.Text = string.Empty;
+            lblTipoCliente.Text = "-";
+            cmbOrigen.SelectedIndex = 0;
+            txtValor.Text = "0";
+            chkISV.Checked = false;
+            txtProducto.Text = string.Empty;
+            label4.Text = "-";
+            label4.Visible = false;
+            _EncabezadoID = 0;
+
+        }
         private void validarAledanos()
         {
             _errorAledano = 0;
+
+            // 🔹 Paleta de colores claros
+            Color[] colores = new Color[]
+            {
+                Color.LightBlue,
+                Color.LightGreen,
+                Color.LightYellow,
+                Color.LightPink,
+                Color.Lavender,
+                Color.MistyRose,
+                Color.Honeydew
+            };
+
+            // 🔹 Limpiar referencias previas en el FlowLayoutPanel
+            flpColores.Controls.Clear();
+
+            // 🔹 Obtener todos los órdenes distintos
+            var ordenes = dgvAledanosDetalle.Rows
+                .Cast<DataGridViewRow>()
+                .Where(r => r.Cells["Orden"].Value != null)
+                .Select(r => Convert.ToInt32(r.Cells["Orden"].Value))
+                .Distinct()
+                .OrderBy(o => o)
+                .ToList();
+
+            // 🔹 Asignar colores por orden y crear referencia en flpColores
+            Dictionary<int, Color> coloresPorOrden = new Dictionary<int, Color>();
+            int colorIndex = 0;
+            foreach (var orden in ordenes)
+            {
+                Color colorAsignado = colores[colorIndex % colores.Length];
+                coloresPorOrden[orden] = colorAsignado;
+
+                // Crear panel de color
+                Panel panelColor = new Panel
+                {
+                    BackColor = colorAsignado,
+                    Width = 28,
+                    Height = 20,
+                    Margin = new Padding(3),
+                    BorderStyle = BorderStyle.FixedSingle
+                };
+
+                // Crear label con el número de orden
+                Label lblOrden = new Label
+                {
+                    Text = $"Orden {orden}",
+                    AutoSize = true,
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    Margin = new Padding(3)
+                };
+
+                // Contenedor horizontal
+                FlowLayoutPanel contenedor = new FlowLayoutPanel
+                {
+                    FlowDirection = FlowDirection.LeftToRight,
+                    AutoSize = true
+                };
+                contenedor.Controls.Add(panelColor);
+                contenedor.Controls.Add(lblOrden);
+
+                flpColores.Controls.Add(contenedor);
+
+                colorIndex++;
+            }
+
+            // 🔹 Recorrer filas y aplicar validaciones
             foreach (DataGridViewRow item in dgvAledanosDetalle.Rows)
             {
                 int ordenGrid = Convert.ToInt32(item.Cells["Orden"].Value);
+
+                // Pintar solo la celda de Orden con el color asignado
+                if (coloresPorOrden.ContainsKey(ordenGrid))
+                {
+                    item.Cells["Orden"].Style.BackColor = coloresPorOrden[ordenGrid];
+                }
+
+                bool filaConCero = false;
 
                 // 🔹 Recorrer todas las columnas de productos (a partir de la tercera)
                 for (int colIndex = 3; colIndex < dgvAledanosDetalle.Columns.Count; colIndex++)
@@ -710,7 +1145,13 @@ namespace ModuloVentasAdmin
                     {
                         decimal valorGrid = Convert.ToDecimal(cell.Value);
 
-                        // Buscar todos los registros en dtgetInfoAledano para este Orden + Producto
+                        // 🔹 Si el valor es 0, marcamos la bandera
+                        if (valorGrid == 0)
+                        {
+                            filaConCero = true;
+                        }
+
+                        // 🔹 Validación normal
                         var rowsMatch = dtgetInfoAledano.AsEnumerable()
                             .Where(r => Convert.ToInt32(r["Orden"]) == ordenGrid
                                      && r["ProductoNombre"].ToString() == productoNombre)
@@ -718,21 +1159,23 @@ namespace ModuloVentasAdmin
 
                         if (rowsMatch.Any())
                         {
-                            // 🔹 Agrupar por costo y contar ocurrencias
                             var costoAgrupado = rowsMatch
                                 .GroupBy(r => Convert.ToDecimal(r["Costo"]))
                                 .Select(g => new { Valor = g.Key, Conteo = g.Count() })
-                                .OrderByDescending(g => g.Conteo)   // primero el que más se repite
-                                .ThenByDescending(g => g.Valor)     // si hay empate, el más alto
+                                .OrderByDescending(g => g.Conteo)
+                                .ThenByDescending(g => g.Valor)
                                 .First();
 
                             decimal valorEsperado = costoAgrupado.Valor;
 
-                            // Comparar valores
-                            if (valorGrid != valorEsperado)
+                            if (valorGrid != valorEsperado && valorGrid != 0) // 🔹 si es 0 no lo marcamos como error
                             {
                                 cell.Style.BackColor = Color.Tomato;
                                 _errorAledano++;
+                            }
+                            else if (valorGrid != valorEsperado && valorGrid == 0)
+                            {
+                                cell.Style.BackColor = Color.Gold;
                             }
                             else
                             {
@@ -741,8 +1184,17 @@ namespace ModuloVentasAdmin
                         }
                     }
                 }
+
+                // 🔹 Si la fila tiene algún 0 → pintar toda la fila en Gold
+                if (filaConCero)
+                {
+                    item.DefaultCellStyle.BackColor = Color.Gold;
+                }
+                else
+                {
+                    item.DefaultCellStyle.BackColor = Color.White;
+                }
             }
-            
         }
 
         private void validarPrincipales()

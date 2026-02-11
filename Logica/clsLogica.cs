@@ -271,5 +271,36 @@ namespace LogicaVentasAdmin
             tabla = enviar.SP_ProductosCiudadesENAC(a);
             return tabla;
         }
+        public DataTable SP_ProductosClienteCostos(ProductoClienteCostos a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_ProductosClienteCostos(a);
+            return tabla;
+        }
+        public DataTable SP_CotizacionDescuentoEncabezado(CotizacionDescuentoEncabezado a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_CotizacionDescuentoEncabezado(a);
+            return tabla;
+        }
+        public DataTable SP_CotizacionDescuentoDetalle(CotizacionDescuentoDetalle a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_CotizacionDescuentoDetalle(a);
+            return tabla;
+        }
+
+        public DataTable SP_CotizacionDescuento(CotizacionDescuento a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.SP_CotizacionDescuento(a);
+            return tabla;
+        }
+        public DataTable DynamicSP_EmpleadosAutorizacion_Ins(EmpleadosAutorizacion a)
+        {
+            DataTable tabla = new DataTable();
+            tabla = enviar.DynamicSP_EmpleadosAutorizacion_Ins(a);
+            return tabla;
+        }
     }
 }

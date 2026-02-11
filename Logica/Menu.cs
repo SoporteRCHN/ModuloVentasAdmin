@@ -619,5 +619,79 @@ namespace LogicaVentasAdmin
         public string CiudadRemitente { get; set; }
         public decimal? Descuento { get; set; }
     }
+    public class ProductoClienteCostos
+    {
+        // Parámetros de entrada al SP
+        public string Opcion { get; set; }              // Ej: "ListadoCiudadPrincipal", "ListadoPrincipalDetalle", etc.
+        public string Productos { get; set; }           // lista separada por coma (ej. "00001,00002,00003")
+        public string CiudadRemitente { get; set; }     // ID de la ciudad remitente
+        public string Cliente { get; set; }             // ID del cliente
+        public decimal? Descuento { get; set; }         // porcentaje de descuento
+    }
+    public class CotizacionDescuentoEncabezado
+    {
+        public string Opcion { get; set; }                // Operación: Listado, Recuperar, Agregar, Actualizar, Eliminar
+        public long? DescuentoID { get; set; }            // PK
+        public int? Tipo { get; set; }                    // 1: TBLClienteCostos, 2: ProductoCostos
+        public string ClienteID { get; set; }               // Cliente asociado
+        public decimal? Descuento { get; set; }           // Porcentaje de descuento
+        public decimal? Impuesto { get; set; }            // Porcentaje de impuesto
+        public int? EstadoAprobacion { get; set; }        // 1 Solicitado, 2 Aprobado, 3 Rechazado
+        public string UPosteo { get; set; }               // Usuario que posteó
+        public DateTime? FPosteo { get; set; }            // Fecha de posteo
+        public string PC { get; set; }                    // PC desde donde se posteó
+        public bool? Estado { get; set; }                 // Activo/Inactivo
+    }
+    public class CotizacionDescuentoDetalle
+    {
+        public string Opcion { get; set; }                // Operación: Listado, Recuperar, Agregar, Actualizar, Eliminar
+        public long? DetalleID { get; set; }              // PK
+        public int? DescuentoID { get; set; }             // FK hacia Encabezado
+        public string PrincipalAledano { get; set; }             // FK hacia Encabezado
+        public string ProductoID { get; set; }            // Producto
+        public string CiudadRemitente { get; set; }       // Ciudad origen
+        public string CiudadDestino { get; set; }         // Ciudad destino
+        public decimal? Costo { get; set; }               // Costo aplicado
+        public int? EstadoAprobacion { get; set; }        // 1 Solicitado, 2 Aprobado, 3 Rechazado
+        public string UPosteo { get; set; }               // Usuario que posteó
+        public DateTime? FPosteo { get; set; }            // Fecha de posteo
+        public string PC { get; set; }                    // PC desde donde se posteó
+        public bool? Estado { get; set; }                 // Activo/Inactivo
+    }
+    public class CotizacionDescuento
+    {
+        public string Opcion { get; set; }                // Operación: Listado, Recuperar, Agregar, Actualizar, Eliminar
+        public long? DescuentoID { get; set; }            // PK
+        public int? TipoCosto { get; set; }               // 1: ClienteCostos, 2: ProductoCostos
+        public string Cliente { get; set; }               // Cliente
+        public string CiudadRemitente { get; set; }       // Ciudad origen
+        public string Productos { get; set; }             // Lista separada por coma
+        public decimal? Descuento { get; set; }           // Porcentaje de descuento
+        public decimal? Impuesto { get; set; }            // Porcentaje de impuesto
+        public int? EstadoAprobacion { get; set; }        // 1 Solicitado, 2 Aprobado, 3 Rechazado
+        public string UPosteo { get; set; }               // Usuario que posteó
+        public DateTime? FPosteo { get; set; }            // Fecha de posteo
+        public string PC { get; set; }                    // PC desde donde se posteó
+        public bool? Estado { get; set; }                 // Activo/Inactivo
+    }
+    public class EmpleadosAutorizacion
+    {
+        public int? Opcion { get; set; }
+        public string valor { get; set; }
+        public int? EmpleadoID { get; set; }
+        public string CampoTabla { get; set; }
+        public string ValorAnterior { get; set; }
+        public string ValorNuevo { get; set; }
+        public int? EstadoAprobacion { get; set; }
+        public string UPosteo { get; set; }
+        public DateTime? FPosteo { get; set; }
+        public string PC { get; set; }
+        public int? Anio { get; set; }
+        public int? Mes { get; set; }
+        public int? Quincena { get; set; }
+        public int? Comodin { get; set; }
+    }
+
+
 
 }
