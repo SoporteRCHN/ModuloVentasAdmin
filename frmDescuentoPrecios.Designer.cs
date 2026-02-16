@@ -61,7 +61,6 @@
             this.label6 = new System.Windows.Forms.Label();
             this.lblTipoCliente = new System.Windows.Forms.Label();
             this.txtNombreCliente = new System.Windows.Forms.TextBox();
-            this.txtImpuesto = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.label7 = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
@@ -83,7 +82,7 @@
             // 
             this.label12.AutoSize = true;
             this.label12.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label12.Location = new System.Drawing.Point(218, 190);
+            this.label12.Location = new System.Drawing.Point(268, 190);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(18, 15);
             this.label12.TabIndex = 107;
@@ -105,7 +104,7 @@
             this.txtValor.ForeColor = System.Drawing.Color.Black;
             this.txtValor.Location = new System.Drawing.Point(92, 188);
             this.txtValor.Name = "txtValor";
-            this.txtValor.Size = new System.Drawing.Size(120, 20);
+            this.txtValor.Size = new System.Drawing.Size(171, 20);
             this.txtValor.TabIndex = 105;
             this.txtValor.Text = "0";
             this.txtValor.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
@@ -331,6 +330,7 @@
             this.button3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.button3.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.button3.UseVisualStyleBackColor = false;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // dgvTarifario
             // 
@@ -350,13 +350,12 @@
             // chkISV
             // 
             this.chkISV.AutoSize = true;
-            this.chkISV.Location = new System.Drawing.Point(251, 190);
+            this.chkISV.Location = new System.Drawing.Point(316, 192);
             this.chkISV.Name = "chkISV";
             this.chkISV.Size = new System.Drawing.Size(105, 17);
             this.chkISV.TabIndex = 153;
             this.chkISV.Text = "Tiene Impuesto?";
             this.chkISV.UseVisualStyleBackColor = true;
-            this.chkISV.CheckedChanged += new System.EventHandler(this.chkISV_CheckedChanged);
             // 
             // tabControl1
             // 
@@ -439,9 +438,9 @@
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.Location = new System.Drawing.Point(825, 454);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(118, 15);
+            this.label4.Size = new System.Drawing.Size(12, 15);
             this.label4.TabIndex = 155;
-            this.label4.Text = "Inconsistenacias:";
+            this.label4.Text = "-";
             this.label4.Visible = false;
             // 
             // label6
@@ -474,18 +473,6 @@
             this.txtNombreCliente.Name = "txtNombreCliente";
             this.txtNombreCliente.Size = new System.Drawing.Size(341, 20);
             this.txtNombreCliente.TabIndex = 158;
-            // 
-            // txtImpuesto
-            // 
-            this.txtImpuesto.BackColor = System.Drawing.Color.White;
-            this.txtImpuesto.Enabled = false;
-            this.txtImpuesto.ForeColor = System.Drawing.Color.Black;
-            this.txtImpuesto.Location = new System.Drawing.Point(357, 189);
-            this.txtImpuesto.Name = "txtImpuesto";
-            this.txtImpuesto.Size = new System.Drawing.Size(67, 20);
-            this.txtImpuesto.TabIndex = 159;
-            this.txtImpuesto.Text = "0";
-            this.txtImpuesto.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtImpuesto_KeyPress);
             // 
             // panel1
             // 
@@ -529,9 +516,9 @@
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label10.Location = new System.Drawing.Point(825, 479);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(118, 15);
+            this.label10.Size = new System.Drawing.Size(12, 15);
             this.label10.TabIndex = 164;
-            this.label10.Text = "Inconsistenacias:";
+            this.label10.Text = "-";
             this.label10.Visible = false;
             // 
             // flpColores
@@ -553,7 +540,6 @@
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.panel1);
-            this.Controls.Add(this.txtImpuesto);
             this.Controls.Add(this.txtNombreCliente);
             this.Controls.Add(this.lblTipoCliente);
             this.Controls.Add(this.label6);
@@ -632,7 +618,6 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label lblTipoCliente;
         private System.Windows.Forms.TextBox txtNombreCliente;
-        private System.Windows.Forms.TextBox txtImpuesto;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label9;

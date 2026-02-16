@@ -1,11 +1,16 @@
-﻿using LogicaVentasAdmin;
+﻿using iTextSharp.text.pdf;
+using iTextSharp.text;
+using LogicaVentasAdmin;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
+using System.Diagnostics;
+
 
 namespace ModuloVentasAdmin
 {
@@ -420,12 +425,8 @@ namespace ModuloVentasAdmin
                         cellAledano.Value = costoAgrupadoAledano.Valor;
                         cellAledano.Style.Alignment = DataGridViewContentAlignment.MiddleCenter; // centrado
                     }
-
                 }
-
             }
-
-
 
             // 🔹 Ajustar altura del encabezado dinámicamente según “Aledaños”
             int altoAledaño = dgvTarifario.Font.Height * "ALEDAÑO".Length +40; // cada letra ocupa una línea
@@ -441,7 +442,7 @@ namespace ModuloVentasAdmin
                                   .Skip(firstProdIndex)
                                   .Sum(c => c.Width);
 
-                Rectangle rect = new Rectangle(
+                System.Drawing.Rectangle rect = new System.Drawing.Rectangle(
                     dgvTarifario.GetCellDisplayRectangle(firstProdIndex, -1, true).Left,
                     dgvTarifario.GetCellDisplayRectangle(firstProdIndex, -1, true).Top,
                     totalWidth,
@@ -494,8 +495,8 @@ namespace ModuloVentasAdmin
                         {
                             // 🔹 Dividir espacio en dos: texto arriba + campo de 20px abajo
                             int campoAltura = 20;
-                            Rectangle rectTexto = new Rectangle(rect.Left, rect.Top, rect.Width, rect.Height - campoAltura);
-                            Rectangle rectCampo = new Rectangle(rect.Left, rect.Bottom - campoAltura, rect.Width, campoAltura);
+                            System.Drawing.Rectangle rectTexto = new System.Drawing.Rectangle(rect.Left, rect.Top, rect.Width, rect.Height - campoAltura);
+                            System.Drawing.Rectangle rectCampo = new System.Drawing.Rectangle(rect.Left, rect.Bottom - campoAltura, rect.Width, campoAltura);
 
                             // Texto del producto centrado en la parte superior
                             var format = new StringFormat
@@ -556,7 +557,7 @@ namespace ModuloVentasAdmin
         private void cargarPreciosPrincipales()
         {
             string productosCsv = string.Join(",", productosSeleccionados.Select(p => p.ProductoID));
-
+            decimal _isv = (chkISV.Checked) ? Convert.ToDecimal("0.15") : Convert.ToDecimal(0);
             if (_TipoCosto == 1)
             {
                 ProductoCiudadENAC getPrecios = new ProductoCiudadENAC
@@ -564,7 +565,8 @@ namespace ModuloVentasAdmin
                     Opcion = "ListadoCiudadPrincipal",
                     Productos = productosCsv, // aquí ya va "00001,00002,00003"
                     CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
-                    Descuento = Convert.ToDecimal(txtValor.Text)
+                    Descuento = Convert.ToDecimal(txtValor.Text),
+                    Impuesto = _isv
                 };
                 dtgetInfoPrincipal = logica.SP_ProductosCiudadesENAC(getPrecios);
             }
@@ -576,7 +578,8 @@ namespace ModuloVentasAdmin
                     Productos = productosCsv, // aquí ya va "00001,00002,00003"
                     CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
                     Descuento = Convert.ToDecimal(txtValor.Text),
-                    Cliente = _Cliente
+                    Cliente = _Cliente,
+                    Impuesto = _isv
                 };
                 dtgetInfoPrincipal = logica.SP_ProductosClienteCostos(getPreciosClienteCostos);
             }
@@ -584,6 +587,8 @@ namespace ModuloVentasAdmin
         private void cargarPreciosAledanos()
         {
             string productosCsvAledano = string.Join(",", productosSeleccionados.Select(p => p.ProductoID));
+            decimal _isv = (chkISV.Checked) ? Convert.ToDecimal("0.15") : Convert.ToDecimal(0);
+
             if (_TipoCosto == 1)
             {
                 ProductoCiudadENAC getPreciosAledanos = new ProductoCiudadENAC
@@ -591,7 +596,8 @@ namespace ModuloVentasAdmin
                     Opcion = "ListadoAledanoPrincipal",
                     Productos = productosCsvAledano,
                     CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
-                    Descuento = Convert.ToDecimal(txtValor.Text)
+                    Descuento = Convert.ToDecimal(txtValor.Text),
+                    Impuesto = _isv
                 };
 
                 dtgetInfoAledano = logica.SP_ProductosCiudadesENAC(getPreciosAledanos);
@@ -604,7 +610,8 @@ namespace ModuloVentasAdmin
                     Productos = productosCsvAledano, // aquí ya va "00001,00002,00003"
                     CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
                     Descuento = Convert.ToDecimal(txtValor.Text),
-                    Cliente = _Cliente
+                    Cliente = _Cliente,
+                    Impuesto = _isv
                 };
                 dtgetInfoAledano = logica.SP_ProductosClienteCostos(getPreciosClienteCostos);
             }
@@ -700,6 +707,7 @@ namespace ModuloVentasAdmin
         private void cargarPreciosPrincipalDetalle()
         {
             string productosCsv = string.Join(",", productosSeleccionados.Select(p => p.ProductoID));
+            decimal _isv = (chkISV.Checked) ? Convert.ToDecimal("0.15") : Convert.ToDecimal(0);
             if (_TipoCosto == 1)
             {
                 ProductoCiudadENAC getPreciosDetalle = new ProductoCiudadENAC
@@ -707,7 +715,8 @@ namespace ModuloVentasAdmin
                     Opcion = "ListadoPrincipalDetalle",
                     Productos = productosCsv, // aquí ya va "00001,00002,00003"
                     CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
-                    Descuento = Convert.ToDecimal(txtValor.Text)
+                    Descuento = Convert.ToDecimal(txtValor.Text),
+                    Impuesto = _isv
                 };
 
                 dtgetInfoPrincipalDetalle = logica.SP_ProductosCiudadesENAC(getPreciosDetalle);
@@ -720,7 +729,8 @@ namespace ModuloVentasAdmin
                     Productos = productosCsv, // aquí ya va "00001,00002,00003"
                     CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
                     Descuento = Convert.ToDecimal(txtValor.Text),
-                    Cliente = _Cliente
+                    Cliente = _Cliente,
+                    Impuesto = _isv
                 };
                 dtgetInfoPrincipalDetalle = logica.SP_ProductosClienteCostos(getPreciosClienteCostos);
             }
@@ -754,6 +764,7 @@ namespace ModuloVentasAdmin
         private void cargarPreciosAledanosDetalle()
         {
             string productosCsvAledanosDetalle = string.Join(",", productosSeleccionados.Select(p => p.ProductoID));
+            decimal _isv = (chkISV.Checked) ? Convert.ToDecimal("0.15") : Convert.ToDecimal(0);
 
             if (_TipoCosto == 1)
             {
@@ -762,7 +773,8 @@ namespace ModuloVentasAdmin
                     Opcion = "ListadoAledanoDetalle",
                     Productos = productosCsvAledanosDetalle,
                     CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
-                    Descuento = Convert.ToDecimal(txtValor.Text)
+                    Descuento = Convert.ToDecimal(txtValor.Text),
+                    Impuesto = _isv
                 };
 
                 dtgetInfoAledanoDetalle = logica.SP_ProductosCiudadesENAC(getPreciosAledanosDetalle);
@@ -787,7 +799,8 @@ namespace ModuloVentasAdmin
                     Productos = productosCsvAledanosDetalle, // aquí ya va "00001,00002,00003"
                     CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
                     Descuento = Convert.ToDecimal(txtValor.Text),
-                    Cliente = _Cliente
+                    Cliente = _Cliente,
+                    Impuesto = _isv
                 };
                 dtgetInfoAledanoDetalle = logica.SP_ProductosClienteCostos(getPreciosClienteCostos);
 
@@ -895,7 +908,222 @@ namespace ModuloVentasAdmin
             }
         }
 
-        private void btnGuardar_Click(object sender, EventArgs e)
+        private void button3_Click(object sender, EventArgs e)
+        {
+            ExportarTarifarioPDF();
+        }
+
+    private void ExportarTarifarioPDF()
+    {
+        string rutaEscritorio = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        string rutaArchivo = Path.Combine(rutaEscritorio, "Tarifario.pdf");
+
+        Document doc = new Document(PageSize.LETTER, 40, 40, 40, 40); // márgenes
+        PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(rutaArchivo, FileMode.Create));
+        doc.Open();
+
+        PdfContentByte cb = writer.DirectContent;
+        BaseFont bf = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
+
+        float startX = 40f;
+        float startY = doc.PageSize.Height - 60f;
+        float pageWidth = doc.PageSize.Width - 80f; // ancho útil con márgenes
+
+        int productosPorHoja = 4;
+        int columnasPorProducto = 2;
+        int totalProductos = dgvTarifario.Columns.Cast<DataGridViewColumn>().Count(c => c.Name.StartsWith("Prod_"));
+        int totalBloques = (int)Math.Ceiling((double)totalProductos / productosPorHoja);
+
+        for (int bloque = 0; bloque < totalBloques; bloque++)
+        {
+            var columnasBloque = dgvTarifario.Columns.Cast<DataGridViewColumn>()
+                .Where(c => c.Name.StartsWith("Prod_") || c.Name.StartsWith("ALEDAÑO_"))
+                .Skip(bloque * productosPorHoja * columnasPorProducto)
+                .Take(productosPorHoja * columnasPorProducto)
+                .ToList();
+
+            // 🔹 Definir anchos base
+            float anchoDestinos = 200f;
+            float anchoProducto = 100f;
+            float anchoAledano = 50f;
+
+            float anchoTotal = anchoDestinos +
+                               columnasBloque.Count(c => c.Name.StartsWith("Prod_")) * anchoProducto +
+                               columnasBloque.Count(c => c.Name.StartsWith("ALEDAÑO_")) * anchoAledano;
+
+            // 🔹 Escalar si excede el ancho de página
+            float factorEscala = anchoTotal > pageWidth ? pageWidth / anchoTotal : 1f;
+            anchoDestinos *= factorEscala;
+            anchoProducto *= factorEscala;
+            anchoAledano *= factorEscala;
+
+            // 🔹 Dibujar título superior
+            float firstProdX = startX + anchoDestinos;
+            float totalWidth = columnasBloque.Count(c => c.Name.StartsWith("Prod_")) * anchoProducto +
+                               columnasBloque.Count(c => c.Name.StartsWith("ALEDAÑO_")) * anchoAledano;
+
+            float headerTop = startY;
+            float headerHeightTop = 30f;
+
+            iTextSharp.text.Rectangle rectTitulo = new iTextSharp.text.Rectangle(firstProdX, headerTop, firstProdX + totalWidth, headerTop + headerHeightTop);
+            cb.Rectangle(rectTitulo.Left, rectTitulo.Bottom, rectTitulo.Width, rectTitulo.Height);
+            cb.Stroke();
+
+            ColumnText.ShowTextAligned(cb, Element.ALIGN_CENTER,
+                new Phrase("DIMENSIONES Y PESO DE CAJA", new iTextSharp.text.Font(bf, 10, iTextSharp.text.Font.BOLD)),
+                rectTitulo.Left + (rectTitulo.Width / 2), rectTitulo.Bottom + (headerHeightTop / 2), 0);
+
+            // 🔹 Encabezados
+            float x = startX;
+            float headerHeight = 80f;
+            float headerStartY = headerTop - headerHeight;
+
+            // Columna Destinos
+            iTextSharp.text.Rectangle rectDestinos = new iTextSharp.text.Rectangle(x, headerStartY, x + anchoDestinos, headerStartY + headerHeight);
+            cb.Rectangle(rectDestinos.Left, rectDestinos.Bottom, rectDestinos.Width, rectDestinos.Height);
+            cb.Stroke();
+
+            ColumnText.ShowTextAligned(cb, Element.ALIGN_CENTER,
+                new Phrase(dgvTarifario.Columns[0].HeaderText, new iTextSharp.text.Font(bf, 9, iTextSharp.text.Font.BOLD)),
+                rectDestinos.Left + (rectDestinos.Width / 2), rectDestinos.Bottom + (headerHeight / 2), 0);
+
+            x += anchoDestinos;
+
+            foreach (var col in columnasBloque)
+            {
+                float colWidth = col.Name.StartsWith("Prod_") ? anchoProducto :
+                                 col.Name.StartsWith("ALEDAÑO_") ? anchoAledano : col.Width;
+
+                iTextSharp.text.Rectangle rect = new iTextSharp.text.Rectangle(x, headerStartY, x + colWidth, headerStartY + headerHeight);
+                cb.Rectangle(rect.Left, rect.Bottom, rect.Width, rect.Height);
+                cb.Stroke();
+
+                if (col.HeaderText == "ALEDAÑO")
+                {
+                    float y = rect.Top - 12;
+                    foreach (char c in col.HeaderText.ToUpper())
+                    {
+                        ColumnText.ShowTextAligned(cb, Element.ALIGN_CENTER,
+                            new Phrase(c.ToString(), new iTextSharp.text.Font(bf, 9, iTextSharp.text.Font.BOLD)),
+                            rect.Left + (colWidth / 2), y, 0);
+                        y -= 10;
+                    }
+                }
+                else if (col.Name.StartsWith("Prod_"))
+                {
+                    float campoAltura = 20f;
+                    Phrase phraseNombre = new Phrase(col.HeaderText, new iTextSharp.text.Font(bf, 9, iTextSharp.text.Font.BOLD));
+
+                    ColumnText ctNombre = new ColumnText(cb);
+                    ctNombre.SetSimpleColumn(
+                        phraseNombre,
+                        rect.Left + 2, rect.Bottom + campoAltura + 2,
+                        rect.Right - 2, rect.Top - 2,
+                        12, Element.ALIGN_CENTER
+                    );
+                    ctNombre.Go();
+
+                    string medida = "";
+                    if (dtProducto != null)
+                    {
+                        var rowMedida = dtProducto.AsEnumerable()
+                            .FirstOrDefault(r => r["Nombre"].ToString() == col.HeaderText);
+                        if (rowMedida != null)
+                            medida = rowMedida["Descripcion"].ToString();
+                    }
+
+                    cb.Rectangle(rect.Left, rect.Bottom, rect.Width, campoAltura);
+                    cb.Stroke();
+
+                    if (!string.IsNullOrEmpty(medida))
+                    {
+                        ColumnText.ShowTextAligned(cb, Element.ALIGN_CENTER,
+                            new Phrase(medida, new iTextSharp.text.Font(bf, 8)),
+                            rect.Left + (rect.Width / 2), rect.Bottom + (campoAltura / 2), 0);
+                    }
+                }
+
+                x += colWidth;
+            }
+
+            // 🔹 Filas
+            float yPos = headerStartY;
+            float rowHeightDefault = 20f;
+
+            foreach (DataGridViewRow row in dgvTarifario.Rows)
+            {
+                if (row.IsNewRow) continue;
+
+                float xPos = startX;
+                float maxHeight = rowHeightDefault;
+
+                // calcular altura máxima de la fila
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    if (cell.OwningColumn == dgvTarifario.Columns[0] || columnasBloque.Contains(cell.OwningColumn))
+                    {
+                        string texto = cell.Value?.ToString() ?? "";
+                        int lineas = texto.Split('\n').Length;
+                        float cellHeight = lineas * (dgvTarifario.Font.Height + 2);
+                        if (cellHeight > maxHeight) maxHeight = cellHeight;
+                    }
+                }
+
+                // dibujar celdas
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    if (cell.OwningColumn == dgvTarifario.Columns[0] || columnasBloque.Contains(cell.OwningColumn))
+                    {
+                        string texto = cell.Value?.ToString() ?? "";
+                        Phrase phrase = new Phrase(texto, new iTextSharp.text.Font(bf, 9));
+
+                        float colWidth = cell.OwningColumn.Name.StartsWith("Prod_") ? anchoProducto :
+                                         cell.OwningColumn.Name.StartsWith("ALEDAÑO_") ? anchoAledano :
+                                         anchoDestinos;
+
+                        iTextSharp.text.Rectangle rect = new iTextSharp.text.Rectangle(xPos, yPos - maxHeight, xPos + colWidth, yPos);
+                        cb.Rectangle(rect.Left, rect.Bottom, rect.Width, rect.Height);
+                        cb.Stroke();
+
+                        ColumnText ct = new ColumnText(cb);
+                        ct.SetSimpleColumn(
+                            phrase,
+                            rect.Left + 2, rect.Bottom + 2,
+                            rect.Right - 2, rect.Top - 2,
+                            12, Element.ALIGN_CENTER
+                        );
+                        ct.Go();
+
+                        xPos += colWidth;
+                    }
+                }
+
+                yPos -= maxHeight;
+
+                if (yPos < 50)
+                {
+                    doc.NewPage();
+                    yPos = doc.PageSize.Height - 60f;
+                }
+            }
+
+            // 🔹 Si no es el último bloque, crear
+
+            // 🔹 Si no es el último bloque, crear nueva página
+            if (bloque < totalBloques - 1)
+            {
+                doc.NewPage();
+            }
+        }
+
+        doc.Close();
+        writer.Close();
+
+        Process.Start(new ProcessStartInfo(rutaArchivo) { UseShellExecute = true });
+    }
+
+
+    private void btnGuardar_Click(object sender, EventArgs e)
         {
             DialogResult resultado = ToastDialog.Mostrar("Desea solicitar la aprobacion para otorgar el descuento a este cliente?", TipoAlerta.Info);
 
@@ -916,7 +1144,7 @@ namespace ModuloVentasAdmin
                 string productosCsvAledano = string.Join(",", productosSeleccionados.Select(p => p.ProductoID));
 
                 //Insertar en tabla para Aprobacion
-
+                decimal _Isv = (chkISV.Checked) ? Convert.ToDecimal("0.15") : Convert.ToDecimal("0");
                 CotizacionDescuento sendDescuento = new CotizacionDescuento 
                 {
                     Opcion = "Agregar",
@@ -925,7 +1153,7 @@ namespace ModuloVentasAdmin
                     CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
                     Productos = productosCsvAledano,
                     Descuento = Convert.ToDecimal(txtValor.Text),
-                    Impuesto = Convert.ToDecimal(txtImpuesto.Text),
+                    Impuesto = _Isv,
                     EstadoAprobacion = 1,
                     UPosteo = DynamicMain.usuarionlogin,
                     FPosteo = DateTime.Now,
@@ -974,21 +1202,16 @@ namespace ModuloVentasAdmin
         //    }
         //}
 
-        private void chkISV_CheckedChanged(object sender, EventArgs e)
-        {
-            txtImpuesto.Enabled = (chkISV.Checked) ? true : false;
-            txtImpuesto.Text = (chkISV.Checked) ? txtImpuesto.Text : "0";
-        }
-
         private int enviarEncabezado() 
         {
+            decimal _Isv = (chkISV.Checked) ? Convert.ToDecimal("0.15") : Convert.ToDecimal("0");
             CotizacionDescuentoEncabezado sendEncabezado = new CotizacionDescuentoEncabezado
             {
                 Opcion  = "Agregar",
                 Tipo = _TipoCosto, 
                 ClienteID = _Cliente,
                 Descuento = Convert.ToDecimal(txtValor.Text),
-                Impuesto = Convert.ToDecimal(txtImpuesto.Text),
+                Impuesto = _Isv,
                 EstadoAprobacion = 1, //Ingresado
                 UPosteo =DynamicMain.usuarionlogin,
                 FPosteo = DateTime.Now,
@@ -1057,145 +1280,183 @@ namespace ModuloVentasAdmin
         {
             _errorAledano = 0;
 
-            // 🔹 Paleta de colores claros
-            Color[] colores = new Color[]
+            // 🔹 Crear y mostrar el formulario de carga en primer plano
+            //FrmLoading loadingForm = new FrmLoading
+            //{
+            //    TopMost = true // Siempre encima de todas las ventanas
+            //};
+            //loadingForm.Show();
+            //loadingForm.BringToFront(); // Forzar que aparezca al frente
+            //loadingForm.Refresh();      // Forzar repintado inmediato
+
+            try
             {
-                Color.LightBlue,
-                Color.LightGreen,
-                Color.LightYellow,
-                Color.LightPink,
-                Color.Lavender,
-                Color.MistyRose,
-                Color.Honeydew
-            };
+                // 🔹 SUSPENDER el repintado durante la actualización
+                dgvAledanosDetalle.SuspendLayout();
 
-            // 🔹 Limpiar referencias previas en el FlowLayoutPanel
-            flpColores.Controls.Clear();
-
-            // 🔹 Obtener todos los órdenes distintos
-            var ordenes = dgvAledanosDetalle.Rows
-                .Cast<DataGridViewRow>()
-                .Where(r => r.Cells["Orden"].Value != null)
-                .Select(r => Convert.ToInt32(r.Cells["Orden"].Value))
-                .Distinct()
-                .OrderBy(o => o)
-                .ToList();
-
-            // 🔹 Asignar colores por orden y crear referencia en flpColores
-            Dictionary<int, Color> coloresPorOrden = new Dictionary<int, Color>();
-            int colorIndex = 0;
-            foreach (var orden in ordenes)
-            {
-                Color colorAsignado = colores[colorIndex % colores.Length];
-                coloresPorOrden[orden] = colorAsignado;
-
-                // Crear panel de color
-                Panel panelColor = new Panel
+                // 🔹 Paleta de colores claros
+                Color[] colores = new Color[]
                 {
-                    BackColor = colorAsignado,
-                    Width = 28,
-                    Height = 20,
-                    Margin = new Padding(3),
-                    BorderStyle = BorderStyle.FixedSingle
+            Color.LightBlue,
+            Color.LightGreen,
+            Color.LightYellow,
+            Color.LightPink,
+            Color.Lavender,
+            Color.MistyRose,
+            Color.Honeydew
                 };
 
-                // Crear label con el número de orden
-                Label lblOrden = new Label
+                // 🔹 Limpiar referencias previas en el FlowLayoutPanel
+                flpColores.Controls.Clear();
+                flpColores.SuspendLayout();
+
+                // 🔹 Obtener todos los órdenes distintos
+                var ordenes = dgvAledanosDetalle.Rows
+                    .Cast<DataGridViewRow>()
+                    .Where(r => r.Cells["Orden"].Value != null)
+                    .Select(r => Convert.ToInt32(r.Cells["Orden"].Value))
+                    .Distinct()
+                    .OrderBy(o => o)
+                    .ToList();
+
+                // 🔹 PRE-CALCULAR: Crear diccionario de valores esperados por orden y producto
+                var valoresEsperadosCache = new Dictionary<string, decimal>();
+
+                foreach (var orden in ordenes)
                 {
-                    Text = $"Orden {orden}",
-                    AutoSize = true,
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    Margin = new Padding(3)
-                };
+                    var productosOrden = dtgetInfoAledano.AsEnumerable()
+                        .Where(r => Convert.ToInt32(r["Orden"]) == orden)
+                        .GroupBy(r => r["ProductoNombre"].ToString());
 
-                // Contenedor horizontal
-                FlowLayoutPanel contenedor = new FlowLayoutPanel
-                {
-                    FlowDirection = FlowDirection.LeftToRight,
-                    AutoSize = true
-                };
-                contenedor.Controls.Add(panelColor);
-                contenedor.Controls.Add(lblOrden);
-
-                flpColores.Controls.Add(contenedor);
-
-                colorIndex++;
-            }
-
-            // 🔹 Recorrer filas y aplicar validaciones
-            foreach (DataGridViewRow item in dgvAledanosDetalle.Rows)
-            {
-                int ordenGrid = Convert.ToInt32(item.Cells["Orden"].Value);
-
-                // Pintar solo la celda de Orden con el color asignado
-                if (coloresPorOrden.ContainsKey(ordenGrid))
-                {
-                    item.Cells["Orden"].Style.BackColor = coloresPorOrden[ordenGrid];
-                }
-
-                bool filaConCero = false;
-
-                // 🔹 Recorrer todas las columnas de productos (a partir de la tercera)
-                for (int colIndex = 3; colIndex < dgvAledanosDetalle.Columns.Count; colIndex++)
-                {
-                    string productoNombre = dgvAledanosDetalle.Columns[colIndex].HeaderText;
-                    var cell = item.Cells[colIndex];
-
-                    if (cell.Value != null && cell.Value != DBNull.Value)
+                    foreach (var grupo in productosOrden)
                     {
-                        decimal valorGrid = Convert.ToDecimal(cell.Value);
+                        var costoAgrupado = grupo
+                            .GroupBy(r => Convert.ToDecimal(r["Costo"]))
+                            .Select(g => new { Valor = g.Key, Conteo = g.Count() })
+                            .OrderByDescending(g => g.Conteo)
+                            .ThenByDescending(g => g.Valor)
+                            .First();
 
-                        // 🔹 Si el valor es 0, marcamos la bandera
-                        if (valorGrid == 0)
-                        {
-                            filaConCero = true;
-                        }
-
-                        // 🔹 Validación normal
-                        var rowsMatch = dtgetInfoAledano.AsEnumerable()
-                            .Where(r => Convert.ToInt32(r["Orden"]) == ordenGrid
-                                     && r["ProductoNombre"].ToString() == productoNombre)
-                            .ToList();
-
-                        if (rowsMatch.Any())
-                        {
-                            var costoAgrupado = rowsMatch
-                                .GroupBy(r => Convert.ToDecimal(r["Costo"]))
-                                .Select(g => new { Valor = g.Key, Conteo = g.Count() })
-                                .OrderByDescending(g => g.Conteo)
-                                .ThenByDescending(g => g.Valor)
-                                .First();
-
-                            decimal valorEsperado = costoAgrupado.Valor;
-
-                            if (valorGrid != valorEsperado && valorGrid != 0) // 🔹 si es 0 no lo marcamos como error
-                            {
-                                cell.Style.BackColor = Color.Tomato;
-                                _errorAledano++;
-                            }
-                            else if (valorGrid != valorEsperado && valorGrid == 0)
-                            {
-                                cell.Style.BackColor = Color.Gold;
-                            }
-                            else
-                            {
-                                cell.Style.BackColor = Color.White;
-                            }
-                        }
+                        string key = $"{orden}_{grupo.Key}";
+                        valoresEsperadosCache[key] = costoAgrupado.Valor;
                     }
                 }
 
-                // 🔹 Si la fila tiene algún 0 → pintar toda la fila en Gold
-                if (filaConCero)
+                // 🔹 Asignar colores por orden y crear referencia en flpColores
+                Dictionary<int, Color> coloresPorOrden = new Dictionary<int, Color>();
+                int colorIndex = 0;
+
+                foreach (var orden in ordenes)
                 {
-                    item.DefaultCellStyle.BackColor = Color.Gold;
+                    Color colorAsignado = colores[colorIndex % colores.Length];
+                    coloresPorOrden[orden] = colorAsignado;
+
+                    Panel panelColor = new Panel
+                    {
+                        BackColor = colorAsignado,
+                        Width = 28,
+                        Height = 20,
+                        Margin = new Padding(3),
+                        BorderStyle = BorderStyle.FixedSingle
+                    };
+
+                    Label lblOrden = new Label
+                    {
+                        Text = $"Orden {orden}",
+                        AutoSize = true,
+                        TextAlign = ContentAlignment.MiddleLeft,
+                        Margin = new Padding(3)
+                    };
+
+                    FlowLayoutPanel contenedor = new FlowLayoutPanel
+                    {
+                        FlowDirection = FlowDirection.LeftToRight,
+                        AutoSize = true
+                    };
+                    contenedor.Controls.Add(panelColor);
+                    contenedor.Controls.Add(lblOrden);
+
+                    flpColores.Controls.Add(contenedor);
+
+                    colorIndex++;
                 }
-                else
+
+                flpColores.ResumeLayout();
+
+                // 🔹 Recorrer filas y aplicar validaciones
+                foreach (DataGridViewRow item in dgvAledanosDetalle.Rows)
                 {
-                    item.DefaultCellStyle.BackColor = Color.White;
+                    if (item.IsNewRow) continue;
+
+                    int ordenGrid = Convert.ToInt32(item.Cells["Orden"].Value);
+                    bool filaConCero = false;
+
+                    if (coloresPorOrden.ContainsKey(ordenGrid))
+                    {
+                        item.Cells["Orden"].Style.BackColor = coloresPorOrden[ordenGrid];
+                    }
+
+                    for (int colIndex = 3; colIndex < dgvAledanosDetalle.Columns.Count; colIndex++)
+                    {
+                        string productoNombre = dgvAledanosDetalle.Columns[colIndex].HeaderText;
+                        var cell = item.Cells[colIndex];
+
+                        if (cell.Value != null && cell.Value != DBNull.Value)
+                        {
+                            decimal valorGrid = Convert.ToDecimal(cell.Value);
+
+                            if (valorGrid == 0)
+                            {
+                                filaConCero = true;
+                            }
+
+                            string key = $"{ordenGrid}_{productoNombre}";
+
+                            if (valoresEsperadosCache.ContainsKey(key))
+                            {
+                                decimal valorEsperado = valoresEsperadosCache[key];
+
+                                if (valorGrid != valorEsperado && valorGrid != 0)
+                                {
+                                    cell.Style.BackColor = Color.Tomato;
+                                    _errorAledano++;
+                                }
+                                else if (valorGrid != valorEsperado && valorGrid == 0)
+                                {
+                                    cell.Style.BackColor = Color.Gold;
+                                }
+                                else
+                                {
+                                    cell.Style.BackColor = Color.White;
+                                }
+                            }
+                        }
+                    }
+
+                    if (filaConCero)
+                    {
+                        item.DefaultCellStyle.BackColor = Color.Gold;
+                    }
+                    else
+                    {
+                        item.DefaultCellStyle.BackColor = Color.White;
+                    }
                 }
             }
+            finally
+            {
+                dgvAledanosDetalle.ResumeLayout();
+                dgvAledanosDetalle.Refresh();
+
+                //// 🔹 Cerrar automáticamente el formulario de carga
+                //if (loadingForm != null && !loadingForm.IsDisposed)
+                //{
+                //    loadingForm.Close();
+                //    loadingForm.Dispose();
+                //}
+            }
         }
+
 
         private void validarPrincipales()
         {

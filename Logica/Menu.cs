@@ -618,6 +618,7 @@ namespace LogicaVentasAdmin
         public string Productos { get; set; }   // lista separada por coma
         public string CiudadRemitente { get; set; }
         public decimal? Descuento { get; set; }
+        public decimal? Impuesto { get; set; }
     }
     public class ProductoClienteCostos
     {
@@ -627,6 +628,7 @@ namespace LogicaVentasAdmin
         public string CiudadRemitente { get; set; }     // ID de la ciudad remitente
         public string Cliente { get; set; }             // ID del cliente
         public decimal? Descuento { get; set; }         // porcentaje de descuento
+        public decimal? Impuesto { get; set; }
     }
     public class CotizacionDescuentoEncabezado
     {

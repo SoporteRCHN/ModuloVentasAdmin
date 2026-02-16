@@ -13,7 +13,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>\\192.168.1.179\SGRC-ModuloVentasAdmin\</PublishUrl>
+    <PublishUrl>\\192.168.1.179\SGRC-ModuloVentasAdminTest\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Unc</InstallFrom>
     <UpdateEnabled>true</UpdateEnabled>
@@ -23,10 +23,10 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>true</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ProductName>ModuloVentasAdmin</ProductName>
-    <PublisherName>ModuloVentasAdmin</PublisherName>
+    <ProductName>ModuloVentasAdmin_Test</ProductName>
+    <PublisherName>ModuloVentasAdmin_Test</PublisherName>
     <SuiteName>Rapido Cargo</SuiteName>
-    <MinimumRequiredVersion>1.0.0.17</MinimumRequiredVersion>
+    <MinimumRequiredVersion>1.0.0.18</MinimumRequiredVersion>
     <ApplicationRevision>18</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>

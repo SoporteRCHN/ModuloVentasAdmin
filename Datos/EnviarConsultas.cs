@@ -1652,6 +1652,7 @@ namespace DatosVentasAdmin
             comando.Parameters.AddWithValue("@Productos", a.Productos ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@CiudadRemitente", a.CiudadRemitente ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@Descuento", a.Descuento ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Impuesto", a.Impuesto ?? (object)DBNull.Value);
 
             // 🔹 Nombre del procedimiento
             comando.CommandText = "ENAC.dbo.SP_ProductosCiudades";
@@ -1687,6 +1688,7 @@ namespace DatosVentasAdmin
             comando.Parameters.AddWithValue("@CiudadRemitente", a.CiudadRemitente ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@Cliente", a.Cliente ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@Descuento", a.Descuento ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Impuesto", a.Impuesto ?? (object)DBNull.Value);
 
             // 🔹 Nombre del procedimiento
             comando.CommandText = "ENAC.dbo.SP_ProductosClienteCostos";
