@@ -26,6 +26,7 @@ namespace ModuloVentasAdmin
         DataTable dtgetInfoAledanoDetalleOUT = new DataTable();
         DataTable _dtRegistroPrincipal = new DataTable();
         DataTable _dtRegistroAledano =new DataTable();
+        public DataTable dtTerminos = new DataTable();
 
         private List<ProductoSeleccionado> productosSeleccionados = new List<ProductoSeleccionado>();
         private List<DestinoRegistro> destinosSeleccionados = new List<DestinoRegistro>();
@@ -38,7 +39,9 @@ namespace ModuloVentasAdmin
             InitializeComponent();
             cargarOrigenes();
             cargarProductos();
-        }
+            cargarTerminos();
+        
+            }
         public class ProductoSeleccionado
         {
             public string ProductoID { get; set; }
@@ -61,7 +64,14 @@ namespace ModuloVentasAdmin
             public int Orden { get; set; }
             public decimal Costo { get; set; }
         }
-
+        private void cargarTerminos()
+        {
+            CotizacionTerminoDTO getTerminos = new CotizacionTerminoDTO
+            {
+                Opcion = "Listar"
+            };
+            dtTerminos = logica.SP_CotizacionTerminos(getTerminos);
+        }
         private void rdbNombre_CheckedChanged(object sender, EventArgs e)
         {
             if (rdbNombre.Checked == true)
@@ -891,8 +901,6 @@ namespace ModuloVentasAdmin
                 label10.Visible = true;
                 label10.Text = _CiudadesOUT.ToString();
             }
-
-
         }
 
         private void txtValor_KeyPress(object sender, KeyPressEventArgs e)
@@ -912,218 +920,414 @@ namespace ModuloVentasAdmin
         {
             ExportarTarifarioPDF();
         }
-
-    private void ExportarTarifarioPDF()
-    {
-        string rutaEscritorio = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-        string rutaArchivo = Path.Combine(rutaEscritorio, "Tarifario.pdf");
-
-        Document doc = new Document(PageSize.LETTER, 40, 40, 40, 40); // márgenes
-        PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(rutaArchivo, FileMode.Create));
-        doc.Open();
-
-        PdfContentByte cb = writer.DirectContent;
-        BaseFont bf = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
-
-        float startX = 40f;
-        float startY = doc.PageSize.Height - 60f;
-        float pageWidth = doc.PageSize.Width - 80f; // ancho útil con márgenes
-
-        int productosPorHoja = 4;
-        int columnasPorProducto = 2;
-        int totalProductos = dgvTarifario.Columns.Cast<DataGridViewColumn>().Count(c => c.Name.StartsWith("Prod_"));
-        int totalBloques = (int)Math.Ceiling((double)totalProductos / productosPorHoja);
-
-        for (int bloque = 0; bloque < totalBloques; bloque++)
+        private void ExportarTarifarioPDF()
         {
-            var columnasBloque = dgvTarifario.Columns.Cast<DataGridViewColumn>()
-                .Where(c => c.Name.StartsWith("Prod_") || c.Name.StartsWith("ALEDAÑO_"))
-                .Skip(bloque * productosPorHoja * columnasPorProducto)
-                .Take(productosPorHoja * columnasPorProducto)
-                .ToList();
+            string rutaEscritorio = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string rutaArchivo = Path.Combine(rutaEscritorio, "Tarifario.pdf");
 
-            // 🔹 Definir anchos base
-            float anchoDestinos = 200f;
-            float anchoProducto = 100f;
+            Document doc = new Document(PageSize.LETTER, 40, 40, 20, 20);
+            PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(rutaArchivo, FileMode.Create));
+            doc.Open();
+
+            var fontCell = FontFactory.GetFont(FontFactory.HELVETICA, 9);
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 ENCABEZADO  ─  logos 135×40
+            // ─────────────────────────────────────────────────────────
+            PdfPTable headerTable = new PdfPTable(3);
+            headerTable.WidthPercentage = 100;
+            headerTable.SetWidths(new float[] { 135f, 200f, 135f });
+
+            iTextSharp.text.Image logoIzq = iTextSharp.text.Image.GetInstance(@"\\192.168.1.179\Logos\RCHondurasColor.png");
+            logoIzq.ScaleAbsolute(135, 40);
+            headerTable.AddCell(new PdfPCell(logoIzq)
+            {
+                Border = iTextSharp.text.Rectangle.NO_BORDER,
+                HorizontalAlignment = Element.ALIGN_LEFT,
+                VerticalAlignment = Element.ALIGN_MIDDLE
+            });
+
+            headerTable.AddCell(new PdfPCell(new Phrase("COTIZACION",
+                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16)))
+            {
+                Border = iTextSharp.text.Rectangle.NO_BORDER,
+                HorizontalAlignment = Element.ALIGN_CENTER,
+                VerticalAlignment = Element.ALIGN_MIDDLE
+            });
+
+            iTextSharp.text.Image logoDer = iTextSharp.text.Image.GetInstance(@"\\192.168.1.179\Logos\RCPaqueteria.png");
+            logoDer.ScaleAbsolute(135, 40);
+            headerTable.AddCell(new PdfPCell(logoDer)
+            {
+                Border = iTextSharp.text.Rectangle.NO_BORDER,
+                HorizontalAlignment = Element.ALIGN_RIGHT,
+                VerticalAlignment = Element.ALIGN_MIDDLE
+            });
+            doc.Add(headerTable);
+            doc.Add(new Paragraph("\n"));
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 CLIENTE / FECHA / ATENCIÓN / CÓDIGO
+            // ─────────────────────────────────────────────────────────
+            PdfPTable clienteFechaTable = new PdfPTable(2);
+            clienteFechaTable.WidthPercentage = 100;
+            clienteFechaTable.SetWidths(new float[] { 250f, 180f });
+            clienteFechaTable.AddCell(new PdfPCell(new Phrase("CLIENTE: " + txtNombreCliente.Text, fontCell))
+            { Border = iTextSharp.text.Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_LEFT, PaddingBottom = 2f });
+            clienteFechaTable.AddCell(new PdfPCell(new Phrase("FECHA: " + DateTime.Now.ToString("dd/MM/yyyy"), fontCell))
+            { Border = iTextSharp.text.Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_RIGHT, PaddingBottom = 2f });
+            doc.Add(clienteFechaTable);
+
+            PdfPTable atencionTable = new PdfPTable(2);
+            atencionTable.WidthPercentage = 100;
+            atencionTable.SetWidths(new float[] { 250f, 200f });
+            atencionTable.AddCell(new PdfPCell(new Phrase("ATENCIÓN:  " + txtNombreCliente.Text, fontCell))
+            { Border = iTextSharp.text.Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_LEFT, PaddingBottom = 2f });
+            atencionTable.AddCell(new PdfPCell(new Phrase("CÓDIGO:  " + _Cliente.ToString(), fontCell))
+            { Border = iTextSharp.text.Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_RIGHT, PaddingBottom = 2f });
+            doc.Add(atencionTable);
+            doc.Add(new Paragraph("\n"));
+
+            // ══════════════════════════════════════════════════════════════
+            // 🎛️  VARIABLES DE CONTROL  ← ajusta SOLO aquí para mover todo
+            // ══════════════════════════════════════════════════════════════
+
+            // Distancia desde el TOP de la página al TOP de la tabla.
+            // Baja este número  → tabla sube (y también suben términos/firmas).
+            // Sube este número  → tabla baja (y también bajan términos/firmas).
+            float tablaOffsetDesdeTop = 140f;
+
+            // Margen extra entre el borde inferior de la última fila y el bloque Términos+Firmas.
+            // Ponlo más negativo  → términos suben más.
+            // Ponlo más positivo  → términos bajan más.
+            float offsetTerminos = 65f;
+
+            // ──────────────────────────────────────────────────────────────
+
+            PdfContentByte cb = writer.DirectContent;
+            BaseFont bf = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
+            BaseFont bfBold = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, BaseFont.CP1252, false);
+
+            float startX = 40f;
+            float pageWidth = doc.PageSize.Width - 80f;
+            float startY = doc.PageSize.Height - tablaOffsetDesdeTop;
+
+            // ──────────────────────────────────────────────────────────────
+            // 🔹 MEDIDAS DE LA TABLA
+            // ──────────────────────────────────────────────────────────────
+            float anchoDestinos = 195f;
+            float anchoProducto = 80f;
             float anchoAledano = 50f;
 
-            float anchoTotal = anchoDestinos +
-                               columnasBloque.Count(c => c.Name.StartsWith("Prod_")) * anchoProducto +
-                               columnasBloque.Count(c => c.Name.StartsWith("ALEDAÑO_")) * anchoAledano;
+            float headerHeightTop = 14f;  // fila "DIMENSIONES Y PESO DE CAJA"
+            float headerHeight = 60f;  // fila nombres de productos + medida
+            float campoMedida = 14f;  // subcampo de medida (dentro de headerHeight)
 
-            // 🔹 Escalar si excede el ancho de página
-            float factorEscala = anchoTotal > pageWidth ? pageWidth / anchoTotal : 1f;
-            anchoDestinos *= factorEscala;
-            anchoProducto *= factorEscala;
-            anchoAledano *= factorEscala;
+            float fontSizeCiudad = 8f;
+            float lineHeight = fontSizeCiudad + 3f;
+            float rowPaddingV = 3f;
 
-            // 🔹 Dibujar título superior
-            float firstProdX = startX + anchoDestinos;
-            float totalWidth = columnasBloque.Count(c => c.Name.StartsWith("Prod_")) * anchoProducto +
-                               columnasBloque.Count(c => c.Name.StartsWith("ALEDAÑO_")) * anchoAledano;
+            int productosPorHoja = 4;
+            int columnasPorProducto = 2;
+            int totalProductos = dgvTarifario.Columns
+                                        .Cast<DataGridViewColumn>()
+                                        .Count(c => c.Name.StartsWith("Prod_"));
+            int totalBloques = (int)Math.Ceiling((double)totalProductos / productosPorHoja);
 
-            float headerTop = startY;
-            float headerHeightTop = 30f;
+            float yPosFinalGlobal = startY;
 
-            iTextSharp.text.Rectangle rectTitulo = new iTextSharp.text.Rectangle(firstProdX, headerTop, firstProdX + totalWidth, headerTop + headerHeightTop);
-            cb.Rectangle(rectTitulo.Left, rectTitulo.Bottom, rectTitulo.Width, rectTitulo.Height);
-            cb.Stroke();
-
-            ColumnText.ShowTextAligned(cb, Element.ALIGN_CENTER,
-                new Phrase("DIMENSIONES Y PESO DE CAJA", new iTextSharp.text.Font(bf, 10, iTextSharp.text.Font.BOLD)),
-                rectTitulo.Left + (rectTitulo.Width / 2), rectTitulo.Bottom + (headerHeightTop / 2), 0);
-
-            // 🔹 Encabezados
-            float x = startX;
-            float headerHeight = 80f;
-            float headerStartY = headerTop - headerHeight;
-
-            // Columna Destinos
-            iTextSharp.text.Rectangle rectDestinos = new iTextSharp.text.Rectangle(x, headerStartY, x + anchoDestinos, headerStartY + headerHeight);
-            cb.Rectangle(rectDestinos.Left, rectDestinos.Bottom, rectDestinos.Width, rectDestinos.Height);
-            cb.Stroke();
-
-            ColumnText.ShowTextAligned(cb, Element.ALIGN_CENTER,
-                new Phrase(dgvTarifario.Columns[0].HeaderText, new iTextSharp.text.Font(bf, 9, iTextSharp.text.Font.BOLD)),
-                rectDestinos.Left + (rectDestinos.Width / 2), rectDestinos.Bottom + (headerHeight / 2), 0);
-
-            x += anchoDestinos;
-
-            foreach (var col in columnasBloque)
+            for (int bloque = 0; bloque < totalBloques; bloque++)
             {
-                float colWidth = col.Name.StartsWith("Prod_") ? anchoProducto :
-                                 col.Name.StartsWith("ALEDAÑO_") ? anchoAledano : col.Width;
+                var columnasBloque = dgvTarifario.Columns
+                    .Cast<DataGridViewColumn>()
+                    .Where(c => c.Name.StartsWith("Prod_") || c.Name.StartsWith("ALEDAÑO_"))
+                    .Skip(bloque * productosPorHoja * columnasPorProducto)
+                    .Take(productosPorHoja * columnasPorProducto)
+                    .ToList();
 
-                iTextSharp.text.Rectangle rect = new iTextSharp.text.Rectangle(x, headerStartY, x + colWidth, headerStartY + headerHeight);
-                cb.Rectangle(rect.Left, rect.Bottom, rect.Width, rect.Height);
-                cb.Stroke();
+                // Escala si no cabe en la página
+                float anchoTotal = anchoDestinos
+                                 + columnasBloque.Count(c => c.Name.StartsWith("Prod_")) * anchoProducto
+                                 + columnasBloque.Count(c => c.Name.StartsWith("ALEDAÑO_")) * anchoAledano;
 
-                if (col.HeaderText == "ALEDAÑO")
+                float factor = anchoTotal > pageWidth ? pageWidth / anchoTotal : 1f;
+                float aD = anchoDestinos * factor;
+                float aP = anchoProducto * factor;
+                float aA = anchoAledano * factor;
+
+                float firstProdX = startX + aD;
+                float totalWidth = columnasBloque.Count(c => c.Name.StartsWith("Prod_")) * aP
+                                 + columnasBloque.Count(c => c.Name.StartsWith("ALEDAÑO_")) * aA;
+
+                // ══════════════════════════════════════════════════════════
+                // 🔹 HEADER UNIFICADO SIN ESPACIO
+                //
+                //  startY ┬────────────────────────────────────────────────
+                //         │  DEST.  │   DIMENSIONES Y PESO DE CAJA        │ ← headerHeightTop
+                //         ├─────────┼──────────────────┬───────────────────┤
+                //         │         │  NOMBRE PRODUCTO  │  NOMBRE PRODUCTO  │
+                //         │  DEST.  │                  │                   │ ← headerHeight
+                //         │         ├──────────────────┼───────────────────┤
+                //         │         │  medida          │  medida           │ ← campoMedida
+                //  nomBottom ├──────┴──────────────────┴───────────────────┤
+                //         │ filas de datos                                  │
+                // ══════════════════════════════════════════════════════════
+
+                float dimTop = startY;                   // top de la franja DIMENSIONES
+                float dimBottom = dimTop - headerHeightTop; // bottom DIMENSIONES = top nombres
+                float nomTop = dimBottom;                // top de la franja nombres
+                float nomBottom = nomTop - headerHeight;    // bottom nombres = top datos
+
+                // ── Franja DIMENSIONES Y PESO DE CAJA ──
+                DrawRect(cb, firstProdX, dimBottom, totalWidth, headerHeightTop);
+                DrawTextCenter(cb, bf, 7f, "DIMENSIONES Y PESO DE CAJA",
+                    firstProdX, dimBottom, totalWidth, headerHeightTop);
+
+                // ── Columna Destinos: abarca TODA la altura del header (unificada) ──
+                float altaHeader = headerHeightTop + headerHeight; // altura total del header
+                DrawRect(cb, startX, nomBottom, aD, altaHeader);
+                DrawTextCenter(cb, bfBold, 8f, dgvTarifario.Columns[0].HeaderText,
+                    startX, nomBottom, aD, altaHeader);
+
+                // ── Columnas de productos y aledaños ──
+                float x = startX + aD;
+
+                foreach (var col in columnasBloque)
                 {
-                    float y = rect.Top - 12;
-                    foreach (char c in col.HeaderText.ToUpper())
+                    float cw = col.Name.StartsWith("Prod_") ? aP : aA;
+
+                    // Marco de la franja de nombres (solo la franja nomTop→nomBottom)
+                    DrawRect(cb, x, nomBottom, cw, headerHeight);
+
+                    if (col.Name.StartsWith("ALEDAÑO_") || col.HeaderText == "ALEDAÑO")
                     {
-                        ColumnText.ShowTextAligned(cb, Element.ALIGN_CENTER,
-                            new Phrase(c.ToString(), new iTextSharp.text.Font(bf, 9, iTextSharp.text.Font.BOLD)),
-                            rect.Left + (colWidth / 2), y, 0);
-                        y -= 10;
+                        // Texto "ALEDAÑO" vertical, fuente 6, centrado en la celda
+                        float ty = nomTop - 10f;
+                        foreach (char ch in "ALEDAÑO")
+                        {
+                            ColumnText.ShowTextAligned(cb, Element.ALIGN_CENTER,
+                                new Phrase(ch.ToString(),
+                                    new iTextSharp.text.Font(bf, 6f, iTextSharp.text.Font.BOLD)),
+                                x + cw / 2f, ty, 0);
+                            ty -= 7f;
+                        }
                     }
+                    else if (col.Name.StartsWith("Prod_"))
+                    {
+                        // Nombre del producto centrado en la zona superior (encima del subcampo)
+                        ColumnText ctNombre = new ColumnText(cb);
+                        ctNombre.SetSimpleColumn(
+                            new Phrase(col.HeaderText, new iTextSharp.text.Font(bfBold, 8f)),
+                            x + 2f,
+                            nomBottom + campoMedida,  // encima del subcampo medida
+                            x + cw - 2f,
+                            nomTop,                   // hasta el tope de la franja nombres
+                            10f,
+                            Element.ALIGN_CENTER
+                        );
+                        ctNombre.Go();
+
+                        // Subcampo de medida (borde inferior dentro de headerHeight)
+                        DrawRect(cb, x, nomBottom, cw, campoMedida);
+
+                        string medida = "";
+                        if (dtProducto != null)
+                        {
+                            var rowMedida = dtProducto.AsEnumerable()
+                                .FirstOrDefault(r => r["Nombre"].ToString() == col.HeaderText);
+                            if (rowMedida != null)
+                                medida = rowMedida["Descripcion"].ToString();
+                        }
+
+                        if (!string.IsNullOrEmpty(medida))
+                            DrawTextCenter(cb, bf, 7f, medida, x, nomBottom, cw, campoMedida);
+                    }
+
+                    x += cw;
                 }
-                else if (col.Name.StartsWith("Prod_"))
+
+                // ──────────────────────────────────────────────────────────
+                // 🔹 FILAS DE DATOS  ─  pegadas justo debajo del header
+                // ──────────────────────────────────────────────────────────
+                float yPos = nomBottom;  // empieza exactamente donde terminó el header
+
+                foreach (DataGridViewRow row in dgvTarifario.Rows)
                 {
-                    float campoAltura = 20f;
-                    Phrase phraseNombre = new Phrase(col.HeaderText, new iTextSharp.text.Font(bf, 9, iTextSharp.text.Font.BOLD));
+                    if (row.IsNewRow) continue;
 
-                    ColumnText ctNombre = new ColumnText(cb);
-                    ctNombre.SetSimpleColumn(
-                        phraseNombre,
-                        rect.Left + 2, rect.Bottom + campoAltura + 2,
-                        rect.Right - 2, rect.Top - 2,
-                        12, Element.ALIGN_CENTER
-                    );
-                    ctNombre.Go();
+                    // Calcular altura real de la fila según el texto
+                    float maxHeight = lineHeight+15 + rowPaddingV * 2;
 
-                    string medida = "";
-                    if (dtProducto != null)
+                    var cellDestino = row.Cells[0];
+                    if (cellDestino.Value != null)
                     {
-                        var rowMedida = dtProducto.AsEnumerable()
-                            .FirstOrDefault(r => r["Nombre"].ToString() == col.HeaderText);
-                        if (rowMedida != null)
-                            medida = rowMedida["Descripcion"].ToString();
+                        string textoDestino = cellDestino.Value.ToString();
+                        int lineas = textoDestino.Split('\n').Length;
+                        float hCalc = lineas * lineHeight + rowPaddingV * 2;
+                        if (hCalc > maxHeight) maxHeight = hCalc;
                     }
 
-                    cb.Rectangle(rect.Left, rect.Bottom, rect.Width, campoAltura);
-                    cb.Stroke();
+                    float xPos = startX;
 
-                    if (!string.IsNullOrEmpty(medida))
+                    foreach (DataGridViewCell cell in row.Cells)
                     {
-                        ColumnText.ShowTextAligned(cb, Element.ALIGN_CENTER,
-                            new Phrase(medida, new iTextSharp.text.Font(bf, 8)),
-                            rect.Left + (rect.Width / 2), rect.Bottom + (campoAltura / 2), 0);
-                    }
-                }
+                        bool esDestino = cell.OwningColumn == dgvTarifario.Columns[0];
+                        bool esBloque = columnasBloque.Contains(cell.OwningColumn);
+                        if (!esDestino && !esBloque) continue;
 
-                x += colWidth;
-            }
+                        float cw = esDestino ? aD :
+                                   cell.OwningColumn.Name.StartsWith("Prod_") ? aP :
+                                   cell.OwningColumn.Name.StartsWith("ALEDAÑO_") ? aA : aD;
 
-            // 🔹 Filas
-            float yPos = headerStartY;
-            float rowHeightDefault = 20f;
-
-            foreach (DataGridViewRow row in dgvTarifario.Rows)
-            {
-                if (row.IsNewRow) continue;
-
-                float xPos = startX;
-                float maxHeight = rowHeightDefault;
-
-                // calcular altura máxima de la fila
-                foreach (DataGridViewCell cell in row.Cells)
-                {
-                    if (cell.OwningColumn == dgvTarifario.Columns[0] || columnasBloque.Contains(cell.OwningColumn))
-                    {
                         string texto = cell.Value?.ToString() ?? "";
-                        int lineas = texto.Split('\n').Length;
-                        float cellHeight = lineas * (dgvTarifario.Font.Height + 2);
-                        if (cellHeight > maxHeight) maxHeight = cellHeight;
-                    }
-                }
 
-                // dibujar celdas
-                foreach (DataGridViewCell cell in row.Cells)
-                {
-                    if (cell.OwningColumn == dgvTarifario.Columns[0] || columnasBloque.Contains(cell.OwningColumn))
-                    {
-                        string texto = cell.Value?.ToString() ?? "";
-                        Phrase phrase = new Phrase(texto, new iTextSharp.text.Font(bf, 9));
-
-                        float colWidth = cell.OwningColumn.Name.StartsWith("Prod_") ? anchoProducto :
-                                         cell.OwningColumn.Name.StartsWith("ALEDAÑO_") ? anchoAledano :
-                                         anchoDestinos;
-
-                        iTextSharp.text.Rectangle rect = new iTextSharp.text.Rectangle(xPos, yPos - maxHeight, xPos + colWidth, yPos);
-                        cb.Rectangle(rect.Left, rect.Bottom, rect.Width, rect.Height);
-                        cb.Stroke();
+                        DrawRect(cb, xPos, yPos - maxHeight, cw, maxHeight);
 
                         ColumnText ct = new ColumnText(cb);
                         ct.SetSimpleColumn(
-                            phrase,
-                            rect.Left + 2, rect.Bottom + 2,
-                            rect.Right - 2, rect.Top - 2,
-                            12, Element.ALIGN_CENTER
+                            new Phrase(texto, new iTextSharp.text.Font(bf, fontSizeCiudad)),
+                            xPos + 2f,
+                            yPos - maxHeight + rowPaddingV,
+                            xPos + cw - 2f,
+                            yPos - rowPaddingV,
+                            lineHeight,
+                            esDestino ? Element.ALIGN_LEFT : Element.ALIGN_CENTER
                         );
                         ct.Go();
 
-                        xPos += colWidth;
+                        xPos += cw;
+                    }
+
+                    yPos -= maxHeight;
+
+                    if (yPos < 130f)
+                    {
+                        doc.NewPage();
+                        yPos = doc.PageSize.Height - 60f;
+                        startY = yPos;
                     }
                 }
 
-                yPos -= maxHeight;
+                yPosFinalGlobal = yPos;
 
-                if (yPos < 50)
+                if (bloque < totalBloques - 1)
                 {
                     doc.NewPage();
-                    yPos = doc.PageSize.Height - 60f;
+                    startY = doc.PageSize.Height - 60f;
+                    yPosFinalGlobal = startY;
                 }
             }
 
-            // 🔹 Si no es el último bloque, crear
+            // ══════════════════════════════════════════════════════════════
+            // ✅ SINCRONIZAR cursor doc.Add() con el yPos final de la tabla
+            //    + aplicar offsetTerminos
+            // ══════════════════════════════════════════════════════════════
+            float yDespuesTabla = yPosFinalGlobal + offsetTerminos;
 
-            // 🔹 Si no es el último bloque, crear nueva página
-            if (bloque < totalBloques - 1)
+            if (yDespuesTabla < 130f)
             {
                 doc.NewPage();
             }
+            else
+            {
+                float yInicioDoc = doc.PageSize.Height - doc.TopMargin;
+                float espacioOcupado = yInicioDoc - yDespuesTabla;
+
+                if (espacioOcupado > 0)
+                {
+                    PdfPTable spacer = new PdfPTable(1);
+                    spacer.WidthPercentage = 100;
+                    spacer.AddCell(new PdfPCell(new Phrase(" "))
+                    {
+                        Border = iTextSharp.text.Rectangle.NO_BORDER,
+                        FixedHeight = espacioOcupado,
+                        MinimumHeight = espacioOcupado
+                    });
+                    doc.Add(spacer);
+                }
+            }
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 TÉRMINOS Y CONDICIONES
+            // ─────────────────────────────────────────────────────────
+            if (dtTerminos != null && dtTerminos.Rows.Count > 0)
+            {
+                doc.Add(new Paragraph("TERMINOS Y NEGOCIACIONES ESPECIALES",
+                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)));
+
+                doc.Add(new Paragraph(
+                    chkISV.Checked
+                        ? "PRECIOS YA INCLUYEN IMPUESTOS SOBRE VENTAS"
+                        : "PRECIOS NO INCLUYEN IMPUESTOS SOBRE VENTAS",
+                    FontFactory.GetFont(FontFactory.HELVETICA, 8)));
+
+                foreach (DataRow row in dtTerminos.Rows)
+                    doc.Add(new Paragraph("- " + row["Descripcion"].ToString(),
+                        FontFactory.GetFont(FontFactory.HELVETICA, 8)));
+            }
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 FIRMAS
+            // ─────────────────────────────────────────────────────────
+            doc.Add(new Paragraph("\n\n"));
+            PdfPTable firmasTable = new PdfPTable(2);
+            firmasTable.WidthPercentage = 100;
+            firmasTable.SetWidths(new float[] { 250f, 250f });
+
+            PdfPCell cellIzq = new PdfPCell { Border = iTextSharp.text.Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_CENTER };
+            cellIzq.AddElement(new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(1f, 60f, BaseColor.BLACK, Element.ALIGN_CENTER, -2))));
+            cellIzq.AddElement(new Paragraph("Autorizado", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9)) { Alignment = Element.ALIGN_CENTER });
+            cellIzq.AddElement(new Paragraph("Nancy D. Valle", FontFactory.GetFont(FontFactory.HELVETICA, 8)) { Alignment = Element.ALIGN_CENTER });
+            cellIzq.AddElement(new Paragraph("GERENTE ADMINISTRATIVO", FontFactory.GetFont(FontFactory.HELVETICA, 8)) { Alignment = Element.ALIGN_CENTER });
+            firmasTable.AddCell(cellIzq);
+
+            PdfPCell cellDer = new PdfPCell { Border = iTextSharp.text.Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_CENTER };
+            cellDer.AddElement(new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(1f, 60f, BaseColor.BLACK, Element.ALIGN_CENTER, -2))));
+            cellDer.AddElement(new Paragraph("Aprobado Por Cliente", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9)) { Alignment = Element.ALIGN_CENTER });
+            cellDer.AddElement(new Paragraph("Firma y Sello", FontFactory.GetFont(FontFactory.HELVETICA, 8)) { Alignment = Element.ALIGN_CENTER });
+            cellDer.AddElement(new Paragraph(txtNombreCliente.Text, FontFactory.GetFont(FontFactory.HELVETICA, 8)) { Alignment = Element.ALIGN_CENTER });
+            firmasTable.AddCell(cellDer);
+
+            doc.Add(firmasTable);
+
+            doc.Close();
+            writer.Close();
+            Process.Start(new ProcessStartInfo(rutaArchivo) { UseShellExecute = true });
         }
 
-        doc.Close();
-        writer.Close();
+        // ─────────────────────────────────────────────────────────────────────────────
+        // 🔧 HELPERS
+        // ─────────────────────────────────────────────────────────────────────────────
 
-        Process.Start(new ProcessStartInfo(rutaArchivo) { UseShellExecute = true });
-    }
+        /// <summary>Dibuja un rectángulo sin relleno.</summary>
+        private void DrawRect(PdfContentByte cb, float x, float y, float w, float h)
+        {
+            cb.Rectangle(x, y, w, h);
+            cb.Stroke();
+        }
+
+        /// <summary>Escribe texto centrado horizontal y verticalmente dentro de un área.</summary>
+        private void DrawTextCenter(PdfContentByte cb, BaseFont font, float fontSize,
+            string text, float x, float y, float w, float h)
+        {
+            ColumnText ct = new ColumnText(cb);
+            ct.SetSimpleColumn(
+                new Phrase(text, new iTextSharp.text.Font(font, fontSize)),
+                x + 2f, y + 2f,
+                x + w - 2f, y + h - 2f,
+                fontSize + 2f,
+                Element.ALIGN_CENTER
+            );
+            ct.Go();
+        }
 
 
-    private void btnGuardar_Click(object sender, EventArgs e)
+        // ─────────────────────────────────────────────────────────────────────────
+        // 🔹 HELPERS  ─  dibujar rectángulo y texto centrado (simplifican el código)
+        // ─────────────────────────────────────────────────────────────────────────
+
+
+        private void btnGuardar_Click(object sender, EventArgs e)
         {
             DialogResult resultado = ToastDialog.Mostrar("Desea solicitar la aprobacion para otorgar el descuento a este cliente?", TipoAlerta.Info);
 
@@ -1280,15 +1484,6 @@ namespace ModuloVentasAdmin
         {
             _errorAledano = 0;
 
-            // 🔹 Crear y mostrar el formulario de carga en primer plano
-            //FrmLoading loadingForm = new FrmLoading
-            //{
-            //    TopMost = true // Siempre encima de todas las ventanas
-            //};
-            //loadingForm.Show();
-            //loadingForm.BringToFront(); // Forzar que aparezca al frente
-            //loadingForm.Refresh();      // Forzar repintado inmediato
-
             try
             {
                 // 🔹 SUSPENDER el repintado durante la actualización
@@ -1297,18 +1492,32 @@ namespace ModuloVentasAdmin
                 // 🔹 Paleta de colores claros
                 Color[] colores = new Color[]
                 {
-            Color.LightBlue,
-            Color.LightGreen,
-            Color.LightYellow,
-            Color.LightPink,
-            Color.Lavender,
-            Color.MistyRose,
-            Color.Honeydew
+                    Color.LightBlue,
+                    Color.LightGreen,
+                    Color.LightYellow,
+                    Color.LightPink,
+                    Color.Lavender,
+                    Color.MistyRose,
+                    Color.Honeydew
                 };
 
-                // 🔹 Limpiar referencias previas en el FlowLayoutPanel
-                flpColores.Controls.Clear();
                 flpColores.SuspendLayout();
+
+                // ✅ Dispose correcto
+                foreach (Control ctrl in flpColores.Controls)
+                {
+                    if (ctrl is FlowLayoutPanel contenedor)
+                    {
+                        foreach (Control hijo in contenedor.Controls)
+                        {
+                            hijo.Dispose();
+                        }
+                        contenedor.Controls.Clear();
+                    }
+                    ctrl.Dispose();
+                }
+
+                flpColores.Controls.Clear();
 
                 // 🔹 Obtener todos los órdenes distintos
                 var ordenes = dgvAledanosDetalle.Rows
@@ -1447,13 +1656,6 @@ namespace ModuloVentasAdmin
             {
                 dgvAledanosDetalle.ResumeLayout();
                 dgvAledanosDetalle.Refresh();
-
-                //// 🔹 Cerrar automáticamente el formulario de carga
-                //if (loadingForm != null && !loadingForm.IsDisposed)
-                //{
-                //    loadingForm.Close();
-                //    loadingForm.Dispose();
-                //}
             }
         }
 

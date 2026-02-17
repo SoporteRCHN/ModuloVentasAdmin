@@ -16,18 +16,18 @@
     <PublishUrl>\\192.168.1.179\SGRC-ModuloVentasAdminTest\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Unc</InstallFrom>
-    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateEnabled>false</UpdateEnabled>
     <UpdateMode>Foreground</UpdateMode>
     <UpdateInterval>7</UpdateInterval>
     <UpdateIntervalUnits>Days</UpdateIntervalUnits>
     <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>true</UpdateRequired>
+    <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ProductName>ModuloVentasAdmin_Test</ProductName>
     <PublisherName>ModuloVentasAdmin_Test</PublisherName>
-    <SuiteName>Rapido Cargo</SuiteName>
-    <MinimumRequiredVersion>1.0.0.18</MinimumRequiredVersion>
-    <ApplicationRevision>18</ApplicationRevision>
+    <SuiteName>Rapido Cargo_Test</SuiteName>
+    <MinimumRequiredVersion>1.0.0.20</MinimumRequiredVersion>
+    <ApplicationRevision>23</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -63,7 +63,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
