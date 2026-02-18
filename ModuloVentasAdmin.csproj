@@ -26,8 +26,8 @@
     <ProductName>ModuloVentasAdmin_Test</ProductName>
     <PublisherName>ModuloVentasAdmin_Test</PublisherName>
     <SuiteName>Rapido Cargo_Test</SuiteName>
-    <MinimumRequiredVersion>1.0.0.20</MinimumRequiredVersion>
-    <ApplicationRevision>23</ApplicationRevision>
+    <MinimumRequiredVersion>1.0.0.26</MinimumRequiredVersion>
+    <ApplicationRevision>27</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -330,6 +330,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\loading2.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\white_trash_can_16px.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

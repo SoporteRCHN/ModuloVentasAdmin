@@ -27,21 +27,29 @@ namespace ModuloVentasAdmin
         DataTable _dtRegistroPrincipal = new DataTable();
         DataTable _dtRegistroAledano =new DataTable();
         public DataTable dtTerminos = new DataTable();
+        DataTable dtClienteHistorico = new DataTable();
+        
 
         private List<ProductoSeleccionado> productosSeleccionados = new List<ProductoSeleccionado>();
         private List<DestinoRegistro> destinosSeleccionados = new List<DestinoRegistro>();
 
-        public string _Nombre, _Cliente, _ProductoID = "";
+        public string _Nombre, _Cliente, _ProductoID, _NombreHistorico, _ClienteHistorico, _RutaArchivo, _NombreArchivo, _IDGenerado = "";
         public int _TipoCosto, _errorPrincipal, _errorAledano, _EncabezadoID, _PrincipalAledano, _CiudadesOUT = 0;
         public decimal _Costo = 0;
+        public bool _estaGuardando = false;
         public frmDescuentoPrecios()
         {
+
             InitializeComponent();
+
+            //tabControl2.TabPages.Remove(tabPage4);
+
             cargarOrigenes();
             cargarProductos();
             cargarTerminos();
-        
-            }
+            cargarRegeistroBase();
+
+        }
         public class ProductoSeleccionado
         {
             public string ProductoID { get; set; }
@@ -96,7 +104,6 @@ namespace ModuloVentasAdmin
                 _Cliente = dtGetCliente.Rows[0]["ClienteID"].ToString();
                 _TipoCosto = Convert.ToInt32(dtGetCliente.Rows[0]["TipoCosto"]);
 
-                lblClienteINombre.Text = "TARIFARIO: " + _Cliente + " - " + _Nombre;
                 lblTipoCliente.Text = (_TipoCosto == 2) ? "Negociacion Especial" : "Cliente Normal";
                 txtValor.Text = "0";
                 txtNombreCliente.Text = _Nombre;
@@ -107,7 +114,6 @@ namespace ModuloVentasAdmin
             else
             {
                 Toast.Mostrar("No se encontro ese codigo de cliente.", TipoAlerta.Warning);
-                lblClienteINombre.Text = "-";
                 _Nombre = String.Empty;
                 _Cliente = String.Empty;
                 lblTipoCliente.Text = "-";
@@ -143,7 +149,6 @@ namespace ModuloVentasAdmin
                         _Cliente = Mensaje.ClienteId.ToString();
                         _TipoCosto = Mensaje._TipoCosto;
 
-                        lblClienteINombre.Text = "TARIFARIO: " + _Cliente + " - " + _Nombre;
                         lblTipoCliente.Text = (_TipoCosto == 2) ? "Negociacion Especial" : "Cliente Normal";
                         txtValor.Text = "0";
                         txtNombreCliente.Text = _Nombre;
@@ -218,7 +223,12 @@ namespace ModuloVentasAdmin
 
         private void btnCliente_Click(object sender, EventArgs e)
         {
-            mostrarClientes();
+            //mostrarClientes();
+            if (String.IsNullOrWhiteSpace(txtBuscar.Text))
+                return;
+
+            cargarClientes();
+            txtBuscar.Focus();
         }
 
         private void txtBuscar_KeyPress(object sender, KeyPressEventArgs e)
@@ -568,19 +578,7 @@ namespace ModuloVentasAdmin
         {
             string productosCsv = string.Join(",", productosSeleccionados.Select(p => p.ProductoID));
             decimal _isv = (chkISV.Checked) ? Convert.ToDecimal("0.15") : Convert.ToDecimal(0);
-            if (_TipoCosto == 1)
-            {
-                ProductoCiudadENAC getPrecios = new ProductoCiudadENAC
-                {
-                    Opcion = "ListadoCiudadPrincipal",
-                    Productos = productosCsv, // aquí ya va "00001,00002,00003"
-                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
-                    Descuento = Convert.ToDecimal(txtValor.Text),
-                    Impuesto = _isv
-                };
-                dtgetInfoPrincipal = logica.SP_ProductosCiudadesENAC(getPrecios);
-            }
-            else if (_TipoCosto == 2) 
+              if (_TipoCosto == 2)
             {
                 ProductoClienteCostos getPreciosClienteCostos = new ProductoClienteCostos
                 {
@@ -592,14 +590,64 @@ namespace ModuloVentasAdmin
                     Impuesto = _isv
                 };
                 dtgetInfoPrincipal = logica.SP_ProductosClienteCostos(getPreciosClienteCostos);
+                if (dtgetInfoPrincipal.Rows.Count <= 0) 
+                {
+                    ProductoCiudadENAC getPrecios = new ProductoCiudadENAC
+                    {
+                        Opcion = "ListadoCiudadPrincipal",
+                        Productos = productosCsv, // aquí ya va "00001,00002,00003"
+                        CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                        Descuento = Convert.ToDecimal(txtValor.Text),
+                        Impuesto = _isv
+                    };
+                    dtgetInfoPrincipal = logica.SP_ProductosCiudadesENAC(getPrecios);
+                }
             }
+            else if (_TipoCosto == 1)
+            {
+                ProductoCiudadENAC getPrecios = new ProductoCiudadENAC
+                {
+                    Opcion = "ListadoCiudadPrincipal",
+                    Productos = productosCsv, // aquí ya va "00001,00002,00003"
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Descuento = Convert.ToDecimal(txtValor.Text),
+                    Impuesto = _isv
+                };
+                dtgetInfoPrincipal = logica.SP_ProductosCiudadesENAC(getPrecios);
+            }
+          
         }
         private void cargarPreciosAledanos()
         {
             string productosCsvAledano = string.Join(",", productosSeleccionados.Select(p => p.ProductoID));
             decimal _isv = (chkISV.Checked) ? Convert.ToDecimal("0.15") : Convert.ToDecimal(0);
+              if (_TipoCosto == 2)
+            {
+                ProductoClienteCostos getPreciosClienteCostos = new ProductoClienteCostos
+                {
+                    Opcion = "ListadoAledanoPrincipal",
+                    Productos = productosCsvAledano, // aquí ya va "00001,00002,00003"
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Descuento = Convert.ToDecimal(txtValor.Text),
+                    Cliente = _Cliente,
+                    Impuesto = _isv
+                };
+                dtgetInfoAledano = logica.SP_ProductosClienteCostos(getPreciosClienteCostos);
+                if (dtgetInfoAledano.Rows.Count <= 0) 
+                {
+                    ProductoCiudadENAC getPreciosAledanos = new ProductoCiudadENAC
+                    {
+                        Opcion = "ListadoAledanoPrincipal",
+                        Productos = productosCsvAledano,
+                        CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                        Descuento = Convert.ToDecimal(txtValor.Text),
+                        Impuesto = _isv
+                    };
 
-            if (_TipoCosto == 1)
+                    dtgetInfoAledano = logica.SP_ProductosCiudadesENAC(getPreciosAledanos);
+                }
+            }
+            else if(_TipoCosto == 1)
             {
                 ProductoCiudadENAC getPreciosAledanos = new ProductoCiudadENAC
                 {
@@ -612,19 +660,7 @@ namespace ModuloVentasAdmin
 
                 dtgetInfoAledano = logica.SP_ProductosCiudadesENAC(getPreciosAledanos);
             }
-            else if (_TipoCosto == 2) 
-            {
-                ProductoClienteCostos getPreciosClienteCostos = new ProductoClienteCostos
-                {
-                    Opcion = "ListadoAledanoPrincipal",
-                    Productos = productosCsvAledano, // aquí ya va "00001,00002,00003"
-                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
-                    Descuento = Convert.ToDecimal(txtValor.Text),
-                    Cliente = _Cliente,
-                    Impuesto = _isv
-                };
-                dtgetInfoAledano = logica.SP_ProductosClienteCostos(getPreciosClienteCostos);
-            }
+           
         }
 
         private void btnVistaPrevia_Click(object sender, EventArgs e)
@@ -689,6 +725,7 @@ namespace ModuloVentasAdmin
 
             cargarPreciosPrincipalDetalle(); //Cargo detalle principales
             cargarPreciosAledanosDetalle(); //Cargo detalle Aledanos
+            button3.Enabled = true;
 
             if (tabControl1.SelectedTab == tabPage1)
             {
@@ -718,7 +755,34 @@ namespace ModuloVentasAdmin
         {
             string productosCsv = string.Join(",", productosSeleccionados.Select(p => p.ProductoID));
             decimal _isv = (chkISV.Checked) ? Convert.ToDecimal("0.15") : Convert.ToDecimal(0);
-            if (_TipoCosto == 1)
+
+               if (_TipoCosto == 2)
+            {
+                ProductoClienteCostos getPreciosClienteCostos = new ProductoClienteCostos
+                {
+                    Opcion = "ListadoPrincipalDetalle",
+                    Productos = productosCsv, // aquí ya va "00001,00002,00003"
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Descuento = Convert.ToDecimal(txtValor.Text),
+                    Cliente = _Cliente,
+                    Impuesto = _isv
+                };
+                dtgetInfoPrincipalDetalle = logica.SP_ProductosClienteCostos(getPreciosClienteCostos);
+                if (dtgetInfoPrincipalDetalle.Rows.Count <= 0) 
+                {
+                    ProductoCiudadENAC getPreciosDetalle = new ProductoCiudadENAC
+                    {
+                        Opcion = "ListadoPrincipalDetalle",
+                        Productos = productosCsv, // aquí ya va "00001,00002,00003"
+                        CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                        Descuento = Convert.ToDecimal(txtValor.Text),
+                        Impuesto = _isv
+                    };
+
+                    dtgetInfoPrincipalDetalle = logica.SP_ProductosCiudadesENAC(getPreciosDetalle);
+                }
+            }
+            else if(_TipoCosto == 1)
             {
                 ProductoCiudadENAC getPreciosDetalle = new ProductoCiudadENAC
                 {
@@ -731,19 +795,7 @@ namespace ModuloVentasAdmin
 
                 dtgetInfoPrincipalDetalle = logica.SP_ProductosCiudadesENAC(getPreciosDetalle);
             }
-            else if (_TipoCosto == 2) 
-            {
-                ProductoClienteCostos getPreciosClienteCostos = new ProductoClienteCostos
-                {
-                    Opcion = "ListadoPrincipalDetalle",
-                    Productos = productosCsv, // aquí ya va "00001,00002,00003"
-                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
-                    Descuento = Convert.ToDecimal(txtValor.Text),
-                    Cliente = _Cliente,
-                    Impuesto = _isv
-                };
-                dtgetInfoPrincipalDetalle = logica.SP_ProductosClienteCostos(getPreciosClienteCostos);
-            }
+          
 
             if (dtgetInfoPrincipalDetalle.Rows.Count > 0)
             {
@@ -776,7 +828,56 @@ namespace ModuloVentasAdmin
             string productosCsvAledanosDetalle = string.Join(",", productosSeleccionados.Select(p => p.ProductoID));
             decimal _isv = (chkISV.Checked) ? Convert.ToDecimal("0.15") : Convert.ToDecimal(0);
 
-            if (_TipoCosto == 1)
+              if (_TipoCosto == 2)
+            {
+                ProductoClienteCostos getPreciosClienteCostos = new ProductoClienteCostos
+                {
+                    Opcion = "ListadoAledanoDetalle",
+                    Productos = productosCsvAledanosDetalle, // aquí ya va "00001,00002,00003"
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Descuento = Convert.ToDecimal(txtValor.Text),
+                    Cliente = _Cliente,
+                    Impuesto = _isv
+                };
+                dtgetInfoAledanoDetalle = logica.SP_ProductosClienteCostos(getPreciosClienteCostos);
+
+                if (dtgetInfoAledanoDetalle.Rows.Count <= 0) 
+                {
+                    ProductoCiudadENAC getPreciosAledanosDetalle = new ProductoCiudadENAC
+                    {
+                        Opcion = "ListadoAledanoDetalle",
+                        Productos = productosCsvAledanosDetalle,
+                        CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                        Descuento = Convert.ToDecimal(txtValor.Text),
+                        Impuesto = _isv
+                    };
+
+                    dtgetInfoAledanoDetalle = logica.SP_ProductosCiudadesENAC(getPreciosAledanosDetalle);
+                }
+
+                ProductoClienteCostos getPreciosClienteCostosOUT = new ProductoClienteCostos
+                {
+                    Opcion = "ListadoAledanoDetalleRegistroOUT",
+                    Productos = productosCsvAledanosDetalle, // aquí ya va "00001,00002,00003"
+                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                    Descuento = Convert.ToDecimal(txtValor.Text),
+                    Cliente = _Cliente
+                };
+                dtgetInfoAledanoDetalleOUT = logica.SP_ProductosClienteCostos(getPreciosClienteCostosOUT);
+                if (dtgetInfoAledanoDetalleOUT.Rows.Count <= 0) 
+                {
+                    ProductoCiudadENAC getPreciosAledanosDetalleOUT = new ProductoCiudadENAC
+                    {
+                        Opcion = "ListadoAledanoDetalleRegistroOUT",
+                        Productos = productosCsvAledanosDetalle,
+                        CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
+                        Descuento = Convert.ToDecimal(txtValor.Text)
+                    };
+
+                    dtgetInfoAledanoDetalleOUT = logica.SP_ProductosCiudadesENAC(getPreciosAledanosDetalleOUT);
+                }
+            }
+            else if(_TipoCosto == 1)
             {
                 ProductoCiudadENAC getPreciosAledanosDetalle = new ProductoCiudadENAC
                 {
@@ -801,29 +902,7 @@ namespace ModuloVentasAdmin
                 dtgetInfoAledanoDetalleOUT = logica.SP_ProductosCiudadesENAC(getPreciosAledanosDetalleOUT);
 
             }
-            else if (_TipoCosto == 2)
-            {
-                ProductoClienteCostos getPreciosClienteCostos = new ProductoClienteCostos
-                {
-                    Opcion = "ListadoAledanoDetalle",
-                    Productos = productosCsvAledanosDetalle, // aquí ya va "00001,00002,00003"
-                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
-                    Descuento = Convert.ToDecimal(txtValor.Text),
-                    Cliente = _Cliente,
-                    Impuesto = _isv
-                };
-                dtgetInfoAledanoDetalle = logica.SP_ProductosClienteCostos(getPreciosClienteCostos);
-
-                ProductoClienteCostos getPreciosClienteCostosOUT = new ProductoClienteCostos
-                {
-                    Opcion = "ListadoAledanoDetalleRegistroOUT",
-                    Productos = productosCsvAledanosDetalle, // aquí ya va "00001,00002,00003"
-                    CiudadRemitente = cmbOrigen.SelectedValue.ToString(),
-                    Descuento = Convert.ToDecimal(txtValor.Text),
-                    Cliente = _Cliente
-                };
-                dtgetInfoAledanoDetalleOUT = logica.SP_ProductosClienteCostos(getPreciosClienteCostosOUT);
-            }
+           
 
             if (dtgetInfoAledanoDetalle.Rows.Count > 0)
             {
@@ -918,7 +997,9 @@ namespace ModuloVentasAdmin
 
         private void button3_Click(object sender, EventArgs e)
         {
+            _estaGuardando = false;
             ExportarTarifarioPDF();
+            //ExportarTarifarioPDFirma();
         }
         private void ExportarTarifarioPDF()
         {
@@ -1292,43 +1373,920 @@ namespace ModuloVentasAdmin
 
             doc.Close();
             writer.Close();
-            Process.Start(new ProcessStartInfo(rutaArchivo) { UseShellExecute = true });
+
+            if (_estaGuardando)
+            {
+                string rutaDestino = @"\\192.168.1.179\CotizacionesEspecificas";
+                Directory.CreateDirectory(rutaDestino);
+
+                string nombreArchivo = "SolicitudDescuento-" + _Cliente + "-" + _IDGenerado + ".pdf";
+                string path = Path.Combine(rutaDestino, nombreArchivo);
+                _RutaArchivo = path;
+                _NombreArchivo = nombreArchivo;
+
+                File.Copy(rutaArchivo, path, true); 
+            }
+            else
+            {
+                Process.Start(new ProcessStartInfo(rutaArchivo) { UseShellExecute = true });
+            }
+        }
+        private void ExportarTarifarioPDFirma()
+        {
+            string rutaEscritorio = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string rutaArchivo = Path.Combine(rutaEscritorio, "Tarifario.pdf");
+
+            Document doc = new Document(PageSize.LETTER, 40, 40, 20, 20);
+            PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream(rutaArchivo, FileMode.Create));
+            doc.Open();
+
+            var fontCell = FontFactory.GetFont(FontFactory.HELVETICA, 9);
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 ENCABEZADO
+            // ─────────────────────────────────────────────────────────
+            PdfPTable headerTable = new PdfPTable(3);
+            headerTable.WidthPercentage = 100;
+            headerTable.SetWidths(new float[] { 135f, 200f, 135f });
+
+            iTextSharp.text.Image logoIzq = iTextSharp.text.Image.GetInstance(@"\\192.168.1.179\Logos\RCHondurasColor.png");
+            logoIzq.ScaleAbsolute(135, 40);
+            headerTable.AddCell(new PdfPCell(logoIzq)
+            {
+                Border = iTextSharp.text.Rectangle.NO_BORDER,
+                HorizontalAlignment = Element.ALIGN_LEFT,
+                VerticalAlignment = Element.ALIGN_MIDDLE
+            });
+
+            headerTable.AddCell(new PdfPCell(new Phrase("COTIZACION",
+                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16)))
+            {
+                Border = iTextSharp.text.Rectangle.NO_BORDER,
+                HorizontalAlignment = Element.ALIGN_CENTER,
+                VerticalAlignment = Element.ALIGN_MIDDLE
+            });
+
+            iTextSharp.text.Image logoDer = iTextSharp.text.Image.GetInstance(@"\\192.168.1.179\Logos\RCPaqueteria.png");
+            logoDer.ScaleAbsolute(135, 40);
+            headerTable.AddCell(new PdfPCell(logoDer)
+            {
+                Border = iTextSharp.text.Rectangle.NO_BORDER,
+                HorizontalAlignment = Element.ALIGN_RIGHT,
+                VerticalAlignment = Element.ALIGN_MIDDLE
+            });
+            doc.Add(headerTable);
+            doc.Add(new Paragraph("\n"));
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 CLIENTE / FECHA
+            // ─────────────────────────────────────────────────────────
+            PdfPTable clienteFechaTable = new PdfPTable(2);
+            clienteFechaTable.WidthPercentage = 100;
+            clienteFechaTable.SetWidths(new float[] { 250f, 180f });
+            clienteFechaTable.AddCell(new PdfPCell(new Phrase("CLIENTE: " + txtNombreCliente.Text, fontCell))
+            { Border = iTextSharp.text.Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_LEFT, PaddingBottom = 2f });
+            clienteFechaTable.AddCell(new PdfPCell(new Phrase("FECHA: " + DateTime.Now.ToString("dd/MM/yyyy"), fontCell))
+            { Border = iTextSharp.text.Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_RIGHT, PaddingBottom = 2f });
+            doc.Add(clienteFechaTable);
+
+            PdfPTable atencionTable = new PdfPTable(2);
+            atencionTable.WidthPercentage = 100;
+            atencionTable.SetWidths(new float[] { 250f, 200f });
+            atencionTable.AddCell(new PdfPCell(new Phrase("ATENCIÓN:  " + txtNombreCliente.Text, fontCell))
+            { Border = iTextSharp.text.Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_LEFT, PaddingBottom = 2f });
+            atencionTable.AddCell(new PdfPCell(new Phrase("CÓDIGO:  " + _Cliente.ToString(), fontCell))
+            { Border = iTextSharp.text.Rectangle.NO_BORDER, HorizontalAlignment = Element.ALIGN_RIGHT, PaddingBottom = 2f });
+            doc.Add(atencionTable);
+            doc.Add(new Paragraph("\n"));
+
+            // ══════════════════════════════════════════════════════════════
+            // 🎛️  VARIABLES DE CONTROL
+            // ══════════════════════════════════════════════════════════════
+            float tablaOffsetDesdeTop = 140f;
+            float offsetTerminos = 65f;
+
+            PdfContentByte cb = writer.DirectContent;
+            BaseFont bf = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
+            BaseFont bfBold = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, BaseFont.CP1252, false);
+
+            float startX = 40f;
+            float pageWidth = doc.PageSize.Width - 80f;
+            float startY = doc.PageSize.Height - tablaOffsetDesdeTop;
+
+            // ──────────────────────────────────────────────────────────────
+            // 🔹 MEDIDAS DE LA TABLA
+            // ──────────────────────────────────────────────────────────────
+            float anchoDestinos = 195f;
+            float anchoProducto = 80f;
+            float anchoAledano = 50f;
+            float headerHeightTop = 14f;
+            float headerHeight = 60f;
+            float campoMedida = 14f;
+            float fontSizeCiudad = 8f;
+            float lineHeight = fontSizeCiudad + 3f;
+            float rowPaddingV = 3f;
+
+            int productosPorHoja = 4;
+            int columnasPorProducto = 2;
+            int totalProductos = dgvTarifario.Columns.Cast<DataGridViewColumn>().Count(c => c.Name.StartsWith("Prod_"));
+            int totalBloques = (int)Math.Ceiling((double)totalProductos / productosPorHoja);
+
+            float yPosFinalGlobal = startY;
+
+            for (int bloque = 0; bloque < totalBloques; bloque++)
+            {
+                var columnasBloque = dgvTarifario.Columns.Cast<DataGridViewColumn>()
+                    .Where(c => c.Name.StartsWith("Prod_") || c.Name.StartsWith("ALEDAÑO_"))
+                    .Skip(bloque * productosPorHoja * columnasPorProducto)
+                    .Take(productosPorHoja * columnasPorProducto)
+                    .ToList();
+
+                float anchoTotal = anchoDestinos + columnasBloque.Count(c => c.Name.StartsWith("Prod_")) * anchoProducto
+                                 + columnasBloque.Count(c => c.Name.StartsWith("ALEDAÑO_")) * anchoAledano;
+
+                float factor = anchoTotal > pageWidth ? pageWidth / anchoTotal : 1f;
+                float aD = anchoDestinos * factor;
+                float aP = anchoProducto * factor;
+                float aA = anchoAledano * factor;
+
+                float firstProdX = startX + aD;
+                float totalWidth = columnasBloque.Count(c => c.Name.StartsWith("Prod_")) * aP
+                                 + columnasBloque.Count(c => c.Name.StartsWith("ALEDAÑO_")) * aA;
+
+                float dimTop = startY;
+                float dimBottom = dimTop - headerHeightTop;
+                float nomTop = dimBottom;
+                float nomBottom = nomTop - headerHeight;
+
+                DrawRect(cb, firstProdX, dimBottom, totalWidth, headerHeightTop);
+                DrawTextCenter(cb, bf, 7f, "DIMENSIONES Y PESO DE CAJA", firstProdX, dimBottom, totalWidth, headerHeightTop);
+
+                float altaHeader = headerHeightTop + headerHeight;
+                DrawRect(cb, startX, nomBottom, aD, altaHeader);
+                DrawTextCenter(cb, bfBold, 8f, dgvTarifario.Columns[0].HeaderText, startX, nomBottom, aD, altaHeader);
+
+                float x = startX + aD;
+
+                foreach (var col in columnasBloque)
+                {
+                    float cw = col.Name.StartsWith("Prod_") ? aP : aA;
+                    DrawRect(cb, x, nomBottom, cw, headerHeight);
+
+                    if (col.Name.StartsWith("ALEDAÑO_") || col.HeaderText == "ALEDAÑO")
+                    {
+                        float ty = nomTop - 10f;
+                        foreach (char ch in "ALEDAÑO")
+                        {
+                            ColumnText.ShowTextAligned(cb, Element.ALIGN_CENTER,
+                                new Phrase(ch.ToString(), new iTextSharp.text.Font(bf, 6f, iTextSharp.text.Font.BOLD)),
+                                x + cw / 2f, ty, 0);
+                            ty -= 7f;
+                        }
+                    }
+                    else if (col.Name.StartsWith("Prod_"))
+                    {
+                        ColumnText ctNombre = new ColumnText(cb);
+                        ctNombre.SetSimpleColumn(new Phrase(col.HeaderText, new iTextSharp.text.Font(bfBold, 8f)),
+                            x + 2f, nomBottom + campoMedida, x + cw - 2f, nomTop, 10f, Element.ALIGN_CENTER);
+                        ctNombre.Go();
+
+                        DrawRect(cb, x, nomBottom, cw, campoMedida);
+
+                        string medida = "";
+                        if (dtProducto != null)
+                        {
+                            var rowMedida = dtProducto.AsEnumerable().FirstOrDefault(r => r["Nombre"].ToString() == col.HeaderText);
+                            if (rowMedida != null) medida = rowMedida["Descripcion"].ToString();
+                        }
+                        if (!string.IsNullOrEmpty(medida))
+                            DrawTextCenter(cb, bf, 7f, medida, x, nomBottom, cw, campoMedida);
+                    }
+                    x += cw;
+                }
+
+                float yPos = nomBottom;
+
+                foreach (DataGridViewRow row in dgvTarifario.Rows)
+                {
+                    if (row.IsNewRow) continue;
+
+                    float maxHeight = lineHeight + 15 + rowPaddingV * 2;
+                    var cellDestino = row.Cells[0];
+                    if (cellDestino.Value != null)
+                    {
+                        string textoDestino = cellDestino.Value.ToString();
+                        int lineas = textoDestino.Split('\n').Length;
+                        float hCalc = lineas * lineHeight + rowPaddingV * 2;
+                        if (hCalc > maxHeight) maxHeight = hCalc;
+                    }
+
+                    float xPos = startX;
+                    foreach (DataGridViewCell cell in row.Cells)
+                    {
+                        bool esDestino = cell.OwningColumn == dgvTarifario.Columns[0];
+                        bool esBloque = columnasBloque.Contains(cell.OwningColumn);
+                        if (!esDestino && !esBloque) continue;
+
+                        float cw = esDestino ? aD : cell.OwningColumn.Name.StartsWith("Prod_") ? aP :
+                                   cell.OwningColumn.Name.StartsWith("ALEDAÑO_") ? aA : aD;
+
+                        string texto = cell.Value?.ToString() ?? "";
+                        DrawRect(cb, xPos, yPos - maxHeight, cw, maxHeight);
+
+                        ColumnText ct = new ColumnText(cb);
+                        ct.SetSimpleColumn(new Phrase(texto, new iTextSharp.text.Font(bf, fontSizeCiudad)),
+                            xPos + 2f, yPos - maxHeight + rowPaddingV, xPos + cw - 2f, yPos - rowPaddingV, lineHeight,
+                            esDestino ? Element.ALIGN_LEFT : Element.ALIGN_CENTER);
+                        ct.Go();
+
+                        xPos += cw;
+                    }
+
+                    yPos -= maxHeight;
+                    if (yPos < 130f)
+                    {
+                        doc.NewPage();
+                        yPos = doc.PageSize.Height - 60f;
+                        startY = yPos;
+                    }
+                }
+
+                yPosFinalGlobal = yPos;
+                if (bloque < totalBloques - 1)
+                {
+                    doc.NewPage();
+                    startY = doc.PageSize.Height - 60f;
+                    yPosFinalGlobal = startY;
+                }
+            }
+
+            // ══════════════════════════════════════════════════════════════
+            // ✅ SINCRONIZAR
+            // ══════════════════════════════════════════════════════════════
+            float yDespuesTabla = yPosFinalGlobal + offsetTerminos;
+            if (yDespuesTabla < 130f)
+            {
+                doc.NewPage();
+            }
+            else
+            {
+                float yInicioDoc = doc.PageSize.Height - doc.TopMargin;
+                float espacioOcupado = yInicioDoc - yDespuesTabla;
+                if (espacioOcupado > 0)
+                {
+                    PdfPTable spacer = new PdfPTable(1);
+                    spacer.WidthPercentage = 100;
+                    spacer.AddCell(new PdfPCell(new Phrase(" "))
+                    {
+                        Border = iTextSharp.text.Rectangle.NO_BORDER,
+                        FixedHeight = espacioOcupado,
+                        MinimumHeight = espacioOcupado
+                    });
+                    doc.Add(spacer);
+                }
+            }
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 TÉRMINOS
+            // ─────────────────────────────────────────────────────────
+            if (dtTerminos != null && dtTerminos.Rows.Count > 0)
+            {
+                doc.Add(new Paragraph("TERMINOS Y NEGOCIACIONES ESPECIALES",
+                    FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 10)));
+                doc.Add(new Paragraph(chkISV.Checked ? "PRECIOS YA INCLUYEN IMPUESTOS SOBRE VENTAS"
+                        : "PRECIOS NO INCLUYEN IMPUESTOS SOBRE VENTAS",
+                    FontFactory.GetFont(FontFactory.HELVETICA, 8)));
+                foreach (DataRow row in dtTerminos.Rows)
+                    doc.Add(new Paragraph("- " + row["Descripcion"].ToString(),
+                        FontFactory.GetFont(FontFactory.HELVETICA, 8)));
+            }
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 FIRMAS ALINEADAS
+            // ─────────────────────────────────────────────────────────
+            doc.Add(new Paragraph("\n\n"));
+            PdfPTable firmasTable = new PdfPTable(2);
+            firmasTable.WidthPercentage = 100;
+            firmasTable.SetWidths(new float[] { 250f, 250f });
+
+            // ✅ IZQUIERDA - con firma
+            PdfPCell cellIzq = new PdfPCell
+            {
+                Border = iTextSharp.text.Rectangle.NO_BORDER,
+                HorizontalAlignment = Element.ALIGN_CENTER,
+                VerticalAlignment = Element.ALIGN_TOP
+            };
+
+            try
+            {
+                iTextSharp.text.Image firmaNancy = iTextSharp.text.Image.GetInstance(@"\\192.168.1.179\Logos\NancyFirma.png");
+                firmaNancy.ScaleAbsolute(100f, 35f);
+                firmaNancy.Alignment = Element.ALIGN_CENTER;
+                firmaNancy.SpacingAfter = -15f;  // ← SIN espacio después
+                cellIzq.AddElement(firmaNancy);
+            }
+            catch
+            {
+                // Si falla, agregar espacio vacío
+                cellIzq.AddElement(new Paragraph(" ") { Leading = 35f, SpacingAfter = 0f });
+            }
+
+            Paragraph lineaIzq = new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(1f, 60f, BaseColor.BLACK, Element.ALIGN_CENTER, -2)));
+            lineaIzq.SpacingBefore = 0f;  // ← SIN espacio antes (pegado a la firma)
+            lineaIzq.SpacingAfter = 3f;
+            cellIzq.AddElement(lineaIzq);
+
+            cellIzq.AddElement(new Paragraph("Autorizado", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9))
+            { Alignment = Element.ALIGN_CENTER, SpacingAfter = 2f });
+            cellIzq.AddElement(new Paragraph("Nancy D. Valle", FontFactory.GetFont(FontFactory.HELVETICA, 8))
+            { Alignment = Element.ALIGN_CENTER, SpacingAfter = 2f });
+            cellIzq.AddElement(new Paragraph("GERENTE ADMINISTRATIVO", FontFactory.GetFont(FontFactory.HELVETICA, 8))
+            { Alignment = Element.ALIGN_CENTER });
+            firmasTable.AddCell(cellIzq);
+
+            // ✅ DERECHA - sin firma (espacio vacío para alinear)
+            PdfPCell cellDer = new PdfPCell
+            {
+                Border = iTextSharp.text.Rectangle.NO_BORDER,
+                HorizontalAlignment = Element.ALIGN_CENTER,
+                VerticalAlignment = Element.ALIGN_TOP
+            };
+
+            // Espacio vacío igual que la firma de la izquierda
+            cellDer.AddElement(new Paragraph(" ") { Leading = 35f, SpacingAfter = 0f });
+
+            Paragraph lineaDer = new Paragraph(new Chunk(new iTextSharp.text.pdf.draw.LineSeparator(1f, 60f, BaseColor.BLACK, Element.ALIGN_CENTER, -2)));
+            lineaDer.SpacingBefore = 0f;
+            lineaDer.SpacingAfter = 3f;
+            cellDer.AddElement(lineaDer);
+
+            cellDer.AddElement(new Paragraph("Aprobado Por Cliente", FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 9))
+            { Alignment = Element.ALIGN_CENTER, SpacingAfter = 2f });
+            cellDer.AddElement(new Paragraph("Firma y Sello", FontFactory.GetFont(FontFactory.HELVETICA, 8))
+            { Alignment = Element.ALIGN_CENTER, SpacingAfter = 2f });
+            cellDer.AddElement(new Paragraph(txtNombreCliente.Text, FontFactory.GetFont(FontFactory.HELVETICA, 8))
+            { Alignment = Element.ALIGN_CENTER });
+            firmasTable.AddCell(cellDer);
+
+            doc.Add(firmasTable);
+
+            doc.Close();
+            writer.Close();
+
+            if (_estaGuardando)
+            {
+                string rutaDestino = @"\\192.168.1.179\CotizacionesEspecificas";
+                Directory.CreateDirectory(rutaDestino);
+                string nombreArchivo = "SolicitudDescuento-" + _Cliente + "-" + _IDGenerado+"-aprobado" + ".pdf";
+                string path = Path.Combine(rutaDestino, nombreArchivo);
+                _RutaArchivo = path;
+                _NombreArchivo = nombreArchivo;
+                File.Copy(rutaArchivo, path, true);
+            }
+            else
+            {
+                Process.Start(new ProcessStartInfo(rutaArchivo) { UseShellExecute = true });
+            }
         }
 
-        // ─────────────────────────────────────────────────────────────────────────────
-        // 🔧 HELPERS
-        // ─────────────────────────────────────────────────────────────────────────────
-
-        /// <summary>Dibuja un rectángulo sin relleno.</summary>
         private void DrawRect(PdfContentByte cb, float x, float y, float w, float h)
         {
             cb.Rectangle(x, y, w, h);
             cb.Stroke();
         }
 
-        /// <summary>Escribe texto centrado horizontal y verticalmente dentro de un área.</summary>
-        private void DrawTextCenter(PdfContentByte cb, BaseFont font, float fontSize,
-            string text, float x, float y, float w, float h)
+        private void DrawTextCenter(PdfContentByte cb, BaseFont font, float fontSize, string text, float x, float y, float w, float h)
         {
             ColumnText ct = new ColumnText(cb);
-            ct.SetSimpleColumn(
-                new Phrase(text, new iTextSharp.text.Font(font, fontSize)),
-                x + 2f, y + 2f,
-                x + w - 2f, y + h - 2f,
-                fontSize + 2f,
-                Element.ALIGN_CENTER
-            );
+            ct.SetSimpleColumn(new Phrase(text, new iTextSharp.text.Font(font, fontSize)),
+                x + 2f, y + 2f, x + w - 2f, y + h - 2f, fontSize + 2f, Element.ALIGN_CENTER);
             ct.Go();
         }
 
 
-        // ─────────────────────────────────────────────────────────────────────────
-        // 🔹 HELPERS  ─  dibujar rectángulo y texto centrado (simplifican el código)
-        // ─────────────────────────────────────────────────────────────────────────
-
-
-        private void btnGuardar_Click(object sender, EventArgs e)
+        private void rdbNombreH_CheckedChanged(object sender, EventArgs e)
         {
+            if (rdbNombreH.Checked)
+            {
+                Form MensajeAdvertencia = new Form();
+                using (frmBuscarClientes Mensaje = new frmBuscarClientes())
+                {
+                    MensajeAdvertencia.StartPosition = FormStartPosition.CenterScreen;
+                    MensajeAdvertencia.FormBorderStyle = FormBorderStyle.None;
+                    MensajeAdvertencia.Opacity = .70d;
+                    MensajeAdvertencia.BackColor = Color.Black;
+                    MensajeAdvertencia.WindowState = FormWindowState.Maximized;
+                    MensajeAdvertencia.Location = this.Location;
+                    MensajeAdvertencia.ShowInTaskbar = false;
+                    Mensaje.Owner = MensajeAdvertencia;
+                    MensajeAdvertencia.Show();
+
+                    if (Mensaje.ShowDialog() == DialogResult.OK)
+                    {
+                        if (Mensaje.ClienteId != 0)
+                        {
+                            txtNombreHistorico.Text = Mensaje.ClienteNombre;
+                            txtCodigoCliente.Text = Mensaje.ClienteId.ToString();
+                            _NombreHistorico = Mensaje.ClienteNombre;
+                            _ClienteHistorico = Mensaje.ClienteId.ToString();
+                            cargarClienteHistorico("RecuperarPorNombre");
+                        }
+                    }
+                    MensajeAdvertencia.Dispose();
+                    rdbCodigoH.Checked = true;
+                }
+            }
+        }
+
+        private void txtCodigoCliente_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtCodigoCliente_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.Tab)
+            {
+                e.IsInputKey = true; // 🔹 obliga a tratar Tab como tecla de entrada
+            }
+        }
+
+        private void dgvHistorico_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            GenerarDocumento();
+        }
+        private void GenerarDocumento()
+        {
+            if (dgvHistorico.Rows.Count > 0)
+            {
+                string rutaDestino = @"\\192.168.1.179\CotizacionesEspecificas";
+                Directory.CreateDirectory(rutaDestino);
+                string nombreArchivo = null;
+                 
+                nombreArchivo = "SolicitudDescuento-" + dgvHistorico.CurrentRow.Cells["Cliente"].Value.ToString() + "-" + dgvHistorico.CurrentRow.Cells["DescuentoID"].Value.ToString() + ".pdf";
+
+                string path = Path.Combine(rutaDestino, nombreArchivo);
+
+                Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+                Toast.Mostrar("Archivo generado correctamente.", TipoAlerta.Warning);
+            }
+            else
+            {
+                Toast.Mostrar("No existen registros en su tabla para visualizar.", TipoAlerta.Warning);
+            }
+        }
+
+        private void btnGenerarPDF_Click(object sender, EventArgs e)
+        {
+            GenerarDocumento();
+        }
+
+        private void dtpDesde_ValueChanged(object sender, EventArgs e)
+        {
+            cargarRegeistroBase();
+        }
+        
+        private void cargarRegeistroBase() 
+        {
+            if (dtpHasta.Value.Date < dtpDesde.Value.Date)
+            {
+                Toast.Mostrar("La fecha hasta es menor a la fecha desde.", TipoAlerta.Warning);
+                return;
+            }
+            if (String.IsNullOrEmpty(txtCodigoCliente.Text) || String.IsNullOrWhiteSpace(txtCodigoCliente.Text))
+            {
+                cargarClienteHistorico("RecuperarPorRangoFechasNoCliente");
+
+            }
+            else
+            {
+                cargarClienteHistorico("RecuperarPorRangoFechasCliente");
+            }
+        }
+        private void btnLimpiarHistorico_Click(object sender, EventArgs e)
+        {
+            _ClienteHistorico = String.Empty;
+            _NombreHistorico = String.Empty;
+            txtNombreHistorico.Text = String.Empty;
+            txtCodigoCliente.Text = String.Empty;   
+        }
+
+        private void dtpHasta_ValueChanged(object sender, EventArgs e)
+        {
+            cargarRegeistroBase();
+        }
+
+        private void txtCodigoCliente_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.Tab)
+            {
+                if (String.IsNullOrWhiteSpace(txtCodigoCliente.Text) || String.IsNullOrEmpty(txtCodigoCliente.Text))
+                    return;
+
+                e.SuppressKeyPress = true;
+                _ClienteHistorico = txtCodigoCliente.Text;
+                _NombreHistorico = String.Empty;
+                cargarClienteHistorico("RecuperarPorCodigo");
+
+                if (dtClienteHistorico.Rows.Count > 0)
+                {
+                    txtCodigoCliente.Text = _ClienteHistorico;
+                    txtNombreHistorico.Text = _NombreHistorico;
+                }
+
+                txtNombreHistorico.Focus();
+            }
+        }
+
+
+        private void cargarClienteHistorico(string _TipoBusqueda)
+        {
+            CotizacionDescuento getHistorico = new CotizacionDescuento
+            {
+                Opcion = _TipoBusqueda,
+                Cliente = _ClienteHistorico,
+                FechaDesde = dtpDesde.Value.Date,
+                FechaHasta = dtpHasta.Value.Date,
+                Nombre = _NombreHistorico
+            };
+            dtClienteHistorico = null;
+            dtClienteHistorico = logica.SP_CotizacionDescuento(getHistorico);
+
+            if (dtClienteHistorico.Rows.Count > 0)
+            {
+                dgvHistorico.DataSource = dtClienteHistorico;
+                _ClienteHistorico = dtClienteHistorico.Rows[0]["Cliente"].ToString();
+                _NombreHistorico = dtClienteHistorico.Rows[0]["Nombre"].ToString();
+
+                dgvHistorico.Columns["DescuentoID"].Visible = false;
+                dgvHistorico.Columns["Cliente"].Width = 60;
+                dgvHistorico.Columns["Nombre"].Width = 200;
+                dgvHistorico.Columns["Descuento"].Width = 50;
+                dgvHistorico.Columns["Solicitado"].Width = 100;
+
+                Toast.Mostrar("Clientes cargados correctamente.", TipoAlerta.Success);
+            }
+            else
+            {
+                dgvHistorico.DataSource = null;
+                Toast.Mostrar("No se encontraron registros con estos datos.", TipoAlerta.Warning);
+                return;
+            }
+        }
+
+        private void txtProducto_KeyUp(object sender, KeyEventArgs e)
+        {
+            string filtro = txtProducto.Text.Trim();
+
+            if (dtProducto != null && dgvProducto.Rows.Count > 0)
+            {
+                DataView dv = new DataView(dtProducto);
+                dv.RowFilter = string.Format("Convert(Producto, 'System.String') = '{0}%' OR Nombre LIKE '%{0}%'", filtro.Replace("'", "''"));
+
+                dgvProducto.DataSource = dv;
+            }
+        }
+
+        // ══════════════════════════════════════════════════════════════════
+        // 🔹 MÉTODO PARA INSERTAR FIRMA EN PDF EXISTENTE
+        // ══════════════════════════════════════════════════════════════════
+
+
+        /// <summary>
+        /// Abre un PDF existente, inserta la firma de Nancy en la posición correcta,
+        /// y reemplaza el archivo original en el servidor.
+        /// </summary>
+        /// <param name="rutaPDFOriginal">Ruta completa del PDF existente</param>
+        private void InsertarFirmaEnPDFExistente(string rutaPDFOriginal)
+    {
+        try
+        {
+            // Validar que el archivo existe
+            if (!File.Exists(rutaPDFOriginal))
+            {
+                Toast.Mostrar($"No se encontró el archivo: {rutaPDFOriginal}", TipoAlerta.Error);
+                return;
+            }
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 CREAR PDF TEMPORAL
+            // ─────────────────────────────────────────────────────────
+            string rutaTemporal = Path.Combine(Path.GetTempPath(),
+                "temp_" + Path.GetFileName(rutaPDFOriginal));
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 ABRIR PDF EXISTENTE Y CREAR NUEVO PDF CON LA FIRMA
+            // ─────────────────────────────────────────────────────────
+            PdfReader reader = new PdfReader(rutaPDFOriginal);
+            PdfStamper stamper = new PdfStamper(reader, new FileStream(rutaTemporal, FileMode.Create));
+
+            // Obtener la ÚLTIMA página (donde están las firmas)
+            int totalPaginas = reader.NumberOfPages;
+
+            // Obtener el contenido de la última página
+            PdfContentByte canvas = stamper.GetOverContent(totalPaginas);
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 CARGAR IMAGEN DE LA FIRMA
+            // ─────────────────────────────────────────────────────────
+            try
+            {
+                iTextSharp.text.Image firmaNancy = iTextSharp.text.Image.GetInstance(
+                    @"\\192.168.1.179\Logos\NancyFirma.png");
+
+                // ─────────────────────────────────────────────────────
+                // 🔹 CALCULAR POSICIÓN DE LA FIRMA
+                // ─────────────────────────────────────────────────────
+
+                // Tamaño de página Letter: 612 x 792 puntos
+                float pageWidth = reader.GetPageSize(totalPaginas).Width;   // 612
+                float pageHeight = reader.GetPageSize(totalPaginas).Height; // 792
+
+                // Posición de la firma (izquierda, sobre la línea "Autorizado")
+                // Ajustar según dónde esté tu línea de firma
+                float xFirma = 120f;  // posición X (desde la izquierda)
+                float yFirma = 160f;  // posición Y (desde abajo)
+
+                // Tamaño de la firma
+                float anchoFirma = 100f;
+                float altoFirma = 35f;
+
+                // Escalar imagen
+                firmaNancy.ScaleAbsolute(anchoFirma, altoFirma);
+
+                // Posicionar imagen
+                firmaNancy.SetAbsolutePosition(xFirma, yFirma);
+
+                // ─────────────────────────────────────────────────────
+                // 🔹 INSERTAR FIRMA EN EL PDF
+                // ─────────────────────────────────────────────────────
+                canvas.AddImage(firmaNancy);
+
+                Toast.Mostrar("Firma insertada correctamente", TipoAlerta.Success);
+            }
+            catch (Exception exImg)
+            {
+                // Si no se encuentra la imagen, continuar sin ella
+                Toast.Mostrar($"No se pudo cargar la firma: {exImg.Message}", TipoAlerta.Warning);
+            }
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 CERRAR Y GUARDAR
+            // ─────────────────────────────────────────────────────────
+            stamper.Close();
+            reader.Close();
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 REEMPLAZAR ARCHIVO ORIGINAL CON EL NUEVO
+            // ─────────────────────────────────────────────────────────
+
+            // Eliminar archivo original
+            File.Delete(rutaPDFOriginal);
+
+            // Mover temporal al lugar del original
+            File.Move(rutaTemporal, rutaPDFOriginal);
+
+            Toast.Mostrar("PDF actualizado con firma", TipoAlerta.Success);
+        }
+        catch (Exception ex)
+        {
+            Toast.Mostrar($"Error al insertar firma: {ex.Message}", TipoAlerta.Error);
+            MessageBox.Show($"Detalle del error:\n{ex.StackTrace}",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // 🔹 MÉTODO ACTUALIZADO: GenerarDocumento() CON INSERCIÓN DE FIRMA
+    // ══════════════════════════════════════════════════════════════════
+
+    private void GenerarDocumentoAgregarFirma()
+    {
+        if (dgvHistorico.Rows.Count > 0)
+        {
+            string rutaDestino = @"\\192.168.1.179\CotizacionesEspecificas";
+            Directory.CreateDirectory(rutaDestino);
+
+            string nombreArchivo = null;
+            string estado = dgvHistorico.CurrentRow.Cells["Estado"].Value.ToString();
+            string cliente = dgvHistorico.CurrentRow.Cells["Cliente"].Value.ToString();
+            string descuentoID = dgvHistorico.CurrentRow.Cells["DescuentoID"].Value.ToString();
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 DETERMINAR NOMBRE DEL ARCHIVO SEGÚN ESTADO
+            // ─────────────────────────────────────────────────────────
+            if (estado == "Solicitado")
+            {
+                nombreArchivo = $"SolicitudDescuento-{cliente}-{descuentoID}.pdf";
+            }
+            else if (estado == "Aprobado")
+            {
+                nombreArchivo = $"SolicitudDescuento-{cliente}-{descuentoID}.pdf";
+            }
+            else
+            {
+                nombreArchivo = $"SolicitudDescuento-{cliente}-{descuentoID}.pdf";
+            }
+
+            string rutaCompleta = Path.Combine(rutaDestino, nombreArchivo);
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 SI ES APROBADO, INSERTAR FIRMA ANTES DE ABRIR
+            // ─────────────────────────────────────────────────────────
+            if (estado == "Aprobado")
+            {
+                InsertarFirmaEnPDFExistente(rutaCompleta);
+            }
+
+            // ─────────────────────────────────────────────────────────
+            // 🔹 ABRIR PDF
+            // ─────────────────────────────────────────────────────────
+            if (File.Exists(rutaCompleta))
+            {
+                Process.Start(new ProcessStartInfo(rutaCompleta) { UseShellExecute = true });
+                Toast.Mostrar("Archivo abierto correctamente.", TipoAlerta.Success);
+            }
+            else
+            {
+                Toast.Mostrar("No se encontró el archivo PDF.", TipoAlerta.Error);
+            }
+        }
+        else
+        {
+            Toast.Mostrar("No existen registros en su tabla para visualizar.", TipoAlerta.Warning);
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // 🔹 MÉTODO ALTERNATIVO: INSERTAR FIRMA AL MOMENTO DE APROBAR
+    // ══════════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Método que se ejecuta cuando se aprueba un descuento.
+    /// Inserta la firma automáticamente en ese momento.
+    /// </summary>
+    private void AprobarDescuentoConFirma(string descuentoID, string clienteID)
+    {
+        try
+        {
+            // 1. Actualizar estado en BD
+            // ... tu código de aprobación aquí ...
+
+            // 2. Construir ruta del PDF
+            string rutaDestino = @"\\192.168.1.179\CotizacionesEspecificas";
+            string nombreOriginal = $"SolicitudDescuento-{clienteID}-{descuentoID}.pdf";
+            string nombreAprobado = $"SolicitudDescuento-{clienteID}-{descuentoID}-Aprobado.pdf";
+
+            string rutaOriginal = Path.Combine(rutaDestino, nombreOriginal);
+            string rutaAprobado = Path.Combine(rutaDestino, nombreAprobado);
+
+            // 3. Copiar el PDF con nuevo nombre
+            if (File.Exists(rutaOriginal))
+            {
+                File.Copy(rutaOriginal, rutaAprobado, true);
+            }
+
+            // 4. Insertar firma en el PDF aprobado
+            InsertarFirmaEnPDFExistente(rutaAprobado);
+
+            Toast.Mostrar("Descuento aprobado y firmado correctamente", TipoAlerta.Success);
+        }
+        catch (Exception ex)
+        {
+            Toast.Mostrar($"Error al aprobar: {ex.Message}", TipoAlerta.Error);
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // 🔹 MÉTODO AVANZADO: ENCONTRAR POSICIÓN EXACTA DE LA LÍNEA
+    // ══════════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Versión mejorada que busca automáticamente dónde está la línea de firma
+    /// para posicionar la imagen justo encima.
+    /// </summary>
+    private void InsertarFirmaEnPDFExistenteV2(string rutaPDFOriginal)
+    {
+        try
+        {
+            if (!File.Exists(rutaPDFOriginal))
+            {
+                Toast.Mostrar($"No se encontró el archivo", TipoAlerta.Error);
+                return;
+            }
+
+            string rutaTemporal = Path.Combine(Path.GetTempPath(),
+                "temp_" + Path.GetFileName(rutaPDFOriginal));
+
+            PdfReader reader = new PdfReader(rutaPDFOriginal);
+            PdfStamper stamper = new PdfStamper(reader, new FileStream(rutaTemporal, FileMode.Create));
+
+            int totalPaginas = reader.NumberOfPages;
+            PdfContentByte canvas = stamper.GetOverContent(totalPaginas);
+
+            try
+            {
+                iTextSharp.text.Image firmaNancy = iTextSharp.text.Image.GetInstance(
+                    @"\\192.168.1.179\Logos\NancyFirma.png");
+
+                // ─────────────────────────────────────────────────────
+                // 🔹 POSICIONES CALCULADAS PARA PÁGINA LETTER
+                // ─────────────────────────────────────────────────────
+
+                // Página Letter: 612 x 792 puntos
+                // Margen izquierdo del documento: 40 puntos
+                // Ancho de columna de firmas: ~250 puntos
+
+                // Posición X: centro de la columna izquierda de firmas
+                float xFirma = 40f + (250f / 2f) - (100f / 2f);  // centrado en columna
+
+                // Posición Y: aproximadamente donde está la línea
+                // (ajustar según tu layout específico)
+                float yFirma = 90f;  // desde el borde inferior de la página
+
+                firmaNancy.ScaleAbsolute(100f, 35f);
+                firmaNancy.SetAbsolutePosition(xFirma, yFirma);
+                canvas.AddImage(firmaNancy);
+            }
+            catch (Exception exImg)
+            {
+                Toast.Mostrar($"No se pudo cargar firma: {exImg.Message}", TipoAlerta.Warning);
+            }
+
+            stamper.Close();
+            reader.Close();
+
+            File.Delete(rutaPDFOriginal);
+            File.Move(rutaTemporal, rutaPDFOriginal);
+
+            Toast.Mostrar("PDF actualizado", TipoAlerta.Success);
+        }
+        catch (Exception ex)
+        {
+            Toast.Mostrar($"Error: {ex.Message}", TipoAlerta.Error);
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // 🔹 HERRAMIENTA DE AYUDA: VISUALIZAR COORDENADAS DEL PDF
+    // ══════════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Método auxiliar para encontrar las coordenadas exactas.
+    /// Dibuja una cuadrícula sobre el PDF para ver las posiciones.
+    /// </summary>
+    private void DibujarCuadriculaEnPDF(string rutaPDF)
+    {
+        PdfReader reader = new PdfReader(rutaPDF);
+        string rutaSalida = rutaPDF.Replace(".pdf", "_cuadricula.pdf");
+        PdfStamper stamper = new PdfStamper(reader, new FileStream(rutaSalida, FileMode.Create));
+
+        int totalPaginas = reader.NumberOfPages;
+        PdfContentByte canvas = stamper.GetOverContent(totalPaginas);
+        BaseFont bf = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, false);
+
+        // Dibujar cuadrícula cada 50 puntos
+        for (int x = 0; x < 612; x += 50)
+        {
+            canvas.MoveTo(x, 0);
+            canvas.LineTo(x, 792);
+            canvas.Stroke();
+
+            canvas.BeginText();
+            canvas.SetFontAndSize(bf, 8);
+            canvas.ShowTextAligned(PdfContentByte.ALIGN_CENTER, x.ToString(), x, 5, 0);
+            canvas.EndText();
+        }
+
+        for (int y = 0; y < 792; y += 50)
+        {
+            canvas.MoveTo(0, y);
+            canvas.LineTo(612, y);
+            canvas.Stroke();
+
+            canvas.BeginText();
+            canvas.SetFontAndSize(bf, 8);
+            canvas.ShowTextAligned(PdfContentByte.ALIGN_CENTER, y.ToString(), 5, y, 0);
+            canvas.EndText();
+        }
+
+        stamper.Close();
+        reader.Close();
+
+        Process.Start(new ProcessStartInfo(rutaSalida) { UseShellExecute = true });
+    }
+    private void btnGuardar_Click(object sender, EventArgs e)
+        {
+
+            if (String.IsNullOrWhiteSpace(txtValor.Text) || String.IsNullOrEmpty(txtValor.Text) || Convert.ToInt32(txtValor.Text) == 0) 
+            {
+                Toast.Mostrar("No asigno un descuento para esta solicitud....", TipoAlerta.Warning);
+            }
+           
+
             DialogResult resultado = ToastDialog.Mostrar("Desea solicitar la aprobacion para otorgar el descuento a este cliente?", TipoAlerta.Info);
 
             string _DesAprobacion = (_TipoCosto == 2) ? "DescuentoNegociacionEspecial" : "DescuentoPrecios";
@@ -1366,7 +2324,11 @@ namespace ModuloVentasAdmin
                 };
                 DataTable dtSendDescuento = logica.SP_CotizacionDescuento(sendDescuento);
                 if (dtSendDescuento.Rows.Count > 0 && dtSendDescuento.Rows[0]["Estado"].ToString() == "1") {
-
+                    
+                    _estaGuardando = true;
+                    _IDGenerado = dtSendDescuento.Rows[0]["UltimoDescuentoID"].ToString(); 
+                    ExportarTarifarioPDF();
+                    //ExportarTarifarioPDFirma();
                     Toast.Mostrar("Solicitud procesada correctamente.", TipoAlerta.Success);
                     Limpiar();
                 }
@@ -1451,6 +2413,8 @@ namespace ModuloVentasAdmin
         {
             //Limpiamos todos los datagirdviews
             dgvTarifario.DataSource = null;
+            dgvTarifario.Rows.Clear();
+            dgvTarifario.Columns.Clear();
             dgvTarifarioDetalle.DataSource = null;
             dgvAledanosDetalle.DataSource = null;
 
@@ -1478,7 +2442,7 @@ namespace ModuloVentasAdmin
             label4.Text = "-";
             label4.Visible = false;
             _EncabezadoID = 0;
-
+            button3.Enabled = false;
         }
         private void validarAledanos()
         {

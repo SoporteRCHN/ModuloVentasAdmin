@@ -675,6 +675,9 @@ namespace LogicaVentasAdmin
         public DateTime? FPosteo { get; set; }            // Fecha de posteo
         public string PC { get; set; }                    // PC desde donde se posteó
         public bool? Estado { get; set; }                 // Activo/Inactivo
+        public DateTime? FechaDesde { get; set; }
+        public DateTime? FechaHasta { get; set; }
+        public string Nombre { get; set; }
     }
     public class EmpleadosAutorizacion
     {

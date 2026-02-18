@@ -1813,6 +1813,10 @@ namespace DatosVentasAdmin
             comando.Parameters.AddWithValue("@FPosteo", a.FPosteo ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@PC", a.PC ?? (object)DBNull.Value);
             comando.Parameters.AddWithValue("@Estado", a.Estado ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@FechaDesde", a.FechaDesde ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@FechaHasta", a.FechaHasta ?? (object)DBNull.Value);
+            comando.Parameters.AddWithValue("@Nombre", a.Nombre ?? (object)DBNull.Value);
+
 
             // 🔹 Nombre del procedimiento
             comando.CommandText = "RCCONFIG.Empresa.SP_CotizacionDescuento";

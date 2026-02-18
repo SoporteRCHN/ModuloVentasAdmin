@@ -12,8 +12,8 @@ namespace DatosVentasAdmin
 
     public class BD_Conexion
     {
-        public static string servidor = "192.168.1.179";
-        public static string servidorENAC = "192.168.1.52";
+        public static string servidor = "192.168.1.180";
+        public static string servidorENAC = "192.168.1.103";
         public static string servidorINTER = "192.168.1.50";
         private static string cadena = "";
         private static string cadena1 = "Data Source = 190.4.7.154; Initial Catalog=RCRH;User ID=sarh; Password=Mkc7wAq\\k$8%ia4.rTgk";
